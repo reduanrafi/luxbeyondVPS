@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  
+  /* Brand Palette (Extracted from Banner) */
+  --color-primary: #2e004f; /* Deep Violet - Main Brand Color/Text */
+  --color-primary-hover: #4a148c; /* Lighter Violet */
+  --color-secondary: #d6006e; /* Vibrant Pink - Accents/Gradients */
+  --color-accent: #ff007f; /* Hot Pink - CTAs */
+  
+  --color-surface: #ffffff;
+  --color-background: #fdf2f8; /* Very light pink tint */
+  --color-text-main: #2e004f; /* Deep Violet for headings */
+  --color-text-muted: #64748b; /* Slate 500 for body */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    @apply bg-background text-slate-800 antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight text-primary;
+}
