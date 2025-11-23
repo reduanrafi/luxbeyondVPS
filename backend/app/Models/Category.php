@@ -21,6 +21,19 @@ class Category extends Model
         'is_active' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+        return asset('storage/' . $this->image);
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class, 'category', 'name');

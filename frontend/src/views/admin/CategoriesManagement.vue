@@ -46,7 +46,7 @@
             <div v-for="category in categories" :key="category.id"
                 class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 <div class="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                    <img v-if="category.image" :src="category.image" :alt="category.name"
+                    <img v-if="category.image_url" :src="category.image_url" :alt="category.name"
                         class="h-full w-full object-cover">
                     <Tag v-else class="w-12 h-12 text-primary/40" />
                 </div>
@@ -110,17 +110,31 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Name *</label>
                         <input type="text" v-model="form.name" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            :class="{ 'border-red-500': errors.name }">
+                        <p v-if="errors.name" class="text-xs text-red-500 mt-1">{{ errors.name[0] }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
                         <textarea v-model="form.description" rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            :class="{ 'border-red-500': errors.description }"></textarea>
+                        <p v-if="errors.description" class="text-xs text-red-500 mt-1">{{ errors.description[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Image URL</label>
-                        <input type="text" v-model="form.image"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Image</label>
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-1">
+                                <input type="file" @change="handleImageUpload" accept="image/*"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                    :class="{ 'border-red-500': errors.image }">
+                                <p v-if="errors.image" class="text-xs text-red-500 mt-1">{{ errors.image[0] }}</p>
+                            </div>
+                            <div v-if="imagePreview"
+                                class="w-16 h-16 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0">
+                                <img :src="imagePreview" class="w-full h-full object-cover">
+                            </div>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" v-model="form.is_active" id="is_active" class="w-4 h-4 text-primary">
@@ -167,9 +181,10 @@ const pagination = ref({
 const form = ref({
     name: '',
     description: '',
-    image: '',
     is_active: true
 });
+const imageFile = ref(null);
+const imagePreview = ref(null);
 
 const visiblePages = computed(() => {
     const pages = [];
@@ -228,14 +243,39 @@ const changePage = (page) => {
     }
 };
 
+const errors = ref({});
+
+const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        imageFile.value = file;
+        imagePreview.value = URL.createObjectURL(file);
+    }
+};
+
 const createCategory = async () => {
+    errors.value = {};
+    const formData = new FormData();
+    formData.append('name', form.value.name);
+    formData.append('description', form.value.description || '');
+    formData.append('is_active', form.value.is_active ? 1 : 0);
+    if (imageFile.value) {
+        formData.append('image', imageFile.value);
+    }
+
     try {
-        await axios.post('/categories', form.value);
+        await axios.post('/categories', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         closeModal();
         fetchCategories(pagination.value.current_page);
     } catch (error) {
-        console.error('Error creating category:', error);
-        alert('Failed to create category');
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        } else {
+            console.error('Error creating category:', error);
+            alert('Failed to create category');
+        }
     }
 };
 
@@ -244,20 +284,38 @@ const editCategory = (category) => {
     form.value = {
         name: category.name,
         description: category.description || '',
-        image: category.image || '',
         is_active: category.is_active
     };
+    imagePreview.value = category.image_url || category.image;
+    imageFile.value = null;
+    errors.value = {};
     showEditModal.value = true;
 };
 
 const updateCategory = async () => {
+    errors.value = {};
+    const formData = new FormData();
+    formData.append('_method', 'PUT');
+    formData.append('name', form.value.name);
+    formData.append('description', form.value.description || '');
+    formData.append('is_active', form.value.is_active ? 1 : 0);
+    if (imageFile.value) {
+        formData.append('image', imageFile.value);
+    }
+
     try {
-        await axios.put(`/categories/${editingId.value}`, form.value);
+        await axios.post(`/categories/${editingId.value}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         closeModal();
         fetchCategories(pagination.value.current_page);
     } catch (error) {
-        console.error('Error updating category:', error);
-        alert('Failed to update category');
+        if (error.response && error.response.status === 422) {
+            errors.value = error.response.data.errors;
+        } else {
+            console.error('Error updating category:', error);
+            alert('Failed to update category');
+        }
     }
 };
 
@@ -284,9 +342,11 @@ const closeModal = () => {
     form.value = {
         name: '',
         description: '',
-        image: '',
         is_active: true
     };
+    imageFile.value = null;
+    imagePreview.value = null;
+    errors.value = {};
 };
 
 onMounted(() => {

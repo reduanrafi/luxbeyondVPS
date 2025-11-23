@@ -45,6 +45,11 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // Decode variants if sent as JSON string
+        if ($request->has('variants') && is_string($request->variants)) {
+            $request->merge(['variants' => json_decode($request->variants, true)]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sku' => 'required|string|unique:products,sku',
@@ -52,7 +57,7 @@ class ProductController extends Controller
             'brand' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|string',
+            'image' => 'nullable',
             'description' => 'nullable|string',
             'short_description' => 'nullable|string',
             'meta_title' => 'nullable|string',
@@ -61,6 +66,10 @@ class ProductController extends Controller
             'variants' => 'nullable|array',
             'gallery' => 'nullable|array',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('products/images', 'public');
+        }
 
         $product = Product::create($validated);
 
@@ -72,11 +81,13 @@ class ProductController extends Controller
         }
 
         // Handle Gallery
-        if (!empty($request->gallery)) {
-            foreach ($request->gallery as $index => $item) {
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $index => $file) {
+                $path = $file->store('products/gallery', 'public');
+                $type = str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image';
                 $product->images()->create([
-                    'path' => $item['path'],
-                    'type' => $item['type'] ?? 'image',
+                    'path' => $path,
+                    'type' => $type,
                     'sort_order' => $index,
                 ]);
             }
@@ -98,6 +109,15 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
+        // Decode variants if sent as JSON string
+        if ($request->has('variants') && is_string($request->variants)) {
+            $request->merge(['variants' => json_decode($request->variants, true)]);
+        }
+        // Decode existing_gallery_ids if sent as JSON string
+        if ($request->has('existing_gallery_ids') && is_string($request->existing_gallery_ids)) {
+            $request->merge(['existing_gallery_ids' => json_decode($request->existing_gallery_ids, true)]);
+        }
+
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'sku' => 'sometimes|string|unique:products,sku,' . $id,
@@ -105,7 +125,7 @@ class ProductController extends Controller
             'brand' => 'nullable|string',
             'price' => 'sometimes|numeric|min:0',
             'stock' => 'sometimes|integer|min:0',
-            'image' => 'nullable|string',
+            'image' => 'nullable',
             'description' => 'nullable|string',
             'short_description' => 'nullable|string',
             'meta_title' => 'nullable|string',
@@ -113,7 +133,16 @@ class ProductController extends Controller
             'has_variants' => 'boolean',
             'variants' => 'nullable|array',
             'gallery' => 'nullable|array',
+            'existing_gallery_ids' => 'nullable|array',
         ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('products/images', 'public');
+        }
 
         $product->update($validated);
 
@@ -130,15 +159,34 @@ class ProductController extends Controller
         }
 
         // Update Gallery
-        if (isset($request->gallery)) {
-            // Remove existing images
-            $product->images()->delete();
-            
-            foreach ($request->gallery as $index => $item) {
+        // 1. Handle existing images deletion
+        if ($request->has('existing_gallery_ids')) {
+            $existingIds = $request->input('existing_gallery_ids', []);
+            $imagesToDelete = $product->images()->whereNotIn('id', $existingIds)->get();
+            foreach ($imagesToDelete as $img) {
+                if (Storage::disk('public')->exists($img->path)) {
+                    Storage::disk('public')->delete($img->path);
+                }
+                $img->delete();
+            }
+        } elseif ($request->hasFile('gallery')) {
+            // If new gallery files are uploaded but no existing_gallery_ids sent, 
+            // and we are not explicitly saying "keep nothing", 
+            // it's ambiguous. But usually if I upload new files I might want to keep old ones.
+            // However, if I want to clear gallery, I should send empty existing_gallery_ids.
+            // Let's assume if existing_gallery_ids is NOT present, we keep all existing images.
+        }
+
+        // 2. Handle new images
+        if ($request->hasFile('gallery')) {
+            $currentMaxSortOrder = $product->images()->max('sort_order') ?? -1;
+            foreach ($request->file('gallery') as $index => $file) {
+                $path = $file->store('products/gallery', 'public');
+                $type = str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image';
                 $product->images()->create([
-                    'path' => $item['path'],
-                    'type' => $item['type'] ?? 'image',
-                    'sort_order' => $index,
+                    'path' => $path,
+                    'type' => $type,
+                    'sort_order' => $currentMaxSortOrder + 1 + $index,
                 ]);
             }
         }

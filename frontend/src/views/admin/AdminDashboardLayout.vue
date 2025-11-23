@@ -45,6 +45,10 @@
 
                 <!-- Logout -->
                 <div class="p-4 border-t border-gray-100">
+                    <router-link to="/"
+                        class="text-black flex items-center gap-3 px-3 py-2.5 text-sm font-medium hover:underline">
+                        <Earth class="w-5 h-5" />Goto Website
+                    </router-link>
                     <button @click="handleLogout"
                         class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg w-full transition-colors">
                         <LogOut class="w-5 h-5" />
@@ -134,7 +138,9 @@ import {
     Tag,
     HelpCircle,
     ChevronLeft,
-    Component
+    Component,
+    Earth,
+    Ticket
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
@@ -163,7 +169,7 @@ const navigationGroups = [
         items: [
             { name: 'Categories', href: '/admin/categories', icon: Tag },
             { name: 'Products', href: '/admin/products', icon: Package },
-            { name: 'Coupons', href: '/admin/coupons', icon: Component },
+            { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
         ]
     },
     {

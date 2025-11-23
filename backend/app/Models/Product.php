@@ -35,6 +35,19 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+            return $this->image;
+        }
+        return asset('storage/' . $this->image);
+    }
+
     public function images()
     {
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');

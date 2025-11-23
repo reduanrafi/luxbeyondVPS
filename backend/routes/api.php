@@ -37,5 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Categories
         Route::apiResource('categories', \App\Http\Controllers\CategoryController::class);
+        
+        // Coupons
+        Route::apiResource('coupons', \App\Http\Controllers\CouponController::class);
+        Route::post('/coupons/apply', [\App\Http\Controllers\CouponController::class, 'apply']);
     });
 });

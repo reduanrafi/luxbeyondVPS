@@ -152,13 +152,18 @@
                 <!-- Gallery Tab -->
                 <div v-show="currentTab === 'gallery'" class="space-y-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Main Image URL</label>
-                        <div class="flex gap-4">
-                            <input type="text" v-model="form.image" placeholder="https://..."
-                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Main Image</label>
+                        <div class="flex gap-4 items-start">
+                            <div class="flex-1">
+                                <input type="file" @change="handleMainImageUpload" accept="image/*"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                            </div>
                             <div
-                                class="w-16 h-10 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0">
-                                <img v-if="form.image" :src="form.image" class="w-full h-full object-cover">
+                                class="w-24 h-24 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                <img v-if="mainImagePreview" :src="mainImagePreview" class="w-full h-full object-cover">
+                                <img v-else-if="form.image_url" :src="form.image_url"
+                                    class="w-full h-full object-cover">
+                                <Image v-else class="w-8 h-8 text-gray-400" />
                             </div>
                         </div>
                     </div>
@@ -176,20 +181,31 @@
                             <div v-for="(item, index) in form.gallery" :key="index"
                                 class="flex gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 items-start">
                                 <div class="flex-1 space-y-2">
-                                    <input type="text" v-model="item.path" placeholder="URL"
-                                        class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm">
-                                    <select v-model="item.type"
-                                        class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm bg-white">
-                                        <option value="image">Image</option>
-                                        <option value="video">Video</option>
-                                    </select>
-                                </div>
-                                <div
-                                    class="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
-                                    <img v-if="item.type === 'image' && item.path" :src="item.path"
-                                        class="w-full h-full object-cover">
-                                    <Video v-else-if="item.type === 'video'" class="w-6 h-6 text-gray-400" />
-                                    <Image v-else class="w-6 h-6 text-gray-400" />
+                                    <!-- Existing Item -->
+                                    <div v-if="item.id" class="flex items-center gap-3">
+                                        <div
+                                            class="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                            <img v-if="item.type === 'image'" :src="item.url"
+                                                class="w-full h-full object-cover">
+                                            <video v-else :src="item.url" class="w-full h-full object-cover"></video>
+                                        </div>
+                                        <div class="text-sm text-slate-600">
+                                            <p class="font-medium">Existing {{ item.type }}</p>
+                                        </div>
+                                    </div>
+                                    <!-- New Item -->
+                                    <div v-else>
+                                        <input type="file" @change="e => handleGalleryFileUpload(e, index)"
+                                            accept="image/*,video/*"
+                                            class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm">
+                                        <div v-if="item.preview"
+                                            class="mt-2 w-16 h-16 bg-gray-200 rounded overflow-hidden flex items-center justify-center">
+                                            <img v-if="item.type === 'image'" :src="item.preview"
+                                                class="w-full h-full object-cover">
+                                            <video v-else :src="item.preview"
+                                                class="w-full h-full object-cover"></video>
+                                        </div>
+                                    </div>
                                 </div>
                                 <button @click="removeGalleryItem(index)" class="text-gray-400 hover:text-red-500">
                                     <X class="w-4 h-4" />
@@ -251,12 +267,16 @@ const form = ref({
     price: 0,
     stock: 0,
     image: '',
+    image_url: '',
     has_variants: false,
     variants: [],
     gallery: [],
     meta_title: '',
     meta_description: ''
 });
+
+const mainImageFile = ref(null);
+const mainImagePreview = ref(null);
 
 const fetchCategories = async () => {
     try {
@@ -293,6 +313,14 @@ const fetchProduct = async () => {
     }
 };
 
+const handleMainImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        mainImageFile.value = file;
+        mainImagePreview.value = URL.createObjectURL(file);
+    }
+};
+
 const addVariant = () => {
     form.value.variants.push({
         attributes_json: '',
@@ -308,9 +336,19 @@ const removeVariant = (index) => {
 
 const addGalleryItem = () => {
     form.value.gallery.push({
-        path: '',
+        file: null,
+        preview: null,
         type: 'image'
     });
+};
+
+const handleGalleryFileUpload = (event, index) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.value.gallery[index].file = file;
+        form.value.gallery[index].preview = URL.createObjectURL(file);
+        form.value.gallery[index].type = file.type.startsWith('video') ? 'video' : 'image';
+    }
 };
 
 const removeGalleryItem = (index) => {
@@ -333,16 +371,44 @@ const saveProduct = async () => {
             }
         });
 
-        const payload = {
-            ...form.value,
-            variants: variantsData
-        };
+        const formData = new FormData();
+        formData.append('name', form.value.name);
+        formData.append('sku', form.value.sku);
+        formData.append('category', form.value.category);
+        formData.append('brand', form.value.brand || '');
+        formData.append('price', form.value.price);
+        formData.append('stock', form.value.stock);
+        formData.append('description', form.value.description || '');
+        formData.append('short_description', form.value.short_description || '');
+        formData.append('meta_title', form.value.meta_title || '');
+        formData.append('meta_description', form.value.meta_description || '');
+        formData.append('has_variants', form.value.has_variants ? 1 : 0);
+        formData.append('variants', JSON.stringify(variantsData));
+
+        if (mainImageFile.value) {
+            formData.append('image', mainImageFile.value);
+        }
+
+        // Handle Gallery
+        const existingIds = form.value.gallery.filter(item => item.id).map(item => item.id);
+        formData.append('existing_gallery_ids', JSON.stringify(existingIds));
+
+        form.value.gallery.forEach(item => {
+            if (item.file) {
+                formData.append('gallery[]', item.file);
+            }
+        });
 
         if (isEditing.value) {
-            await axios.put(`/products/${route.params.id}`, payload);
+            formData.append('_method', 'PUT');
+            await axios.post(`/products/${route.params.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             alert('Product updated successfully');
         } else {
-            await axios.post('/products', payload);
+            await axios.post('/products', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             alert('Product created successfully');
         }
         router.push('/admin/products');

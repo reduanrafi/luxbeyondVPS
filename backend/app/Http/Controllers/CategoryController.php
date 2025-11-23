@@ -6,6 +6,8 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+use Illuminate\Support\Facades\Storage;
+
 class CategoryController extends Controller
 {
     public function index(Request $request)
@@ -19,7 +21,7 @@ class CategoryController extends Controller
         }
 
         // Filter by status
-        if ($request->has('status')) {
+        if ($request->has('status') && $request->status !== null && $request->status !== '') {
             $isActive = $request->status === 'active' ? 1 : 0;
             $query->where('is_active', $isActive);
         }
@@ -40,11 +42,15 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable',
             'is_active' => 'boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('categories', 'public');
+        }
 
         $category = Category::create($validated);
 
@@ -67,12 +73,20 @@ class CategoryController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255|unique:categories,name,' . $id,
             'description' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable',
             'is_active' => 'boolean',
         ]);
 
         if (isset($validated['name'])) {
             $validated['slug'] = Str::slug($validated['name']);
+        }
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($category->image && Storage::disk('public')->exists($category->image)) {
+                Storage::disk('public')->delete($category->image);
+            }
+            $validated['image'] = $request->file('image')->store('categories', 'public');
         }
 
         $category->update($validated);
