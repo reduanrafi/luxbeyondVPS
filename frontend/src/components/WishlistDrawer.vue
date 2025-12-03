@@ -1,12 +1,22 @@
 <template>
     <Teleport to="body">
-        <div v-if="isOpen" class="fixed inset-0 z-[60] overflow-hidden" aria-labelledby="slide-over-title" role="dialog"
-            aria-modal="true">
-            <div class="absolute inset-0 bg-gray-500/75 backdrop-blur-sm transition-opacity" @click="$emit('close')">
-            </div>
-            <div class="fixed inset-y-0 right-0 max-w-full flex pointer-events-none">
-                <div
-                    class="w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700 bg-white shadow-2xl flex flex-col pointer-events-auto">
+        <div class="fixed inset-0 z-[60] flex justify-end pointer-events-none">
+            <!-- Backdrop -->
+            <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
+                leave-from-class="opacity-100" leave-to-class="opacity-0">
+                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 backdrop-blur-sm pointer-events-auto"
+                    @click="$emit('close')">
+                </div>
+            </Transition>
+
+            <!-- Panel -->
+            <Transition enter-active-class="transform transition ease-in-out duration-500 sm:duration-700"
+                enter-from-class="translate-x-full" enter-to-class="translate-x-0"
+                leave-active-class="transform transition ease-in-out duration-500 sm:duration-700"
+                leave-from-class="translate-x-0" leave-to-class="translate-x-full">
+                <div v-if="isOpen"
+                    class="w-screen max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
                     <div class="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
                         <div class="flex items-start justify-between">
                             <h2 class="text-lg font-bold text-primary" id="slide-over-title">My Wishlist</h2>
@@ -28,14 +38,14 @@
                                     <li v-for="item in wishlistStore.items" :key="item.id" class="py-6 flex">
                                         <div
                                             class="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
-                                            <img :src="item.image" :alt="item.name"
+                                            <img :src="item.image_url" :alt="item.name"
                                                 class="w-full h-full object-center object-cover">
                                         </div>
                                         <div class="ml-4 flex-1 flex flex-col">
                                             <div>
                                                 <div class="flex justify-between text-base font-medium text-slate-900">
                                                     <h3><router-link :to="`/product/${item.id}`">{{ item.name
-                                                            }}</router-link></h3>
+                                                    }}</router-link></h3>
                                                     <p class="ml-4 text-primary font-bold">৳{{ item.price }}</p>
                                                 </div>
                                             </div>
@@ -53,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </Transition>
         </div>
     </Teleport>
 </template>

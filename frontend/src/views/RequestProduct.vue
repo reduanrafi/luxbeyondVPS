@@ -1,196 +1,439 @@
 <template>
-    <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-15">
-        <div class="max-w-6xl mx-auto">
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
             <!-- Header -->
-            <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold text-slate-900 mb-3">Request Any Product</h1>
-                <p class="text-lg text-slate-600">From anywhere in the world, delivered to your doorstep</p>
-            </div>
-
-            <!-- How It Works Section -->
-            <div class="mb-12">
-                <h2 class="text-2xl font-bold text-slate-900 text-center mb-8">How It Works</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="text-center">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <Link class="w-8 h-8 text-white" />
-                        </div>
-                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
-                            <h3 class="font-bold text-slate-900 mb-2">1. Paste Link</h3>
-                            <p class="text-sm text-slate-600">Share the product URL from any online store</p>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <Search class="w-8 h-8 text-white" />
-                        </div>
-                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
-                            <h3 class="font-bold text-slate-900 mb-2">2. We Source</h3>
-                            <p class="text-sm text-slate-600">We verify and calculate total cost</p>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <CheckCircle class="w-8 h-8 text-white" />
-                        </div>
-                        <div class="bg-green-50 rounded-xl p-4 border border-green-100">
-                            <h3 class="font-bold text-slate-900 mb-2">3. You Approve</h3>
-                            <p class="text-sm text-slate-600">Review quote and make payment</p>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <div
-                            class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                            <Truck class="w-8 h-8 text-white" />
-                        </div>
-                        <div class="bg-orange-50 rounded-xl p-4 border border-orange-100">
-                            <h3 class="font-bold text-slate-900 mb-2">4. We Deliver</h3>
-                            <p class="text-sm text-slate-600">Product arrives at your doorstep</p>
-                        </div>
-                    </div>
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+                    <Link class="w-8 h-8 text-primary" />
                 </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Request Any Product</h1>
+                <p class="text-base text-slate-600 max-w-2xl mx-auto">
+                    From anywhere in the world, delivered to your doorstep. Fill out the form below to get started.
+                </p>
             </div>
 
             <!-- Main Form Card -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 mb-8">
-                <h2 class="text-2xl font-bold text-slate-900 mb-6">Request Details</h2>
-                <form @submit.prevent="submitRequest" class="space-y-6">
-                    <!-- Product URL -->
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">
-                            Product URL <span class="text-red-500">*</span>
-                        </label>
-                        <input v-model="form.url" type="url" required placeholder="https://amazon.com/product-link"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
-                        <p class="mt-1.5 text-xs text-slate-500">Example: Amazon, eBay, AliExpress, or any online store
-                        </p>
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6">
+                <!-- Form Header -->
+                <div class="bg-gradient-to-r from-primary to-primary/90 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white">Product Request Form</h2>
+                    <p class="text-white/90 text-xs mt-1">Please provide accurate information for faster processing</p>
+                </div>
+
+                <form @submit.prevent="submitRequest" class="p-6">
+                    <!-- Step 1: Product Information -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flex items-center justify-center w-8 h-8 bg-primary/10 text-primary rounded-full font-bold text-sm">
+                                1
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Product Information</h3>
+                        </div>
+
+                        <div class="space-y-4 pl-12">
+                            <!-- Product URL -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Product URL <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <Link class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <input 
+                                        v-model="form.url" 
+                                        type="url" 
+                                        required 
+                                        placeholder="https://amazon.com/product-link"
+                                        class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    />
+                                </div>
+                                <p class="mt-2 text-xs text-slate-500 flex items-center gap-1">
+                                    <Globe class="w-3 h-3" />
+                                    Supports Amazon, eBay, AliExpress, and most online stores
+                                </p>
+                            </div>
+
+                            <!-- Price & Currency -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                        Product Price <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                            {{ selectedCurrency?.symbol || '$' }}
+                                        </span>
+                                        <input 
+                                            v-model.number="form.price" 
+                                            type="number" 
+                                            step="0.01" 
+                                            min="0"
+                                            required 
+                                            placeholder="0.00"
+                                            @input="calculateEstimate"
+                                            class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                        Currency <span class="text-red-500">*</span>
+                                    </label>
+                                    <select 
+                                        v-model="form.currency"
+                                        @change="onCurrencyChange"
+                                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white"
+                                    >
+                                        <option value="">Select Currency</option>
+                                        <option v-for="currency in currencies" :key="currency.id" :value="currency.code">
+                                            {{ currency.code }} - {{ currency.name }} ({{ currency.symbol }})
+                                        </option>
+                                    </select>
+                                    <p v-if="selectedCurrency && !selectedCurrency.is_base" class="mt-1 text-xs text-slate-500">
+                                        Rate: 1 {{ selectedCurrency.code }} = {{ selectedCurrency.rate_to_base }} BDT
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Quantity & Weight -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                        Quantity <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input 
+                                            v-model.number="form.quantity" 
+                                            type="number" 
+                                            min="1" 
+                                            required 
+                                            placeholder="1"
+                                            @input="calculateEstimate"
+                                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                        Weight (kg) <span class="text-xs font-normal text-slate-500">Optional</span>
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">kg</span>
+                                        <input 
+                                            v-model.number="form.weight" 
+                                            type="number" 
+                                            step="0.01" 
+                                            min="0"
+                                            placeholder="0.00"
+                                            @input="calculateEstimate"
+                                            class="w-full px-4 pr-12 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        />
+                                    </div>
+                                    <p class="mt-1 text-xs text-slate-500">Required for accurate shipping calculation</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Price & Currency -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Price <span
-                                    class="text-red-500">*</span></label>
-                            <input v-model="form.price" type="number" step="0.01" required placeholder="99.99"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-6"></div>
+
+                    <!-- Step 2: Shipping & Delivery -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flex items-center justify-center w-8 h-8 bg-primary/10 text-primary rounded-full font-bold text-sm">
+                                2
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Shipping & Delivery</h3>
                         </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Currency <span
-                                    class="text-red-500">*</span></label>
-                            <select v-model="form.currency"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white">
-                                <option value="USD">USD - US Dollar</option>
-                                <option value="CNY">CNY - Chinese Yuan</option>
-                                <option value="BDT">BDT - Bangladeshi Taka</option>
-                            </select>
+
+                        <div class="space-y-4 pl-12">
+                            <!-- Shipping Cost -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Declared Shipping Cost <span class="text-xs font-normal text-slate-500">(Optional)</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                                        {{ selectedCurrency?.symbol || '$' }}
+                                    </span>
+                                    <input 
+                                        v-model.number="form.declared_shipping_cost" 
+                                        type="number" 
+                                        step="0.01" 
+                                        min="0"
+                                        placeholder="0.00"
+                                        @input="calculateEstimate"
+                                        class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                    />
+                                </div>
+                                <p class="mt-2 text-xs text-slate-500">
+                                    If the seller has provided shipping cost information
+                                </p>
+                            </div>
+
+                            <!-- Delivery Location -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-3">
+                                    Delivery Location <span class="text-red-500">*</span>
+                                </label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <button
+                                        type="button"
+                                        @click="form.is_inside_city = true"
+                                        :class="form.is_inside_city 
+                                            ? 'border-2 border-primary bg-primary/5' 
+                                            : 'border-2 border-gray-200 hover:border-gray-300'"
+                                        class="p-4 rounded-lg transition-all text-left group"
+                                    >
+                                        <div class="flex items-center gap-3">
+                                            <div :class="form.is_inside_city 
+                                                ? 'bg-primary text-white' 
+                                                : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'"
+                                                class="w-5 h-5 rounded-full flex items-center justify-center transition-all">
+                                                <CheckCircle v-if="form.is_inside_city" class="w-3 h-3" />
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-slate-900">Inside City</div>
+                                                <div class="text-xs text-slate-500 mt-0.5">Dhaka city limits</div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="form.is_inside_city = false"
+                                        :class="!form.is_inside_city 
+                                            ? 'border-2 border-primary bg-primary/5' 
+                                            : 'border-2 border-gray-200 hover:border-gray-300'"
+                                        class="p-4 rounded-lg transition-all text-left group"
+                                    >
+                                        <div class="flex items-center gap-3">
+                                            <div :class="!form.is_inside_city 
+                                                ? 'bg-primary text-white' 
+                                                : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'"
+                                                class="w-5 h-5 rounded-full flex items-center justify-center transition-all">
+                                                <CheckCircle v-if="!form.is_inside_city" class="w-3 h-3" />
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold text-slate-900">Outside City</div>
+                                                <div class="text-xs text-slate-500 mt-0.5">Outside Dhaka</div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Payment Method -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">
+                                    Preferred Payment Method <span class="text-xs font-normal text-slate-500">(Optional)</span>
+                                </label>
+                                <select 
+                                    v-model="form.payment_method"
+                                    @change="calculateEstimate"
+                                    class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white"
+                                >
+                                    <option value="">Select Payment Method</option>
+                                    <option v-for="method in paymentMethods" :key="method.id" :value="method.type">
+                                        {{ method.name }} {{ method.sub_type ? `(${method.sub_type})` : '' }}
+                                    </option>
+                                </select>
+                                <p class="mt-2 text-xs text-slate-500">
+                                    Delivery charges may vary based on payment method
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Quantity & Weight -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Quantity <span
-                                    class="text-red-500">*</span></label>
-                            <input v-model="form.quantity" type="number" min="1" required placeholder="1"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">
-                                Weight <span class="text-xs font-normal text-slate-500">(kg, Optional)</span>
-                            </label>
-                            <input v-model="form.weight" type="number" step="0.01" placeholder="0.5"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
-                        </div>
-                    </div>
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-6"></div>
 
-                    <!-- Shipping Cost -->
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-2">
-                            Shipping Cost <span class="text-xs font-normal text-slate-500">(Optional)</span>
-                        </label>
-                        <input v-model="form.declared_shipping_cost" type="number" step="0.01" placeholder="0.00"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
-                        <p class="mt-1.5 text-xs text-slate-500">If you know the shipping cost from the seller</p>
-                    </div>
-
-                    <!-- Inside City Delivery -->
-                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <input v-model="form.is_inside_city" type="checkbox"
-                            class="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary/20 border-gray-300">
-                        <div>
-                            <span class="text-sm font-semibold text-slate-900">Inside City Delivery</span>
-                            <p class="text-xs text-slate-600">Delivery within Dhaka city limits</p>
+                    <!-- Step 3: Cost Summary -->
+                    <div class="mb-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flex items-center justify-center w-8 h-8 bg-primary/10 text-primary rounded-full font-bold text-sm">
+                                3
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Cost Summary</h3>
                         </div>
-                    </div>
 
-                    <!-- Estimated Total -->
-                    <div v-if="estimatedTotal" class="p-5 bg-green-50 rounded-lg border border-green-200">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-semibold text-green-900">Estimated Total</span>
-                            <span class="text-2xl font-bold text-green-700">৳{{ estimatedTotal }}</span>
+                        <div class="pl-12">
+                            <div v-if="calculationLoading" class="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                                <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary mb-2"></div>
+                                <p class="text-sm text-gray-600">Calculating charges...</p>
+                            </div>
+                            <div v-else-if="costBreakdown" class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-4">
+                                <div class="space-y-3 mb-4">
+                                    <!-- Product Cost -->
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="text-gray-600">Product Cost:</span>
+                                        <div class="text-right">
+                                            <div class="font-medium">{{ selectedCurrency?.symbol || '$' }}{{ (form.price * form.quantity).toFixed(2) }}</div>
+                                            <div v-if="selectedCurrency && !selectedCurrency.is_base" class="text-xs text-gray-500 mt-0.5">
+                                                = ৳{{ costBreakdown.product_total.toFixed(2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Declared Shipping -->
+                                    <div v-if="form.declared_shipping_cost > 0" class="flex justify-between items-center text-sm">
+                                        <span class="text-gray-600">Declared Shipping:</span>
+                                        <div class="text-right">
+                                            <div class="font-medium">{{ selectedCurrency?.symbol || '$' }}{{ form.declared_shipping_cost.toFixed(2) }}</div>
+                                            <div v-if="selectedCurrency && !selectedCurrency.is_base && costBreakdown.declared_shipping" class="text-xs text-gray-500 mt-0.5">
+                                                = ৳{{ costBreakdown.declared_shipping.toFixed(2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Delivery Charge -->
+                                    <div v-if="costBreakdown.delivery_charge > 0" class="flex justify-between items-center text-sm mt-3 pt-3 border-t border-green-200">
+                                        <div>
+                                            <span class="text-gray-600 font-medium">Delivery Charge:</span>
+                                            <p class="text-xs text-gray-500 mt-0.5">
+                                                {{ form.is_inside_city ? 'Inside City' : 'Outside City' }}
+                                            </p>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-medium">৳{{ costBreakdown.delivery_charge.toFixed(2) }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Processing Fee -->
+                                    <div v-if="costBreakdown.payment_processing_fee > 0" class="flex justify-between items-center text-sm mt-3 pt-3 border-t border-green-200">
+                                        <div>
+                                            <span class="text-gray-600 font-medium">Payment Processing Fee:</span>
+                                            <p class="text-xs text-gray-500 mt-0.5" v-if="form.payment_method">
+                                                {{ getPaymentMethodName(form.payment_method) }}
+                                            </p>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="font-medium">৳{{ costBreakdown.payment_processing_fee.toFixed(2) }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Additional Charges Breakdown -->
+                                    <div v-if="costBreakdown.breakdown && costBreakdown.breakdown.length > 0" class="mt-3 pt-3 border-t border-green-200">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-xs font-semibold text-green-800 uppercase tracking-wide">Additional Charges</span>
+                                            <span class="text-xs text-green-700 font-bold">Total: ৳{{ (costBreakdown.total_charges - (costBreakdown.delivery_charge || 0) - (costBreakdown.payment_processing_fee || 0)).toFixed(2) }}</span>
+                                        </div>
+                                        <div class="space-y-2.5">
+                                            <div 
+                                                v-for="(charge, index) in costBreakdown.breakdown" 
+                                                :key="index"
+                                                class="flex items-start justify-between text-xs bg-white/70 rounded-lg p-3 hover:bg-white transition-colors border border-green-100"
+                                            >
+                                                <div class="flex-1 min-w-0 pr-3">
+                                                    <div class="font-bold text-gray-900 truncate mb-1">{{ charge.charge }}</div>
+                                                    <div class="text-gray-500 capitalize text-[10px] mb-1">{{ charge.type }}</div>
+                                                    <div v-if="charge.calculation_type === 'percentage'" class="text-gray-400 text-[10px]">
+                                                        {{ charge.value }}% of base amount
+                                                    </div>
+                                                    <div v-else class="text-gray-400 text-[10px]">
+                                                        Fixed charge
+                                                    </div>
+                                                </div>
+                                                <div class="text-right shrink-0 border-l border-green-200 pl-3 min-w-[100px]">
+                                                    <div class="font-bold text-gray-900 mb-1">
+                                                        {{ charge.currency_symbol || charge.currency }} {{ parseFloat(charge.amount_in_currency || charge.amount || 0).toFixed(2) }}
+                                                    </div>
+                                                    <div v-if="charge.amount_in_bdt && charge.currency !== 'BDT'" class="text-[10px] text-gray-600 font-medium">
+                                                        = ৳{{ parseFloat(charge.amount_in_bdt).toFixed(2) }}
+                                                    </div>
+                                                    <div v-else-if="charge.currency === 'BDT'" class="text-[10px] text-gray-400">
+                                                        (Base currency)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else-if="costBreakdown.total_charges > 0" class="flex justify-between text-sm">
+                                        <span class="text-gray-600">Additional Charges:</span>
+                                        <span class="font-medium">৳{{ costBreakdown.total_charges.toFixed(2) }}</span>
+                                    </div>
+
+                                    <!-- Grand Total -->
+                                    <div class="border-t-2 border-green-300 pt-3 mt-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-lg font-bold text-green-900">Estimated Total:</span>
+                                            <span class="text-3xl font-bold text-green-700">৳{{ costBreakdown.grand_total.toFixed(2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-green-700/80 mt-3 flex items-center gap-1">
+                                    <Info class="w-3 h-3" />
+                                    Final amount may vary based on actual weight and exchange rates
+                                </p>
+                            </div>
+                            <div v-else class="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-500">
+                                Fill in product details to see cost estimate
+                            </div>
                         </div>
-                        <p class="text-xs text-green-700 mt-2">*Final amount may vary based on actual weight and
-                            exchange rates</p>
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" :disabled="requestStore.loading"
-                        class="w-full py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg">
-                        <span v-if="requestStore.loading" class="flex items-center justify-center gap-2">
-                            <span class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
-                            Submitting...
-                        </span>
-                        <span v-else>Submit Request</span>
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200">
+                        <button 
+                            type="submit" 
+                            :disabled="requestStore.loading || !isFormValid"
+                            class="flex-1 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                        >
+                            <span v-if="requestStore.loading" class="flex items-center gap-2">
+                                <span class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+                                Submitting Request...
+                            </span>
+                            <span v-else class="flex items-center gap-2">
+                                <CheckCircle class="w-5 h-5" />
+                                Submit Request
+                            </span>
+                        </button>
+                        <router-link 
+                            to="/dashboard/requests"
+                            class="px-6 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all text-center"
+                        >
+                            View My Requests
+                        </router-link>
+                    </div>
 
                     <!-- Error Message -->
-                    <div v-if="requestStore.error" class="p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <p class="text-red-700 text-sm">{{ requestStore.error }}</p>
+                    <div v-if="requestStore.error" class="mt-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <AlertCircle class="w-5 h-5 text-red-600" />
+                            <p class="text-red-700 text-sm font-medium">{{ requestStore.error }}</p>
+                        </div>
                     </div>
                 </form>
             </div>
 
             <!-- Trust Indicators -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                    <ShieldCheck class="w-10 h-10 text-green-600 mx-auto mb-3" />
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <CheckCircle class="w-5 h-5 text-green-600" />
+                    </div>
                     <p class="font-semibold text-slate-900 text-sm">100% Secure</p>
-                    <p class="text-xs text-slate-500 mt-1">Protected Payment</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Protected Payment</p>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                    <Clock class="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <CheckCircle class="w-5 h-5 text-blue-600" />
+                    </div>
                     <p class="font-semibold text-slate-900 text-sm">Fast Processing</p>
-                    <p class="text-xs text-slate-500 mt-1">24-48 hours</p>
+                    <p class="text-xs text-slate-500 mt-0.5">24-48 hours</p>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                    <Globe class="w-10 h-10 text-purple-600 mx-auto mb-3" />
+                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <Globe class="w-5 h-5 text-purple-600" />
+                    </div>
                     <p class="font-semibold text-slate-900 text-sm">Worldwide</p>
-                    <p class="text-xs text-slate-500 mt-1">Any country</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Any country</p>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                    <Users class="w-10 h-10 text-orange-600 mx-auto mb-3" />
+                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <CheckCircle class="w-5 h-5 text-orange-600" />
+                    </div>
                     <p class="font-semibold text-slate-900 text-sm">5000+ Customers</p>
                     <p class="text-xs text-slate-500 mt-1">Trusted by many</p>
-                </div>
-            </div>
-
-            <!-- FAQ Section -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-                <h2 class="text-2xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h2>
-                <div class="space-y-4">
-                    <div v-for="(faq, index) in faqs" :key="index" class="border-b border-gray-200 pb-4 last:border-0">
-                        <button @click="toggleFaq(index)" class="w-full flex items-center justify-between text-left">
-                            <span class="font-semibold text-slate-900">{{ faq.question }}</span>
-                            <ChevronDown class="w-5 h-5 text-slate-400 transition-transform"
-                                :class="{ 'rotate-180': faq.open }" />
-                        </button>
-                        <div v-show="faq.open" class="mt-3 text-sm text-slate-600">
-                            {{ faq.answer }}
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -198,73 +441,192 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRequestStore } from '../stores/request';
 import { useRouter } from 'vue-router';
-import { Link, Search, CheckCircle, Truck, ShieldCheck, Clock, Globe, Users, ChevronDown } from 'lucide-vue-next';
+import { Link, CheckCircle, Globe, Info, AlertCircle } from 'lucide-vue-next';
+import axios from '../axios';
 
 const requestStore = useRequestStore();
 const router = useRouter();
 
 const form = ref({
     url: '',
-    price: '',
+    price: 0,
     quantity: 1,
-    currency: 'USD',
-    weight: '',
-    declared_shipping_cost: '',
-    is_inside_city: false
+    currency: '',
+    weight: 0,
+    declared_shipping_cost: 0,
+    is_inside_city: false,
+    payment_method: ''
 });
 
-const faqs = ref([
-    {
-        question: 'How long does the process take?',
-        answer: 'Typically 7-14 days from request approval to delivery, depending on the product location and shipping method.',
-        open: false
-    },
-    {
-        question: 'What payment methods do you accept?',
-        answer: 'We accept bKash, bank transfers, and cash on delivery for local customers. International payments via PayPal or bank transfer.',
-        open: false
-    },
-    {
-        question: 'Can I request products from any country?',
-        answer: 'Yes! We can source products from anywhere in the world including USA, UK, China, Japan, and more.',
-        open: false
-    },
-    {
-        question: 'What if the product is out of stock?',
-        answer: 'We will notify you immediately and help you find alternatives or issue a full refund.',
-        open: false
-    },
-    {
-        question: 'Are there any hidden fees?',
-        answer: 'No hidden fees. The estimated total includes product cost, shipping, and our service fee. Final amount is confirmed before payment.',
-        open: false
+const currencies = ref([]);
+const paymentMethods = ref([]);
+const selectedCurrency = ref(null);
+const costBreakdown = ref(null);
+const calculationLoading = ref(false);
+const calculationTimeout = ref(null);
+
+const isFormValid = computed(() => {
+    return form.value.url && 
+           form.value.price > 0 && 
+           form.value.quantity > 0 && 
+           form.value.currency;
+});
+
+const fetchCurrencies = async () => {
+    try {
+        const response = await axios.get('/currencies', { params: { all: true } });
+        currencies.value = response.data.data || response.data;
+        
+        // Set default currency to BDT if available
+        const bdt = currencies.value.find(c => c.code === 'BDT');
+        if (bdt) {
+            form.value.currency = 'BDT';
+            selectedCurrency.value = bdt;
+        }
+    } catch (error) {
+        console.error('Error fetching currencies:', error);
+        // Fallback to admin endpoint if public fails
+        try {
+            const response = await axios.get('/admin/currencies', { params: { all: true } });
+            currencies.value = response.data.data || response.data;
+            const bdt = currencies.value.find(c => c.code === 'BDT');
+            if (bdt) {
+                form.value.currency = 'BDT';
+                selectedCurrency.value = bdt;
+            }
+        } catch (e) {
+            console.error('Error fetching currencies from admin endpoint:', e);
+        }
     }
-]);
+};
 
-// Mock conversion rates for estimation (should ideally come from backend settings)
-const rates = { USD: 120, CNY: 18, BDT: 1 };
+const onCurrencyChange = () => {
+    selectedCurrency.value = currencies.value.find(c => c.code === form.value.currency);
+    calculateEstimate();
+};
 
-const estimatedTotal = computed(() => {
-    if (!form.value.price || !form.value.quantity) return 0;
-    const rate = rates[form.value.currency];
-    const productTotal = form.value.price * form.value.quantity * rate;
-    const shipping = (form.value.declared_shipping_cost || 0) * (form.value.currency === 'BDT' ? 1 : rate);
-    return (productTotal + shipping).toFixed(2);
-});
+const calculateEstimate = async () => {
+    if (!form.value.price || !form.value.quantity || !form.value.currency) {
+        costBreakdown.value = null;
+        return;
+    }
 
-const toggleFaq = (index) => {
-    faqs.value[index].open = !faqs.value[index].open;
+    // Clear previous timeout
+    if (calculationTimeout.value) {
+        clearTimeout(calculationTimeout.value);
+    }
+
+    // Debounce calculation
+    calculationTimeout.value = setTimeout(async () => {
+        calculationLoading.value = true;
+        try {
+            // Convert product price to base currency (BDT)
+            const productTotal = form.value.price * form.value.quantity;
+            let baseAmount = productTotal;
+            
+            if (selectedCurrency.value && !selectedCurrency.value.is_base) {
+                baseAmount = productTotal * selectedCurrency.value.rate_to_base;
+            }
+
+            // Calculate charges using the charges API
+            const response = await axios.post('/charges/calculate', {
+                base_amount: baseAmount,
+                currency_id: selectedCurrency.value?.id,
+                additional_data: {
+                    weight: form.value.weight || 0,
+                    is_inside_city: form.value.is_inside_city,
+                    payment_method: form.value.payment_method || null,
+                }
+            });
+
+            // Add declared shipping if provided
+            let declaredShippingBDT = 0;
+            if (form.value.declared_shipping_cost > 0) {
+                declaredShippingBDT = form.value.declared_shipping_cost;
+                if (selectedCurrency.value && !selectedCurrency.value.is_base) {
+                    declaredShippingBDT = form.value.declared_shipping_cost * selectedCurrency.value.rate_to_base;
+                }
+            }
+
+            costBreakdown.value = {
+                product_total: baseAmount,
+                declared_shipping: declaredShippingBDT,
+                total_charges: response.data.total_charges || 0,
+                delivery_charge: response.data.delivery_charge || 0,
+                payment_processing_fee: response.data.payment_processing_fee || 0,
+                grand_total: baseAmount + declaredShippingBDT + (response.data.total_charges || 0),
+                breakdown: response.data.breakdown || [],
+                base_amount: response.data.base_amount || baseAmount,
+            };
+        } catch (error) {
+            console.error('Error calculating charges:', error);
+            // Fallback calculation
+            const productTotal = form.value.price * form.value.quantity;
+            let baseAmount = productTotal;
+            if (selectedCurrency.value && !selectedCurrency.value.is_base) {
+                baseAmount = productTotal * selectedCurrency.value.rate_to_base;
+            }
+            costBreakdown.value = {
+                product_total: baseAmount,
+                declared_shipping: 0,
+                total_charges: 0,
+                grand_total: baseAmount,
+                breakdown: [],
+            };
+        } finally {
+            calculationLoading.value = false;
+        }
+    }, 500);
 };
 
 const submitRequest = async () => {
+    if (!isFormValid.value) {
+        return;
+    }
+
     try {
-        await requestStore.createRequest(form.value);
+        const requestData = {
+            url: form.value.url,
+            price: form.value.price,
+            quantity: form.value.quantity,
+            currency: form.value.currency,
+            weight: form.value.weight || null,
+            declared_shipping_cost: form.value.declared_shipping_cost || null,
+            is_inside_city: form.value.is_inside_city,
+            payment_method: form.value.payment_method || null,
+        };
+
+        await requestStore.createRequest(requestData);
         router.push('/dashboard/requests');
     } catch (e) {
         // Error handled in store
     }
 };
+
+const fetchPaymentMethods = async () => {
+    try {
+        const response = await axios.get('/payment-methods');
+        paymentMethods.value = response.data || [];
+    } catch (error) {
+        console.error('Error fetching payment methods:', error);
+    }
+};
+
+const getPaymentMethodName = (type) => {
+    const method = paymentMethods.value.find(m => m.type === type);
+    return method ? method.name : type;
+};
+
+// Watch for form changes to recalculate
+watch([() => form.value.price, () => form.value.quantity, () => form.value.weight, () => form.value.declared_shipping_cost, () => form.value.is_inside_city, () => form.value.payment_method], () => {
+    calculateEstimate();
+});
+
+onMounted(() => {
+    fetchCurrencies();
+    fetchPaymentMethods();
+});
 </script>

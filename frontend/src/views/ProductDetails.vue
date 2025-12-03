@@ -1,14 +1,34 @@
 <template>
     <div class="bg-gray-50 min-h-screen pt-20 pb-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="animate-pulse">
+                <div class="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="h-96 bg-gray-200 rounded-2xl"></div>
+                    <div class="space-y-4">
+                        <div class="h-8 bg-gray-200 rounded w-3/4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                        <div class="h-12 bg-gray-200 rounded w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else-if="product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Breadcrumb -->
             <nav class="mb-6">
-                <ol class="flex items-center space-x-2 text-sm text-slate-600">
-                    <li><router-link to="/" class="hover:text-primary">Home</router-link></li>
+                <ol class="flex items-center space-x-2 text-sm text-gray-600">
+                    <li><router-link to="/" class="hover:text-primary transition-colors">Home</router-link></li>
                     <li>/</li>
-                    <li><router-link to="/shop" class="hover:text-primary">Shop</router-link></li>
+                    <li><router-link to="/shop" class="hover:text-primary transition-colors">Shop</router-link></li>
+                    <li v-if="product.category">/</li>
+                    <li v-if="product.category">
+                        <router-link :to="`/shop?category=${product.category}`" class="hover:text-primary transition-colors">
+                            {{ product.category }}
+                        </router-link>
+                    </li>
                     <li>/</li>
-                    <li class="text-slate-900 font-medium">{{ product.name }}</li>
+                    <li class="text-gray-900 font-medium">{{ product.name }}</li>
                 </ol>
             </nav>
 
@@ -16,14 +36,23 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 <!-- Product Images -->
                 <div class="space-y-4">
-                    <div
-                        class="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-lg h-96 lg:h-[500px]">
-                        <img :src="selectedImage" :alt="product.name" class="w-full h-full object-cover">
+                    <div class="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-lg h-96 lg:h-[500px] relative group">
+                        <img
+                            :src="selectedImage"
+                            :alt="product.name"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <!-- Zoom on hover -->
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors"></div>
                     </div>
-                    <div class="grid grid-cols-4 gap-3">
-                        <button v-for="(img, index) in product.images" :key="index" @click="selectedImage = img"
-                            class="rounded-lg overflow-hidden border-2 transition-all"
-                            :class="selectedImage === img ? 'border-primary shadow-md' : 'border-gray-200 hover:border-gray-300'">
+                    <div v-if="productImages.length > 1" class="grid grid-cols-4 gap-3">
+                        <button
+                            v-for="(img, index) in productImages"
+                            :key="index"
+                            @click="selectedImage = img"
+                            class="rounded-lg overflow-hidden border-2 transition-all hover:scale-105"
+                            :class="selectedImage === img ? 'border-primary shadow-md ring-2 ring-primary/20' : 'border-gray-200 hover:border-gray-300'"
+                        >
                             <img :src="img" :alt="`${product.name} ${index + 1}`" class="w-full h-20 object-cover">
                         </button>
                     </div>
@@ -31,81 +60,162 @@
 
                 <!-- Product Info -->
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-                    <h1 class="text-3xl font-bold text-slate-900 mb-4">{{ product.name }}</h1>
-
-                    <!-- Rating -->
+                    <!-- Category & Brand -->
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="flex items-center">
-                            <Star v-for="i in 5" :key="i" class="w-5 h-5"
-                                :class="i <= product.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'" />
-                        </div>
-                        <span class="text-sm text-slate-600">({{ product.reviews }} reviews)</span>
-                    </div>
-
-                    <!-- Price -->
-                    <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
-                        <span class="text-4xl font-bold text-primary">৳{{ product.price }}</span>
-                        <span v-if="product.oldPrice" class="text-xl text-gray-400 line-through">৳{{ product.oldPrice
-                            }}</span>
-                        <span v-if="product.discount"
-                            class="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full">
-                            -{{ product.discount }}%
+                        <span v-if="product.category" class="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+                            {{ product.category }}
+                        </span>
+                        <span v-if="product.brand" class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
+                            {{ product.brand }}
+                        </span>
+                        <span v-if="product.is_featured" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full flex items-center gap-1">
+                            <Star class="w-3 h-3 fill-current" />
+                            Featured
                         </span>
                     </div>
 
-                    <!-- Description -->
-                    <p class="text-slate-600 mb-6 leading-relaxed">{{ product.description }}</p>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
+
+                    <!-- SKU -->
+                    <p v-if="product.sku" class="text-sm text-gray-500 mb-4">SKU: {{ product.sku }}</p>
+
+                    <!-- Price -->
+                    <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
+                        <span class="text-4xl font-bold text-primary">
+                            ৳{{ formatPrice(product.sellable_price || product.price) }}
+                        </span>
+                        <span
+                            v-if="product.sellable_price && product.price > product.sellable_price"
+                            class="text-xl text-gray-400 line-through"
+                        >
+                            ৳{{ formatPrice(product.price) }}
+                        </span>
+                        <span
+                            v-if="product.sellable_price && product.price > product.sellable_price"
+                            class="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full"
+                        >
+                            -{{ calculateDiscount(product.price, product.sellable_price) }}%
+                        </span>
+                    </div>
+
+                    <!-- Short Description -->
+                    <p v-if="product.short_description" class="text-gray-600 mb-6 leading-relaxed">
+                        {{ product.short_description }}
+                    </p>
 
                     <!-- Stock Status -->
-                    <div class="mb-6">
+                    <div class="mb-6 p-4 rounded-lg"
+                        :class="(product.total_stock || 0) > 10 ? 'bg-green-50 border border-green-200' : (product.total_stock || 0) > 0 ? 'bg-yellow-50 border border-yellow-200' : 'bg-red-50 border border-red-200'">
                         <div class="flex items-center gap-2 mb-2">
-                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                            <span class="text-sm font-semibold text-green-700">In Stock</span>
+                            <div
+                                class="w-3 h-3 rounded-full"
+                                :class="(product.total_stock || 0) > 10 ? 'bg-green-500' : (product.total_stock || 0) > 0 ? 'bg-yellow-500' : 'bg-red-500'"
+                            ></div>
+                            <span
+                                class="text-sm font-semibold"
+                                :class="(product.total_stock || 0) > 10 ? 'text-green-700' : (product.total_stock || 0) > 0 ? 'text-yellow-700' : 'text-red-700'"
+                            >
+                                {{
+                                    (product.total_stock || 0) > 10
+                                        ? 'In Stock'
+                                        : (product.total_stock || 0) > 0
+                                        ? 'Low Stock'
+                                        : 'Out of Stock'
+                                }}
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-500">Ships within 24-48 hours</p>
+                        <p class="text-xs text-gray-600">
+                            {{ (product.total_stock || 0) > 0 ? `${product.total_stock} units available` : 'Currently unavailable' }}
+                        </p>
+                    </div>
+
+                    <!-- Variants (if available) -->
+                    <div v-if="product.has_variants && product.variants && product.variants.length > 0" class="mb-6">
+                        <h3 class="text-sm font-semibold text-gray-900 mb-3">Select Variant</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button
+                                v-for="variant in product.variants"
+                                :key="variant.id"
+                                @click="selectedVariant = variant"
+                                class="p-3 border-2 rounded-lg text-left transition-all hover:border-primary"
+                                :class="selectedVariant?.id === variant.id ? 'border-primary bg-primary/5' : 'border-gray-200'"
+                            >
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ formatVariantAttributes(variant.attributes) }}
+                                </div>
+                                <div class="text-sm text-primary font-semibold mt-1">
+                                    ৳{{ formatPrice(variant.price) }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    Stock: {{ variant.stock }}
+                                </div>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Quantity & Actions -->
                     <div class="space-y-4 mb-6">
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">Quantity</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Quantity</label>
                             <div class="flex items-center gap-3">
-                                <button @click="decrementQty"
-                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-50 flex items-center justify-center">
+                                <button
+                                    @click="decrementQty"
+                                    :disabled="quantity <= 1"
+                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                                >
                                     <Minus class="w-4 h-4" />
                                 </button>
-                                <input type="number" v-model="quantity" min="1"
-                                    class="w-20 text-center border border-gray-300 rounded-lg py-2 focus:outline-none focus:ring-2 focus:ring-primary/20">
-                                <button @click="incrementQty"
-                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-50 flex items-center justify-center">
+                                <input
+                                    type="number"
+                                    v-model.number="quantity"
+                                    min="1"
+                                    :max="maxQuantity"
+                                    class="w-20 text-center border border-gray-300 rounded-lg py-2 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                />
+                                <button
+                                    @click="incrementQty"
+                                    :disabled="quantity >= maxQuantity"
+                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
+                                >
                                     <Plus class="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
 
                         <div class="flex gap-3">
-                            <button @click="addToCart"
-                                class="flex-1 bg-primary text-white font-semibold py-4 rounded-lg hover:bg-primary-hover transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                            <button
+                                @click="addToCart"
+                                :disabled="(product.total_stock || 0) === 0"
+                                class="flex-1 bg-primary text-white font-semibold py-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                            >
                                 <ShoppingCart class="w-5 h-5" />
                                 Add to Cart
                             </button>
-                            <button @click="toggleWishlist"
+                            <button
+                                @click="toggleWishlist"
                                 class="w-14 h-14 rounded-lg border-2 transition-all flex items-center justify-center"
-                                :class="isInWishlist ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-red-500'">
-                                <Heart class="w-6 h-6"
-                                    :class="isInWishlist ? 'text-red-500 fill-red-500' : 'text-gray-400'" />
+                                :class="isInWishlist ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-red-500'"
+                            >
+                                <Heart class="w-6 h-6" :class="isInWishlist ? 'text-red-500 fill-red-500' : 'text-gray-400'" />
                             </button>
                         </div>
                     </div>
 
                     <!-- Features -->
                     <div class="pt-6 border-t border-gray-200">
-                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3">Key Features</h3>
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Key Features</h3>
                         <ul class="space-y-2">
-                            <li v-for="feature in product.features" :key="feature"
-                                class="flex items-start gap-2 text-sm text-slate-600">
-                                <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                {{ feature }}
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <CheckCircle class="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                                Fast & Secure Delivery
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <CheckCircle class="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                                7-Day Return Policy
+                            </li>
+                            <li class="flex items-start gap-2 text-sm text-gray-600">
+                                <CheckCircle class="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                                Genuine Product Guarantee
                             </li>
                         </ul>
                     </div>
@@ -115,170 +225,238 @@
             <!-- Tabs Section -->
             <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 mb-12">
                 <div class="border-b border-gray-200 mb-6">
-                    <nav class="flex gap-8">
-                        <button v-for="tab in tabs" :key="tab" @click="activeTab = tab"
-                            class="pb-4 text-sm font-semibold transition-all relative"
-                            :class="activeTab === tab ? 'text-primary' : 'text-slate-600 hover:text-slate-900'">
+                    <nav class="flex gap-8 overflow-x-auto">
+                        <button
+                            v-for="tab in tabs"
+                            :key="tab"
+                            @click="activeTab = tab"
+                            class="pb-4 text-sm font-semibold transition-all relative whitespace-nowrap"
+                            :class="activeTab === tab ? 'text-primary' : 'text-gray-600 hover:text-gray-900'"
+                        >
                             {{ tab }}
-                            <div v-if="activeTab === tab" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary">
-                            </div>
+                            <div v-if="activeTab === tab" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
                         </button>
                     </nav>
                 </div>
 
                 <!-- Tab Content -->
                 <div v-if="activeTab === 'Description'" class="prose max-w-none">
-                    <p class="text-slate-600 leading-relaxed">{{ product.fullDescription }}</p>
+                    <div v-html="product.description || product.short_description || 'No description available.'" class="text-gray-600 leading-relaxed"></div>
                 </div>
 
                 <div v-if="activeTab === 'Specifications'">
                     <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div v-for="(value, key) in product.specs" :key="key"
-                            class="flex py-3 border-b border-gray-100">
-                            <dt class="font-semibold text-slate-700 w-1/2">{{ key }}</dt>
-                            <dd class="text-slate-600 w-1/2">{{ value }}</dd>
+                        <div v-if="product.sku" class="flex py-3 border-b border-gray-100">
+                            <dt class="font-semibold text-gray-700 w-1/2">SKU</dt>
+                            <dd class="text-gray-600 w-1/2">{{ product.sku }}</dd>
+                        </div>
+                        <div v-if="product.category" class="flex py-3 border-b border-gray-100">
+                            <dt class="font-semibold text-gray-700 w-1/2">Category</dt>
+                            <dd class="text-gray-600 w-1/2">{{ product.category }}</dd>
+                        </div>
+                        <div v-if="product.brand" class="flex py-3 border-b border-gray-100">
+                            <dt class="font-semibold text-gray-700 w-1/2">Brand</dt>
+                            <dd class="text-gray-600 w-1/2">{{ product.brand }}</dd>
+                        </div>
+                        <div class="flex py-3 border-b border-gray-100">
+                            <dt class="font-semibold text-gray-700 w-1/2">Stock</dt>
+                            <dd class="text-gray-600 w-1/2">{{ product.total_stock || 0 }} units</dd>
                         </div>
                     </dl>
                 </div>
 
                 <div v-if="activeTab === 'Reviews'">
-                    <div class="space-y-6">
-                        <div v-for="review in productReviews" :key="review.id"
-                            class="border-b border-gray-100 pb-6 last:border-0">
-                            <div class="flex items-start justify-between mb-3">
-                                <div>
-                                    <h4 class="font-semibold text-slate-900">{{ review.name }}</h4>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <div class="flex">
-                                            <Star v-for="i in 5" :key="i" class="w-4 h-4"
-                                                :class="i <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'" />
-                                        </div>
-                                        <span class="text-xs text-slate-500">{{ review.date }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-slate-600 text-sm">{{ review.comment }}</p>
-                        </div>
+                    <div class="text-center py-12">
+                        <p class="text-gray-600">No reviews yet. Be the first to review this product!</p>
                     </div>
                 </div>
             </div>
 
             <!-- Related Products -->
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-6">You May Also Like</h2>
+            <div v-if="relatedProducts.length > 0">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div v-for="item in relatedProducts" :key="item.id"
-                        class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all cursor-pointer">
-                        <div class="aspect-square bg-gray-100">
-                            <img :src="item.image" :alt="item.name" class="w-full h-full object-cover">
-                        </div>
-                        <div class="p-4">
-                            <h3 class="font-semibold text-slate-900 text-sm mb-2 line-clamp-2">{{ item.name }}</h3>
-                            <p class="text-primary font-bold">৳{{ item.price }}</p>
-                        </div>
-                    </div>
+                    <ProductCard
+                        v-for="item in relatedProducts"
+                        :key="item.id"
+                        :product="item"
+                        view-mode="grid"
+                    />
                 </div>
             </div>
+        </div>
+
+        <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+            <Package class="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Product Not Found</h3>
+            <p class="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
+            <router-link
+                to="/shop"
+                class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all"
+            >
+                Back to Shop
+            </router-link>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
-import { Star, ShoppingCart, Heart, CheckCircle, Minus, Plus } from 'lucide-vue-next';
+import { Star, ShoppingCart, Heart, CheckCircle, Minus, Plus, Package } from 'lucide-vue-next';
+import axios from '../axios';
+import ProductCard from '../components/ProductCard.vue';
 
 const route = useRoute();
 const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
 
+const product = ref(null);
+const relatedProducts = ref([]);
+const loading = ref(true);
 const quantity = ref(1);
 const activeTab = ref('Description');
 const tabs = ['Description', 'Specifications', 'Reviews'];
-const isInWishlist = ref(false);
+const selectedVariant = ref(null);
 
-// Mock data
-const product = ref({
-    id: 1,
-    name: 'Wireless Noise Cancelling Headphones',
-    price: '12,500',
-    oldPrice: '15,000',
-    discount: 20,
-    rating: 4.5,
-    reviews: 128,
-    description: 'Experience world-class silence and exceptional sound with our premium noise cancelling headphones.',
-    fullDescription: 'Experience world-class silence and exceptional sound with our premium noise cancelling headphones. Designed for comfort and performance, these headphones are perfect for travel, work, or just relaxing. With advanced active noise cancellation technology, you can immerse yourself in your music without distractions.',
-    features: [
-        'Active Noise Cancellation',
-        '30-hour battery life',
-        'Touch controls',
-        'Voice assistant support',
-        'Foldable design',
-        'Premium carrying case included'
-    ],
-    specs: {
-        'Brand': 'Premium Audio',
-        'Model': 'WH-1000XM4',
-        'Color': 'Black',
-        'Connectivity': 'Bluetooth 5.0',
-        'Battery Life': '30 hours',
-        'Weight': '254g'
-    },
-    images: [
-        'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
-        'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500',
-        'https://images.unsplash.com/photo-1545127398-14699f92334b?w=500',
-        'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=500'
-    ]
+const productImages = computed(() => {
+    if (!product.value) return [];
+    const images = [];
+    
+    // Add main product image
+    if (product.value.image_url) {
+        images.push(product.value.image_url);
+    } else if (product.value.image) {
+        images.push(product.value.image.startsWith('http') ? product.value.image : `/storage/${product.value.image}`);
+    }
+    
+    // Add gallery images
+    if (product.value.images && product.value.images.length > 0) {
+        product.value.images.forEach(img => {
+            if (img.url) {
+                images.push(img.url);
+            } else if (img.image_url) {
+                images.push(img.image_url);
+            } else if (img.path) {
+                images.push(img.path.startsWith('http') ? img.path : `/storage/${img.path}`);
+            }
+        });
+    }
+    
+    return images.length > 0 ? images : ['/assets/placeholder.png'];
 });
 
-const selectedImage = ref(product.value.images[0]);
+const selectedImage = ref('');
 
-const productReviews = ref([
-    { id: 1, name: 'John Doe', rating: 5, date: '2 days ago', comment: 'Excellent sound quality and noise cancellation. Worth every penny!' },
-    { id: 2, name: 'Jane Smith', rating: 4, date: '1 week ago', comment: 'Very comfortable for long use. Battery life is impressive.' },
-    { id: 3, name: 'Mike Johnson', rating: 5, date: '2 weeks ago', comment: 'Best headphones I\'ve ever owned. Highly recommended!' }
-]);
+const isInWishlist = computed(() => {
+    return product.value ? wishlistStore.isInWishlist(product.value.id) : false;
+});
 
-const relatedProducts = ref([
-    { id: 2, name: 'Wireless Earbuds Pro', price: '8,500', image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300' },
-    { id: 3, name: 'Smart Watch Series 5', price: '15,000', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' },
-    { id: 4, name: 'Portable Speaker', price: '6,500', image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300' },
-    { id: 5, name: 'USB-C Cable', price: '1,200', image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=300' }
-]);
+const maxQuantity = computed(() => {
+    if (selectedVariant.value) {
+        return selectedVariant.value.stock || 0;
+    }
+    return product.value?.total_stock || 0;
+});
 
-const incrementQty = () => quantity.value++;
-const decrementQty = () => { if (quantity.value > 1) quantity.value--; };
+const fetchProduct = async () => {
+    loading.value = true;
+    try {
+        const response = await axios.get(`/products/${route.params.id}`);
+        product.value = response.data;
+        selectedImage.value = productImages.value[0];
+        
+        // Check if product has variants
+        if (product.value.has_variants && product.value.variants && product.value.variants.length > 0) {
+            selectedVariant.value = product.value.variants[0];
+        }
 
-const addToCart = () => {
-    cartStore.addItem({
-        id: product.value.id,
-        name: product.value.name,
-        price: parseFloat(product.value.price.replace(/,/g, '')),
-        image: product.value.images[0],
-        quantity: quantity.value
+        // Fetch related products
+        fetchRelatedProducts();
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        product.value = null;
+    } finally {
+        loading.value = false;
+    }
+};
+
+const fetchRelatedProducts = async () => {
+    try {
+        const params = {
+            per_page: 4,
+            category: product.value?.category,
+        };
+        const response = await axios.get('/products', { params });
+        const allProducts = response.data.data || response.data || [];
+        relatedProducts.value = allProducts
+            .filter(p => p.id !== product.value.id)
+            .slice(0, 4);
+    } catch (error) {
+        console.error('Error fetching related products:', error);
+    }
+};
+
+const formatPrice = (price) => {
+    if (!price) return '0.00';
+    return parseFloat(price).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
     });
 };
 
+const calculateDiscount = (originalPrice, salePrice) => {
+    if (!originalPrice || !salePrice) return 0;
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+};
+
+const formatVariantAttributes = (attributes) => {
+    if (!attributes) return 'Default';
+    if (typeof attributes === 'string') {
+        try {
+            attributes = JSON.parse(attributes);
+        } catch (e) {
+            return attributes;
+        }
+    }
+    return Object.entries(attributes)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ');
+};
+
+const incrementQty = () => {
+    if (quantity.value < maxQuantity.value) quantity.value++;
+};
+
+const decrementQty = () => {
+    if (quantity.value > 1) quantity.value--;
+};
+
+const addToCart = () => {
+    if ((product.value.total_stock || 0) === 0) return;
+
+    const cartProduct = {
+        ...product.value,
+        price: `৳${formatPrice(selectedVariant.value?.price || product.value.sellable_price || product.value.price)}`,
+        quantity: quantity.value,
+    };
+
+    if (selectedVariant.value) {
+        cartProduct.variant = selectedVariant.value;
+    }
+
+    cartStore.addItem(cartProduct);
+};
+
 const toggleWishlist = () => {
-    isInWishlist.value = !isInWishlist.value;
-    if (isInWishlist.value) {
-        wishlistStore.addItem({
-            id: product.value.id,
-            name: product.value.name,
-            price: parseFloat(product.value.price.replace(/,/g, '')),
-            image: product.value.images[0]
-        });
-    } else {
-        wishlistStore.removeItem(product.value.id);
+    if (product.value) {
+        wishlistStore.toggleItem(product.value);
     }
 };
 
 onMounted(() => {
-    console.log('Product ID:', route.params.id);
-    // Check if product is in wishlist
-    isInWishlist.value = wishlistStore.items.some(item => item.id === product.value.id);
+    fetchProduct();
 });
 </script>

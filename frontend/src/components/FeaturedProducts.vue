@@ -1,55 +1,173 @@
 <template>
-    <section id="products" class="py-24 bg-white">
+    <section id="products" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl mb-4">Featured Products</h2>
-                <p class="text-xl text-slate-500 max-w-2xl mx-auto">Handpicked items ready for immediate delivery,
-                    curated just for you.</p>
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
+                    <Star class="w-4 h-4 fill-current" />
+                    Featured Collection
+                </div>
+                <h2 class="text-4xl font-bold text-gray-900 sm:text-5xl mb-4">
+                    Handpicked for You
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Discover our curated selection of premium products, ready for immediate delivery
+                </p>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <Card v-for="product in products" :key="product.id" bodyClass="p-0" class="group h-full flex flex-col">
-                    <template #header>
-                        <div
-                            class="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-200 relative group-hover:opacity-90 transition-opacity">
-                            <img :src="product.image" :alt="product.name"
-                                class="w-full h-64 object-cover object-center group-hover:scale-105 transition-transform duration-500">
-                            <span v-if="product.discount"
-                                class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">-{{
-                                    product.discount }}%</span>
 
-                            <!-- Wishlist Button Overlay -->
-                            <button @click.prevent="wishlistStore.toggleItem(product)"
-                                class="absolute top-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-sm group-hover:scale-110"
-                                :class="wishlistStore.isInWishlist(product.id) ? 'text-secondary' : 'text-slate-400 hover:text-secondary'">
-                                <Heart class="w-5 h-5"
-                                    :fill="wishlistStore.isInWishlist(product.id) ? 'currentColor' : 'none'" />
-                            </button>
-                        </div>
-                    </template>
-                    <div class="p-5 flex-1 flex flex-col">
-                        <router-link :to="`/product/${product.id}`">
-                            <h3
-                                class="text-lg font-bold text-slate-900 mb-1 line-clamp-1 hover:text-primary transition-colors">
-                                {{ product.name }}</h3>
+            <!-- Loading State -->
+            <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div v-for="n in 4" :key="n" class="animate-pulse">
+                    <div class="bg-gray-200 rounded-2xl h-80 mb-4"></div>
+                    <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div v-else-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div
+                    v-for="product in products"
+                    :key="product.id"
+                    class="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col"
+                >
+                    <!-- Product Image -->
+                    <div class="relative overflow-hidden bg-gray-100 aspect-square">
+                        <router-link :to="`/products/${product.id}`" class="block h-full">
+                            <img
+                                :src="getProductImage(product)"
+                                :alt="product.name"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                @error="handleImageError"
+                            />
                         </router-link>
-                        <div class="flex items-baseline gap-2 mb-4">
-                            <span class="text-xl font-bold text-primary">৳{{ product.price }}</span>
-                            <span v-if="product.oldPrice" class="text-sm text-slate-400 line-through">৳{{
-                                product.oldPrice }}</span>
+
+                        <!-- Discount Badge -->
+                        <div
+                            v-if="product.sellable_price && product.price > product.sellable_price"
+                            class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg"
+                        >
+                            -{{ calculateDiscount(product.price, product.sellable_price) }}%
                         </div>
-                        <div class="mt-auto">
-                            <Button variant="primary" block @click.prevent="cartStore.addItem(product)"
-                                class="flex items-center justify-center gap-2 group-hover:bg-primary-hover transition-all">
-                                <ShoppingCart class="w-4 h-4" />
-                                Add to Cart
-                            </Button>
+
+                        <!-- Featured Badge -->
+                        <div
+                            v-if="product.is_featured"
+                            class="absolute top-4 right-4 bg-primary text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1"
+                        >
+                            <Star class="w-3 h-3 fill-current" />
+                            Featured
+                        </div>
+
+                        <!-- Wishlist Button -->
+                        <button
+                            @click.prevent="toggleWishlist(product)"
+                            class="absolute bottom-4 right-4 p-2.5 bg-white/95 backdrop-blur-sm rounded-full hover:bg-white transition-all duration-200 shadow-lg hover:scale-110 opacity-0 group-hover:opacity-100"
+                            :class="wishlistStore.isInWishlist(product.id) ? 'opacity-100 text-red-500' : 'text-gray-600'"
+                        >
+                            <Heart
+                                class="w-5 h-5"
+                                :fill="wishlistStore.isInWishlist(product.id) ? 'currentColor' : 'none'"
+                            />
+                        </button>
+
+                        <!-- Quick View Overlay -->
+                        <div
+                            class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+                        >
+                            <router-link
+                                :to="`/products/${product.id}`"
+                                class="px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-primary hover:text-white transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                            >
+                                Quick View
+                            </router-link>
                         </div>
                     </div>
-                </Card>
+
+                    <!-- Product Info -->
+                    <div class="p-5 flex-1 flex flex-col">
+                        <!-- Category -->
+                        <div class="mb-2">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                {{ product.category || 'Uncategorized' }}
+                            </span>
+                        </div>
+
+                        <!-- Product Name -->
+                        <router-link :to="`/products/${product.id}`" class="mb-3 group/link">
+                            <h3 class="text-lg font-bold text-gray-900 line-clamp-2 group-hover/link:text-primary transition-colors min-h-14">
+                                {{ product.name }}
+                            </h3>
+                        </router-link>
+
+                        <!-- Brand -->
+                        <p v-if="product.brand" class="text-sm text-gray-500 mb-3">
+                            {{ product.brand }}
+                        </p>
+
+                        <!-- Price -->
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-2xl font-bold text-primary">
+                                ${{ formatPrice(product.sellable_price || product.price) }}
+                            </span>
+                            <span
+                                v-if="product.sellable_price && product.price > product.sellable_price"
+                                class="text-sm text-gray-400 line-through"
+                            >
+                                ${{ formatPrice(product.price) }}
+                            </span>
+                        </div>
+
+                        <!-- Stock Status -->
+                        <div class="mb-4">
+                            <span
+                                v-if="product.in_stock"
+                                class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-2.5 py-1 rounded-full"
+                            >
+                                <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                In Stock
+                            </span>
+                            <span
+                                v-else
+                                class="inline-flex items-center gap-1.5 text-xs font-medium text-red-600 bg-red-50 px-2.5 py-1 rounded-full"
+                            >
+                                <div class="w-1.5 h-1.5 bg-red-500 rounded-full"></div>
+                                Out of Stock
+                            </span>
+                        </div>
+
+                        <!-- Add to Cart Button -->
+                        <button
+                            @click.prevent="addToCart(product)"
+                            :disabled="!product.in_stock"
+                            class="w-full px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                        >
+                            <ShoppingCart class="w-5 h-5" />
+                            <span>{{ product.in_stock ? 'Add to Cart' : 'Out of Stock' }}</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="text-center mt-16">
+
+            <!-- Empty State -->
+            <div v-else class="text-center py-16">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
+                    <Package class="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">No Featured Products</h3>
+                <p class="text-gray-500 mb-6">Check back soon for our featured collection</p>
                 <router-link to="/shop">
-                    <Button variant="outline" size="lg">View All Products</Button>
+                    <Button variant="primary" size="lg">Browse All Products</Button>
+                </router-link>
+            </div>
+
+            <!-- View All Button -->
+            <div v-if="products.length > 0" class="text-center mt-12">
+                <router-link to="/shop">
+                    <Button variant="outline" size="lg" class="px-8">
+                        View All Products
+                        <ArrowRight class="w-5 h-5 ml-2 inline" />
+                    </Button>
                 </router-link>
             </div>
         </div>
@@ -57,19 +175,91 @@
 </template>
 
 <script setup>
-import Card from './ui/Card.vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import Button from './ui/Button.vue';
-import { ShoppingCart, Heart } from 'lucide-vue-next';
+import { ShoppingCart, Heart, Star, Package, ArrowRight } from 'lucide-vue-next';
 import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
+import axios from '../axios';
 
+const router = useRouter();
 const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
 
-const products = [
-    { id: 1, name: 'Wireless Noise Cancelling Headphones', price: '12,500', oldPrice: '15,000', discount: 15, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 2, name: 'Smart Fitness Watch Series 5', price: '4,200', oldPrice: '5,500', discount: 20, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 3, name: 'Premium Leather Backpack', price: '8,500', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 4, name: 'Ergonomic Office Chair', price: '18,000', image: 'https://images.unsplash.com/photo-1580480055273-228ff5388ef8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-];
+const products = ref([]);
+const loading = ref(true);
+
+const fetchFeaturedProducts = async () => {
+    loading.value = true;
+    try {
+        const response = await axios.get('/products', {
+            params: {
+                featured: true,
+                per_page: 8
+            }
+        });
+
+        // Handle paginated response
+        if (response.data.data) {
+            products.value = Array.isArray(response.data.data)
+                ? response.data.data
+                : response.data.data.data || [];
+        } else {
+            products.value = Array.isArray(response.data) ? response.data : [];
+        }
+    } catch (error) {
+        console.error('Error fetching featured products:', error);
+        products.value = [];
+    } finally {
+        loading.value = false;
+    }
+};
+
+const getProductImage = (product) => {
+    if (product.image_url) {
+        return product.image_url;
+    }
+    if (product.image) {
+        return product.image.startsWith('http') ? product.image : `/storage/${product.image}`;
+    }
+    return '/assets/placeholder.png';
+};
+
+const handleImageError = (event) => {
+    event.target.src = '/assets/placeholder.png';
+};
+
+const formatPrice = (price) => {
+    if (!price) return '0.00';
+    return parseFloat(price).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+};
+
+const calculateDiscount = (originalPrice, salePrice) => {
+    if (!originalPrice || !salePrice) return 0;
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+};
+
+const addToCart = (product) => {
+    if (!product.in_stock) return;
+    
+    // Format product for cart
+    const cartProduct = {
+        ...product,
+        price: `$${formatPrice(product.sellable_price || product.price)}`
+    };
+    
+    cartStore.addItem(cartProduct);
+};
+
+const toggleWishlist = (product) => {
+    wishlistStore.toggleItem(product);
+};
+
+onMounted(() => {
+    fetchFeaturedProducts();
+});
 </script>

@@ -47,12 +47,17 @@
                 class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 <div class="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                     <img v-if="category.image_url" :src="category.image_url" :alt="category.name"
-                        class="h-full w-full object-cover">
+                        class="h-full w-full object-contain">
                     <Tag v-else class="w-12 h-12 text-primary/40" />
                 </div>
                 <div class="p-4">
                     <div class="flex items-start justify-between mb-2">
-                        <h3 class="font-bold text-lg text-slate-900">{{ category.name }}</h3>
+                        <div>
+                            <h3 class="font-bold text-lg text-slate-900">{{ category.name }}</h3>
+                            <p v-if="category.parent" class="text-xs text-slate-500 mt-1">
+                                <span class="text-primary">{{ category.parent.name }}</span> → {{ category.name }}
+                            </p>
+                        </div>
                         <span class="px-2 py-1 rounded-full text-xs font-semibold"
                             :class="category.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'">
                             {{ category.is_active ? 'Active' : 'Inactive' }}
@@ -132,9 +137,21 @@
                             </div>
                             <div v-if="imagePreview"
                                 class="w-16 h-16 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0">
-                                <img :src="imagePreview" class="w-full h-full object-cover">
+                                <img :src="imagePreview" class="w-full h-full object-contain">
                             </div>
                         </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Parent Category</label>
+                        <select v-model="form.parent_id"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white"
+                            :class="{ 'border-red-500': errors.parent_id }">
+                            <option :value="null">None (Root Category)</option>
+                            <option v-for="cat in availableParentCategories" :key="cat.id" :value="cat.id">
+                                {{ cat.name }}
+                            </option>
+                        </select>
+                        <p v-if="errors.parent_id" class="text-xs text-red-500 mt-1">{{ errors.parent_id[0] }}</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" v-model="form.is_active" id="is_active" class="w-4 h-4 text-primary">
@@ -181,10 +198,12 @@ const pagination = ref({
 const form = ref({
     name: '',
     description: '',
-    is_active: true
+    is_active: true,
+    parent_id: null
 });
 const imageFile = ref(null);
 const imagePreview = ref(null);
+const allCategories = ref([]);
 
 const visiblePages = computed(() => {
     const pages = [];
@@ -197,10 +216,21 @@ const visiblePages = computed(() => {
     return pages;
 });
 
+const availableParentCategories = computed(() => {
+    console.log(allCategories.value);
+
+    // Always show all categories, but exclude self when editing
+    if (showEditModal.value && editingId.value) {
+        return allCategories.value.filter(cat => cat.id !== editingId.value);
+        // return allCategories.value;
+    }
+    return allCategories.value;
+});
+
 const fetchCategories = async (page = 1) => {
     loading.value = true;
     try {
-        const response = await axios.get('/categories', {
+        const response = await axios.get('/admin/categories', {
             params: {
                 page,
                 search: filters.value.search,
@@ -222,6 +252,15 @@ const fetchCategories = async (page = 1) => {
         console.error('Error fetching categories:', error);
     } finally {
         loading.value = false;
+    }
+};
+
+const fetchAllCategories = async () => {
+    try {
+        const response = await axios.get('/admin/categories?all=true');
+        allCategories.value = response.data;
+    } catch (error) {
+        console.error('Error fetching all categories:', error);
     }
 };
 
@@ -259,12 +298,15 @@ const createCategory = async () => {
     formData.append('name', form.value.name);
     formData.append('description', form.value.description || '');
     formData.append('is_active', form.value.is_active ? 1 : 0);
+    if (form.value.parent_id) {
+        formData.append('parent_id', form.value.parent_id);
+    }
     if (imageFile.value) {
         formData.append('image', imageFile.value);
     }
 
     try {
-        await axios.post('/categories', formData, {
+        await axios.post('/admin/categories', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         closeModal();
@@ -284,7 +326,8 @@ const editCategory = (category) => {
     form.value = {
         name: category.name,
         description: category.description || '',
-        is_active: category.is_active
+        is_active: category.is_active,
+        parent_id: category.parent_id || null
     };
     imagePreview.value = category.image_url || category.image;
     imageFile.value = null;
@@ -299,12 +342,15 @@ const updateCategory = async () => {
     formData.append('name', form.value.name);
     formData.append('description', form.value.description || '');
     formData.append('is_active', form.value.is_active ? 1 : 0);
+    if (form.value.parent_id) {
+        formData.append('parent_id', form.value.parent_id);
+    }
     if (imageFile.value) {
         formData.append('image', imageFile.value);
     }
 
     try {
-        await axios.post(`/categories/${editingId.value}`, formData, {
+        await axios.post(`/admin/categories/${editingId.value}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         closeModal();
@@ -323,7 +369,7 @@ const deleteCategory = async (id) => {
     if (!confirm('Are you sure you want to delete this category?')) return;
 
     try {
-        await axios.delete(`/categories/${id}`);
+        await axios.delete(`/admin/categories/${id}`);
         fetchCategories(pagination.value.current_page);
     } catch (error) {
         console.error('Error deleting category:', error);
@@ -342,7 +388,8 @@ const closeModal = () => {
     form.value = {
         name: '',
         description: '',
-        is_active: true
+        is_active: true,
+        parent_id: null
     };
     imageFile.value = null;
     imagePreview.value = null;
@@ -351,5 +398,6 @@ const closeModal = () => {
 
 onMounted(() => {
     fetchCategories();
+    fetchAllCategories();
 });
 </script>

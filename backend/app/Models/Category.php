@@ -15,6 +15,7 @@ class Category extends Model
         'description',
         'image',
         'is_active',
+        'parent_id',
     ];
 
     protected $casts = [
@@ -37,5 +38,33 @@ class Category extends Model
     public function products()
     {
         return $this->hasMany(Product::class, 'category', 'name');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    public function isParent()
+    {
+        return $this->children()->count() > 0;
+    }
+
+    public function getFullPathAttribute()
+    {
+        $path = [$this->name];
+        $parent = $this->parent;
+
+        while ($parent) {
+            array_unshift($path, $parent->name);
+            $parent = $parent->parent;
+        }
+
+        return implode(' → ', $path);
     }
 }

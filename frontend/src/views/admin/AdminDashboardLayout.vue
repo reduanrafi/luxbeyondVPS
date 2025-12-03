@@ -140,7 +140,9 @@ import {
     ChevronLeft,
     Component,
     Earth,
-    Ticket
+    Ticket,
+    Crown,
+    DollarSign
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
@@ -155,6 +157,7 @@ const navigationGroups = [
             { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
             { name: 'Customer', href: '/admin/customers', icon: Users },
             { name: 'All Order', href: '/admin/orders', icon: Package, badge: '2' },
+            { name: 'Order Statuses', href: '/admin/order-statuses', icon: Tag },
         ]
     },
     {
@@ -167,9 +170,11 @@ const navigationGroups = [
     {
         title: 'Hub Management',
         items: [
+            { name: 'Brands', href: '/admin/brands', icon: Crown },
             { name: 'Categories', href: '/admin/categories', icon: Tag },
             { name: 'Products', href: '/admin/products', icon: Package },
             { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
+            { name: 'Charges', href: '/admin/charges', icon: DollarSign },
         ]
     },
     {

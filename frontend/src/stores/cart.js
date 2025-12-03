@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 
 export const useCartStore = defineStore('cart', () => {
     const items = ref([]);
+    const shouldOpenDrawer = ref(false);
 
     // Load from local storage on init
     if (localStorage.getItem('cart')) {
@@ -31,6 +32,12 @@ export const useCartStore = defineStore('cart', () => {
             items.value.push({ ...product, quantity: 1 });
         }
         saveToLocalStorage();
+        // Trigger drawer to open
+        shouldOpenDrawer.value = true;
+    }
+
+    function closeDrawer() {
+        shouldOpenDrawer.value = false;
     }
 
     function removeItem(productId) {
@@ -63,9 +70,11 @@ export const useCartStore = defineStore('cart', () => {
         totalItems,
         subtotal,
         formattedSubtotal,
+        shouldOpenDrawer,
         addItem,
         removeItem,
         updateQuantity,
-        clearCart
+        clearCart,
+        closeDrawer
     };
 });

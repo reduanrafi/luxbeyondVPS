@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-gray-50 min-h-screen pt-8">
+    <div class="bg-gray-50 min-h-screen">
         <!-- Hero Section -->
         <section class="relative bg-primary overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-r from-primary via-purple-900 to-secondary opacity-90"></div>

@@ -1,235 +1,452 @@
 <template>
-    <div class="space-y-6">
-        <!-- Header -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900">{{ isEditing ? 'Edit Product' : 'Add Product' }}</h2>
-                <p class="text-sm text-slate-600 mt-1">{{ isEditing ? 'Update existing product details' : 'Create a new
-                    product' }}</p>
-            </div>
-            <div class="flex gap-3">
-                <button @click="router.back()"
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                    Cancel
-                </button>
-                <button @click="saveProduct" :disabled="loading"
-                    class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <Save class="w-5 h-5" />
-                    {{ loading ? 'Saving...' : 'Save Product' }}
-                </button>
+    <div class="space-y-6 pb-20">
+        <!-- Sticky Header -->
+        <div class="sticky top-16 z-20 bg-gray-50/95 backdrop-blur-sm py-4 border-b border-gray-200 -mx-6 px-6 mb-6">
+            <div class="flex items-center justify-between max-w-7xl mx-auto">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">{{ isEditing ? 'Edit Product' : 'Add New Product' }}
+                    </h2>
+                    <p class="text-sm text-slate-600 mt-1">
+                        {{ isEditing
+                        ? 'Update product details and inventory' :
+                        "Create a new product with variants and media" }}
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <button @click="router.back()"
+                        class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-slate-700 shadow-sm">
+                        Cancel
+                    </button>
+                    <button @click="saveProduct" :disabled="loading"
+                        class="px-6 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <Save class="w-5 h-5" />
+                        {{ loading ? 'Saving...' : 'Save Product' }}
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Tabs -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="flex border-b border-gray-200">
-                <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
-                    class="px-6 py-4 text-sm font-medium transition-colors relative"
-                    :class="currentTab === tab.id ? 'text-primary' : 'text-slate-600 hover:text-slate-900 hover:bg-gray-50'">
-                    {{ tab.label }}
-                    <div v-if="currentTab === tab.id" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
-                </button>
+        <div class="max-w-7xl mx-auto">
+            <!-- Tabs -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                <div class="flex border-b border-gray-200 overflow-x-auto">
+                    <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
+                        class="px-6 py-4 text-sm font-bold transition-colors relative whitespace-nowrap"
+                        :class="currentTab === tab.id ? 'text-primary bg-primary/5' : 'text-slate-600 hover:text-slate-900 hover:bg-gray-50'">
+                        {{ tab.label }}
+                        <div v-if="currentTab === tab.id" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary">
+                        </div>
+                    </button>
+                </div>
             </div>
 
-            <div class="p-6">
+            <!-- Content -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
                 <!-- General Tab -->
-                <div v-show="currentTab === 'general'" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
+                <div v-show="currentTab === 'general'" class="space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Left Column: Basic Info -->
+                        <div class="lg:col-span-2 space-y-6">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Product Name *</label>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Product Name *</label>
                                 <input type="text" v-model="form.name" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                    placeholder="e.g. Premium Leather Jacket"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                             </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">Brand</label>
+                                    <select v-model="form.brand"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                        <option value="">Select Brand (Optional)</option>
+                                        <option v-for="brand in brands" :key="brand.id" :value="brand.name">
+                                            {{ brand.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2">SKU *</label>
+                                    <input type="text" v-model="form.sku" required placeholder="e.g. PRD-001"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono">
+                                </div>
+                            </div>
+
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Brand</label>
-                                <input type="text" v-model="form.brand"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Short Description</label>
+                                <textarea v-model="form.short_description" rows="5"
+                                    placeholder="Brief summary for product cards..."
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
                             </div>
-                        </div>
-                        <div class="space-y-4">
+
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Category *</label>
-                                <select v-model="form.category" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
-                                    <option value="">Select Category</option>
-                                    <option v-for="cat in categories" :key="cat.id" :value="cat.name">{{ cat.name }}
-                                    </option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">SKU *</label>
-                                <input type="text" v-model="form.sku" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Long Description
+                                    (R&D)</label>
+                                <div class="prose max-w-none">
+                                    <QuillEditor :key="editorKey" v-model:content="form.description" contentType="html"
+                                        theme="snow" toolbar="full" />
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2">Use this editor to provide detailed product
+                                    information, specifications, and formatting.</p>
                             </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Short Description</label>
-                        <textarea v-model="form.short_description" rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
-                        <p class="text-xs text-slate-500 mt-1">Brief summary for product cards and search results.</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Long Description</label>
-                        <textarea v-model="form.description" rows="6"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
-                        <p class="text-xs text-slate-500 mt-1">Detailed product information.</p>
-                    </div>
-                </div>
-
-                <!-- Data Tab (Pricing & Inventory) -->
-                <div v-show="currentTab === 'data'" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Base Price (৳) *</label>
-                            <input type="number" v-model="form.price" required min="0" step="0.01"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Total Stock</label>
-                            <input type="number" v-model="form.stock" required min="0"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                :disabled="form.has_variants">
-                            <p v-if="form.has_variants" class="text-xs text-orange-500 mt-1">Managed by variants</p>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-gray-200 pt-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-2">
-                                <input type="checkbox" v-model="form.has_variants" id="has_variants"
-                                    class="w-4 h-4 text-primary">
-                                <label for="has_variants" class="font-medium text-slate-900">Enable Attribute-based
-                                    Pricing (Variants)</label>
-                            </div>
-                            <button v-if="form.has_variants" @click="addVariant"
-                                class="text-sm text-primary hover:text-primary-hover font-medium flex items-center gap-1">
-                                <Plus class="w-4 h-4" /> Add Variant
-                            </button>
-                        </div>
-
-                        <div v-if="form.has_variants" class="space-y-4">
-                            <div v-for="(variant, index) in form.variants" :key="index"
-                                class="bg-gray-50 rounded-lg p-4 border border-gray-200 relative group">
-                                <button @click="removeVariant(index)"
-                                    class="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <X class="w-4 h-4" />
-                                </button>
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Right Column: Category & Organization -->
+                        <div class="space-y-6">
+                            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                                <h3 class="font-bold text-slate-900 mb-4">Organization</h3>
+                                <div class="space-y-4">
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-600 mb-1">Attributes
-                                            (JSON)</label>
-                                        <input type="text" v-model="variant.attributes_json"
-                                            placeholder='{"Color": "Red", "Size": "XL"}'
-                                            class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm font-mono">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Category *</label>
+                                        <select v-model="form.category" required
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                            <option value="">Select Category</option>
+                                            <option v-for="cat in categories" :key="cat.id" :value="cat.name">
+                                                {{ cat.parent ? cat.parent.name + ' → ' : '' }}{{ cat.name }}
+                                            </option>
+                                        </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-medium text-slate-600 mb-1">SKU</label>
-                                        <input type="text" v-model="variant.sku"
-                                            class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Status</label>
+                                        <select
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                            <option value="published">Published</option>
+                                            <option value="draft">Draft</option>
+                                            <option value="archived">Archived</option>
+                                        </select>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-600 mb-1">Price</label>
-                                        <input type="number" v-model="variant.price" min="0" step="0.01"
-                                            class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm">
+                                    <div class="flex items-center gap-2 pt-2">
+                                        <input type="checkbox" v-model="form.is_featured" id="is_featured"
+                                            class="w-4 h-4 text-primary rounded focus:ring-2 focus:ring-primary/20">
+                                        <label for="is_featured" class="text-sm font-medium text-slate-700">
+                                            Featured Product
+                                        </label>
                                     </div>
-                                    <div>
-                                        <label class="block text-xs font-medium text-slate-600 mb-1">Stock</label>
-                                        <input type="number" v-model="variant.stock" min="0"
-                                            class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm">
+                                    <p class="text-xs text-slate-500">Featured products will be displayed on the home
+                                        page</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                                <h3 class="font-bold text-slate-900 mb-4">Pricing (Base)</h3>
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-700 mb-2">Regular Price (৳)
+                                                *</label>
+                                            <input type="number" v-model="form.price" required min="0" step="0.01"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono text-lg">
+                                            <p class="text-xs text-slate-500 mt-1">Base price before any discounts</p>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-700 mb-2">Sellable Price
+                                                (৳)</label>
+                                            <input type="number" v-model="form.sellable_price" min="0" step="0.01"
+                                                placeholder="Leave empty if no discount"
+                                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono text-lg">
+                                            <p class="text-xs text-slate-500 mt-1">Discounted/sale price (optional)</p>
+                                        </div>
+                                    </div>
+                                    <div v-if="!form.has_variants">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Stock Quantity
+                                            *</label>
+                                        <input type="number" v-model="form.stock" required min="0"
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 font-mono">
+                                        <p class="text-xs text-slate-500 mt-1">Available quantity in inventory</p>
                                     </div>
                                 </div>
                             </div>
-                            <p v-if="form.variants.length === 0" class="text-sm text-slate-500 text-center py-4">No
-                                variants added yet.</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Variants Tab -->
+                <div v-show="currentTab === 'variants'" class="space-y-8">
+                    <div class="flex items-center justify-between bg-purple-50 p-4 rounded-xl border border-purple-100">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-white rounded-lg shadow-sm">
+                                <Layers class="w-6 h-6 text-primary" />
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">Product Variants</h3>
+                                <p class="text-sm text-slate-600">Manage different versions of this product (e.g. Size,
+                                    Color)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" v-model="form.has_variants" class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                </div>
+                                <span class="ml-3 text-sm font-medium text-slate-700">Enable Variants</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div v-if="form.has_variants" class="space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <!-- Variant Generator -->
+                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                <Wand2 class="w-4 h-4 text-primary" /> Variant Generator (Attribute Based Pricing)
+                            </h4>
+                            <div class="space-y-6">
+                                <div v-for="(attr, attrIndex) in variantAttributes" :key="attrIndex"
+                                    class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <input type="text" v-model="attr.name" placeholder="Attribute Name (e.g. Size)"
+                                            class="font-bold text-slate-900 border-b border-transparent hover:border-gray-300 focus:border-primary focus:outline-none px-2 py-1 transition-colors w-1/3">
+                                        <button type="button" @click="removeAttribute(attrIndex)"
+                                            class="text-red-500 hover:text-red-700 text-sm font-medium">
+                                            Remove Attribute
+                                        </button>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <div v-for="(value, valIndex) in attr.values" :key="valIndex"
+                                            class="flex items-center gap-4">
+                                            <div class="flex-1">
+                                                <input type="text" v-model="value.name"
+                                                    placeholder="Value (e.g. Red, XL)"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                                            </div>
+                                            <div class="w-32">
+                                                <div class="relative">
+                                                    <span class="absolute left-3 top-2 text-gray-500 text-sm">+৳</span>
+                                                    <input type="number" v-model="value.price_adjustment"
+                                                        placeholder="0"
+                                                        class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+                                                </div>
+                                            </div>
+                                            <div class="w-12">
+                                                <div
+                                                    class="relative w-10 h-10 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary transition-colors">
+                                                    <input type="file"
+                                                        @change="e => handleAttributeImageUpload(e, attrIndex, valIndex)"
+                                                        accept="image/*"
+                                                        class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                                                    <img v-if="value.image_preview" :src="value.image_preview"
+                                                        class="w-full h-full object-cover">
+                                                    <ImageIcon v-else class="w-4 h-4 text-gray-400" />
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="removeAttributeValue(attrIndex, valIndex)"
+                                                class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                                <X class="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <button type="button" @click="addAttributeValue(attrIndex)"
+                                            class="text-sm text-primary font-medium hover:text-primary-hover flex items-center gap-1 mt-2">
+                                            <Plus class="w-3 h-3" /> Add Value
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-3 pt-2">
+                                    <button type="button" @click="addAttribute"
+                                        class="px-4 py-2 bg-white border border-gray-300 text-slate-700 font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
+                                        <Plus class="w-4 h-4" /> Add Attribute
+                                    </button>
+                                    <button type="button" @click="generateVariants"
+                                        class="ml-auto px-6 py-2 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800 transition-colors shadow-md flex items-center gap-2">
+                                        <Wand2 class="w-4 h-4" /> Generate Variants
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Variants Table -->
+                        <div v-if="form.variants.length > 0" class="border border-gray-200 rounded-xl overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            Variant</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            Image</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            SKU</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            Price</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            Stock</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr v-for="(variant, index) in form.variants" :key="index"
+                                        class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                                            <div class="flex gap-2">
+                                                <span v-for="(value, key) in parseAttributes(variant.attributes_json)"
+                                                    :key="key"
+                                                    class="px-2 py-1 bg-gray-100 rounded text-xs text-slate-600 border border-gray-200">
+                                                    {{ key }}: {{ value }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div
+                                                class="relative w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden group cursor-pointer">
+                                                <input type="file" @change="e => handleVariantImageUpload(e, index)"
+                                                    accept="image/*"
+                                                    class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                                                <img v-if="variant.image_preview" :src="variant.image_preview"
+                                                    class="w-full h-full object-cover">
+                                                <img v-else-if="variant.image" :src="variant.image"
+                                                    class="w-full h-full object-cover">
+                                                <ImageIcon v-else class="w-5 h-5 text-gray-400" />
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="text" v-model="variant.sku"
+                                                class="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-primary">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="number" v-model="variant.price"
+                                                class="w-32 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-primary">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="number" v-model="variant.stock"
+                                                class="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:border-primary">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                                            <button type="button" @click="removeVariant(index)"
+                                                class="text-red-500 hover:text-red-700 transition-colors">
+                                                <Trash2 class="w-4 h-4" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div v-else class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                        <Layers class="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <h3 class="text-lg font-medium text-slate-900">No Variants Enabled</h3>
+                        <p class="text-slate-500">Enable variants to manage different options for this product.</p>
                     </div>
                 </div>
 
                 <!-- Gallery Tab -->
-                <div v-show="currentTab === 'gallery'" class="space-y-6">
+                <div v-show="currentTab === 'gallery'" class="space-y-8">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Main Image</label>
-                        <div class="flex gap-4 items-start">
-                            <div class="flex-1">
-                                <input type="file" @change="handleMainImageUpload" accept="image/*"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
-                            </div>
+                        <label class="block text-sm font-bold text-slate-700 mb-4">Main Product Image</label>
+                        <div class="flex items-start gap-6">
                             <div
-                                class="w-24 h-24 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                class="w-48 h-48 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+                                <input type="file" @change="handleMainImageUpload" accept="image/*"
+                                    class="absolute inset-0 opacity-0 cursor-pointer z-10">
                                 <img v-if="mainImagePreview" :src="mainImagePreview" class="w-full h-full object-cover">
                                 <img v-else-if="form.image_url" :src="form.image_url"
                                     class="w-full h-full object-cover">
-                                <Image v-else class="w-8 h-8 text-gray-400" />
+                                <div v-else class="text-center p-4">
+                                    <ImageIcon
+                                        class="w-8 h-8 text-gray-400 mx-auto mb-2 group-hover:text-primary transition-colors" />
+                                    <span class="text-xs text-gray-500 font-medium">Upload Main Image</span>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-slate-900 mb-2">Image Guidelines</h4>
+                                <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                    <li>Recommended size: 1000x1000 pixels</li>
+                                    <li>Format: JPG, PNG, or WEBP</li>
+                                    <li>Max file size: 5MB</li>
+                                    <li>White background preferred</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
 
-                    <div class="border-t border-gray-200 pt-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-medium text-slate-900">Gallery Images & Videos</h3>
-                            <button @click="addGalleryItem"
-                                class="text-sm text-primary hover:text-primary-hover font-medium flex items-center gap-1">
-                                <Plus class="w-4 h-4" /> Add Item
+                    <div class="border-t border-gray-200 pt-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-bold text-slate-900">Gallery</h3>
+                                <p class="text-sm text-slate-600">Add additional images or videos to showcase your
+                                    product.</p>
+                            </div>
+                            <button type="button" @click="addGalleryItem"
+                                class="px-4 py-2 bg-gray-100 text-slate-700 font-bold rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2">
+                                <Plus class="w-4 h-4" /> Add Media
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             <div v-for="(item, index) in form.gallery" :key="index"
-                                class="flex gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200 items-start">
-                                <div class="flex-1 space-y-2">
-                                    <!-- Existing Item -->
-                                    <div v-if="item.id" class="flex items-center gap-3">
-                                        <div
-                                            class="w-16 h-16 bg-gray-200 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
-                                            <img v-if="item.type === 'image'" :src="item.url"
-                                                class="w-full h-full object-cover">
-                                            <video v-else :src="item.url" class="w-full h-full object-cover"></video>
-                                        </div>
-                                        <div class="text-sm text-slate-600">
-                                            <p class="font-medium">Existing {{ item.type }}</p>
-                                        </div>
+                                class="group relative aspect-square bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                                <!-- Existing Item -->
+                                <template v-if="item.id">
+                                    <img v-if="item.type === 'image'" :src="item.url"
+                                        class="w-full h-full object-cover">
+                                    <video v-else :src="item.url" class="w-full h-full object-cover"></video>
+                                    <div
+                                        class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <span class="text-white text-xs font-bold uppercase">{{ item.type }}</span>
                                     </div>
-                                    <!-- New Item -->
-                                    <div v-else>
+                                </template>
+                                <!-- New Item -->
+                                <template v-else>
+                                    <div v-if="item.preview" class="w-full h-full">
+                                        <img v-if="item.type === 'image'" :src="item.preview"
+                                            class="w-full h-full object-cover">
+                                        <video v-else :src="item.preview" class="w-full h-full object-cover"></video>
+                                    </div>
+                                    <div v-else
+                                        class="w-full h-full flex flex-col items-center justify-center p-4 text-center">
                                         <input type="file" @change="e => handleGalleryFileUpload(e, index)"
                                             accept="image/*,video/*"
-                                            class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm">
-                                        <div v-if="item.preview"
-                                            class="mt-2 w-16 h-16 bg-gray-200 rounded overflow-hidden flex items-center justify-center">
-                                            <img v-if="item.type === 'image'" :src="item.preview"
-                                                class="w-full h-full object-cover">
-                                            <video v-else :src="item.preview"
-                                                class="w-full h-full object-cover"></video>
-                                        </div>
+                                            class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                                        <Plus class="w-6 h-6 text-gray-400 mb-2" />
+                                        <span class="text-xs text-gray-500">Upload</span>
                                     </div>
-                                </div>
-                                <button @click="removeGalleryItem(index)" class="text-gray-400 hover:text-red-500">
+                                </template>
+
+                                <button type="button" @click="removeGalleryItem(index)"
+                                    class="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 z-20">
                                     <X class="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
-                        <p v-if="form.gallery.length === 0" class="text-sm text-slate-500 text-center py-4">No gallery
-                            items added.</p>
                     </div>
                 </div>
 
                 <!-- SEO Tab -->
                 <div v-show="currentTab === 'seo'" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Meta Title</label>
-                        <input type="text" v-model="form.meta_title"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
-                        <p class="text-xs text-slate-500 mt-1">Recommended length: 50-60 characters.</p>
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-100 mb-6">
+                        <h3 class="font-bold text-blue-900 mb-2">Search Engine Optimization</h3>
+                        <p class="text-sm text-blue-700">Optimize how your product appears in search engine results like
+                            Google.</p>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Meta Description</label>
-                        <textarea v-model="form.meta_description" rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
-                        <p class="text-xs text-slate-500 mt-1">Recommended length: 150-160 characters.</p>
+
+                    <div class="space-y-6 max-w-3xl">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Meta Title</label>
+                            <input type="text" v-model="form.meta_title" placeholder="Product Name | Brand"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
+                            <p class="text-xs text-slate-500 mt-2 flex justify-between">
+                                <span>Recommended length: 50-60 characters.</span>
+                                <span :class="form.meta_title.length > 60 ? 'text-red-500' : 'text-green-600'">{{
+                                    form.meta_title.length }} chars</span>
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Meta Description</label>
+                            <textarea v-model="form.meta_description" rows="4"
+                                placeholder="A brief summary of the product..."
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"></textarea>
+                            <p class="text-xs text-slate-500 mt-2 flex justify-between">
+                                <span>Recommended length: 150-160 characters.</span>
+                                <span :class="form.meta_description.length > 160 ? 'text-red-500' : 'text-green-600'">{{
+                                    form.meta_description.length }} chars</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -238,9 +455,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, computed, onMounted, watch, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Save, Plus, X, Image, Video } from 'lucide-vue-next';
+import { Save, Plus, X, Image as ImageIcon, Video, Layers, Wand2, Trash2 } from 'lucide-vue-next';
 import axios from '../../axios';
 
 const route = useRoute();
@@ -248,12 +465,14 @@ const router = useRouter();
 const isEditing = computed(() => route.params.id !== undefined);
 const loading = ref(false);
 const categories = ref([]);
+const brands = ref([]);
+const editorKey = ref(0);
 
 const currentTab = ref('general');
 const tabs = [
-    { id: 'general', label: 'General' },
-    { id: 'data', label: 'Data & Inventory' },
-    { id: 'gallery', label: 'Gallery' },
+    { id: 'general', label: 'General Info' },
+    { id: 'variants', label: 'Variants & Inventory' },
+    { id: 'gallery', label: 'Media Gallery' },
     { id: 'seo', label: 'SEO' },
 ];
 
@@ -265,25 +484,49 @@ const form = ref({
     short_description: '',
     description: '',
     price: 0,
+    sellable_price: null,
     stock: 0,
     image: '',
     image_url: '',
     has_variants: false,
+    is_featured: false,
     variants: [],
     gallery: [],
     meta_title: '',
-    meta_description: ''
+    meta_description: '',
+    attribute_definitions: []
 });
+
+// Variant Generator State
+const variantAttributes = ref([
+    {
+        name: 'Size',
+        values: [
+            { name: 'S', price_adjustment: 0, image_preview: null, image_file: null },
+            { name: 'M', price_adjustment: 0, image_preview: null, image_file: null },
+            { name: 'L', price_adjustment: 0, image_preview: null, image_file: null }
+        ]
+    }
+]);
 
 const mainImageFile = ref(null);
 const mainImagePreview = ref(null);
 
 const fetchCategories = async () => {
     try {
-        const response = await axios.get('/categories?all=true');
+        const response = await axios.get('/admin/categories?all=true');
         categories.value = response.data;
     } catch (error) {
         console.error('Error fetching categories:', error);
+    }
+};
+
+const fetchBrands = async () => {
+    try {
+        const response = await axios.get('/admin/brands?all=true');
+        brands.value = response.data;
+    } catch (error) {
+        console.error('Error fetching brands:', error);
     }
 };
 
@@ -291,25 +534,86 @@ const fetchProduct = async () => {
     if (!isEditing.value) return;
     loading.value = true;
     try {
-        const response = await axios.get(`/products/${route.params.id}`);
+        const response = await axios.get(`/admin/products/${route.params.id}`);
         const product = response.data;
 
         // Transform variants attributes from object to JSON string for editing
         const variants = product.variants ? product.variants.map(v => ({
             ...v,
-            attributes_json: JSON.stringify(v.attributes)
+            attributes_json: JSON.stringify(v.attributes),
+            image_preview: v.image ? `/storage/${v.image}` : null // Assuming image path is relative to storage
         })) : [];
 
         form.value = {
-            ...product,
+            name: product.name || '',
+            brand: product.brand || '',
+            category: product.category || '',
+            sku: product.sku || '',
+            short_description: product.short_description || '',
+            description: product.description || '',
+            price: product.price || 0,
+            stock: product.stock || 0,
+            image: product.image || '',
+            image_url: product.image_url || '',
+            has_variants: product.has_variants || false,
+            is_featured: product.is_featured || false,
             variants,
-            gallery: product.images || []
+            gallery: product.images || [],
+            meta_title: product.meta_title || '',
+            meta_description: product.meta_description || '',
+            attribute_definitions: product.attribute_definitions || []
         };
+
+        // Populate generator if definitions exist
+        if (product.attribute_definitions && product.attribute_definitions.length > 0) {
+            variantAttributes.value = product.attribute_definitions.map(attr => ({
+                name: attr.name || '',
+                values: (attr.values || []).map(val => {
+                    // Try to find an image from existing variants
+                    let imagePreview = null;
+                    let imagePath = null;
+
+                    if (product.variants && product.variants.length > 0) {
+                        const matchingVariant = product.variants.find(v =>
+                            v.attributes && v.attributes[attr.name] === val.name && v.image
+                        );
+                        if (matchingVariant) {
+                            imagePath = matchingVariant.image;
+                            imagePreview = `/storage/${matchingVariant.image}`;
+                        }
+                    }
+
+                    return {
+                        name: val.name || '',
+                        price_adjustment: parseFloat(val.price_adjustment) || 0,
+                        image: imagePath,
+                        image_preview: imagePreview,
+                        image_file: null
+                    };
+                })
+            }));
+        } else {
+            // If no attribute definitions, reset to default
+            variantAttributes.value = [
+                {
+                    name: 'Size',
+                    values: [
+                        { name: 'S', price_adjustment: 0, image_preview: null, image_file: null },
+                        { name: 'M', price_adjustment: 0, image_preview: null, image_file: null },
+                        { name: 'L', price_adjustment: 0, image_preview: null, image_file: null }
+                    ]
+                }
+            ];
+        }
     } catch (error) {
         console.error('Error fetching product:', error);
         alert('Failed to load product details');
     } finally {
         loading.value = false;
+
+        // Force Quill editor to re-render with new content
+        editorKey.value++;
+        await nextTick();
     }
 };
 
@@ -321,19 +625,134 @@ const handleMainImageUpload = (event) => {
     }
 };
 
-const addVariant = () => {
-    form.value.variants.push({
-        attributes_json: '',
-        sku: '',
-        price: form.value.price,
-        stock: 0
+// Variant Logic
+const addAttribute = () => {
+    variantAttributes.value.push({ name: '', values: [{ name: '', price_adjustment: 0, image_preview: null, image_file: null }] });
+};
+
+const removeAttribute = (index) => {
+    variantAttributes.value.splice(index, 1);
+};
+
+const addAttributeValue = (attrIndex) => {
+    variantAttributes.value[attrIndex].values.push({ name: '', price_adjustment: 0, image_preview: null, image_file: null });
+};
+
+const removeAttributeValue = (attrIndex, valIndex) => {
+    variantAttributes.value[attrIndex].values.splice(valIndex, 1);
+};
+
+const handleAttributeImageUpload = (event, attrIndex, valIndex) => {
+    const file = event.target.files[0];
+    if (file) {
+        variantAttributes.value[attrIndex].values[valIndex].image_file = file;
+        variantAttributes.value[attrIndex].values[valIndex].image_preview = URL.createObjectURL(file);
+    }
+};
+
+const generateVariants = () => {
+    if (variantAttributes.value.length === 0) return;
+
+    // Filter out empty attributes
+    const validAttributes = variantAttributes.value.filter(a => a.name && a.values.some(v => v.name));
+    if (validAttributes.length === 0) return;
+
+    // Prepare attributes for cartesian product
+    const attributeMap = validAttributes.map(attr => ({
+        name: attr.name.trim(),
+        values: attr.values.filter(v => v.name).map(v => ({
+            name: v.name.trim(),
+            price_adjustment: parseFloat(v.price_adjustment) || 0,
+            image: v.image,
+            image_file: v.image_file,
+            image_preview: v.image_preview
+        }))
+    }));
+
+    // Generate Cartesian Product
+    const cartesian = (args) => {
+        const result = [];
+        const max = args.length - 1;
+        function helper(arr, i) {
+            for (let j = 0, l = args[i].values.length; j < l; j++) {
+                const a = arr.slice(0); // clone arr
+                a.push({
+                    key: args[i].name,
+                    value: args[i].values[j].name,
+                    price_adjustment: args[i].values[j].price_adjustment,
+                    image: args[i].values[j].image,
+                    image_file: args[i].values[j].image_file,
+                    image_preview: args[i].values[j].image_preview
+                });
+                if (i == max)
+                    result.push(a);
+                else
+                    helper(a, i + 1);
+            }
+        }
+        helper([], 0);
+        return result;
+    };
+
+    const combinations = cartesian(attributeMap);
+
+    // Create variants
+    form.value.variants = combinations.map(combo => {
+        // Calculate price
+        const priceAdjustment = combo.reduce((sum, item) => sum + item.price_adjustment, 0);
+        const finalPrice = parseFloat(form.value.price) + priceAdjustment;
+
+        // Construct attributes object
+        const attributes = {};
+        combo.forEach(item => {
+            attributes[item.key] = item.value;
+        });
+
+        // Determine image (use the first one found in the combination)
+        const imageItem = combo.find(item => item.image_file || item.image_preview);
+
+        return {
+            attributes_json: JSON.stringify(attributes),
+            sku: `${form.value.sku}-${Object.values(attributes).join('-').toUpperCase()}`,
+            price: finalPrice,
+            stock: 0,
+            image: imageItem ? imageItem.image : null,
+            image_file: imageItem ? imageItem.image_file : null,
+            image_preview: imageItem ? imageItem.image_preview : null
+        };
     });
+
+    // Save definitions to form for persistence
+    form.value.attribute_definitions = variantAttributes.value.map(attr => ({
+        name: attr.name,
+        values: attr.values.map(v => ({
+            name: v.name,
+            price_adjustment: v.price_adjustment
+        }))
+    }));
+};
+
+const parseAttributes = (json) => {
+    try {
+        return JSON.parse(json);
+    } catch (e) {
+        return {};
+    }
 };
 
 const removeVariant = (index) => {
     form.value.variants.splice(index, 1);
 };
 
+const handleVariantImageUpload = (event, index) => {
+    const file = event.target.files[0];
+    if (file) {
+        form.value.variants[index].image_file = file;
+        form.value.variants[index].image_preview = URL.createObjectURL(file);
+    }
+};
+
+// Gallery Logic
 const addGalleryItem = () => {
     form.value.gallery.push({
         file: null,
@@ -377,13 +796,22 @@ const saveProduct = async () => {
         formData.append('category', form.value.category);
         formData.append('brand', form.value.brand || '');
         formData.append('price', form.value.price);
+        if (form.value.sellable_price) {
+            formData.append('sellable_price', form.value.sellable_price);
+        }
         formData.append('stock', form.value.stock);
         formData.append('description', form.value.description || '');
         formData.append('short_description', form.value.short_description || '');
         formData.append('meta_title', form.value.meta_title || '');
         formData.append('meta_description', form.value.meta_description || '');
         formData.append('has_variants', form.value.has_variants ? 1 : 0);
+        formData.append('is_featured', form.value.is_featured ? 1 : 0);
         formData.append('variants', JSON.stringify(variantsData));
+
+        // Only append attribute_definitions if it exists and is not empty
+        if (form.value.attribute_definitions && form.value.attribute_definitions.length > 0) {
+            formData.append('attribute_definitions', JSON.stringify(form.value.attribute_definitions));
+        }
 
         if (mainImageFile.value) {
             formData.append('image', mainImageFile.value);
@@ -399,14 +827,21 @@ const saveProduct = async () => {
             }
         });
 
+        // Append Variant Images
+        form.value.variants.forEach((variant, index) => {
+            if (variant.image_file) {
+                formData.append(`variant_images[${index}]`, variant.image_file);
+            }
+        });
+
         if (isEditing.value) {
             formData.append('_method', 'PUT');
-            await axios.post(`/products/${route.params.id}`, formData, {
+            await axios.post(`/admin/products/${route.params.id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             alert('Product updated successfully');
         } else {
-            await axios.post('/products', formData, {
+            await axios.post('/admin/products', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             alert('Product created successfully');
@@ -422,6 +857,42 @@ const saveProduct = async () => {
 
 onMounted(() => {
     fetchCategories();
+    fetchBrands();
     fetchProduct();
 });
+
+// Auto-fill meta title and description based on product name and brand
+watch([() => form.value.name, () => form.value.brand], ([newName, newBrand]) => {
+    // Auto-fill meta title if empty or matches previous auto-generated format
+    if (newName) {
+        const autoTitle = newBrand ? `${newName} | ${newBrand}` : newName;
+        // Only auto-fill if meta_title is empty or was previously auto-generated
+        if (!form.value.meta_title || form.value.meta_title === form.value.name ||
+            form.value.meta_title.includes('|')) {
+            form.value.meta_title = autoTitle;
+        }
+    }
+
+    // Auto-fill meta description if empty
+    if (newName && !form.value.meta_description) {
+        const brandPart = newBrand ? ` by ${newBrand}` : '';
+        form.value.meta_description = `Shop ${newName}${brandPart}. High quality product with great features.`;
+    }
+});
 </script>
+
+<style>
+/* Quill Editor Customization */
+.ql-toolbar.ql-snow {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    border-color: #e2e8f0;
+}
+
+.ql-container.ql-snow {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    border-color: #e2e8f0;
+    min-height: 200px;
+}
+</style>

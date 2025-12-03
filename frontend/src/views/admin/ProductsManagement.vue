@@ -69,7 +69,7 @@
                             class="border-b border-gray-100 hover:bg-gray-50">
                             <td class="py-4 px-6">
                                 <div class="flex items-center gap-3">
-                                    <img :src="product.image || 'https://via.placeholder.com/100'" :alt="product.name"
+                                    <img :src="product.image_url || 'https://via.placeholder.com/100'" :alt="product.name"
                                         class="w-12 h-12 rounded-lg object-cover">
                                     <div>
                                         <p class="font-semibold text-slate-900 text-sm">{{ product.name }}</p>
@@ -79,13 +79,13 @@
                             </td>
                             <td class="py-4 px-6 text-sm text-slate-600">{{ product.sku }}</td>
                             <td class="py-4 px-6 text-sm text-slate-600">{{ product.category }}</td>
-                            <td class="py-4 px-6 text-sm font-semibold text-slate-900">৳{{
-                                parseFloat(product.price).toLocaleString() }}</td>
-                            <td class="py-4 px-6 text-sm text-slate-600">{{ product.stock }}</td>
+                            <td class="py-4 px-6 text-sm font-mono text-slate-900">৳{{ Number(product.price).toLocaleString()
+                                }}</td>
+                            <td class="py-4 px-6 text-sm text-slate-600">{{ product.total_stock || 0 }}</td>
                             <td class="py-4 px-6">
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold"
-                                    :class="getStockClass(product.stock)">
-                                    {{ getStockLabel(product.stock) }}
+                                    :class="getStockClass(product.total_stock || 0)">
+                                    {{ getStockLabel(product.total_stock || 0) }}
                                 </span>
                             </td>
                             <td class="py-4 px-6">
@@ -166,7 +166,7 @@ const visiblePages = computed(() => {
 const fetchProducts = async (page = 1) => {
     loading.value = true;
     try {
-        const response = await axios.get('/products', {
+        const response = await axios.get('/admin/products', {
             params: {
                 page,
                 search: filters.value.search,

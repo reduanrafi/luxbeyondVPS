@@ -15,6 +15,7 @@ class Product extends Model
         'category',
         'brand',
         'price',
+        'sellable_price',
         'stock',
         'image',
         'description',
@@ -22,12 +23,17 @@ class Product extends Model
         'meta_title',
         'meta_description',
         'has_variants',
+        'is_featured',
+        'attribute_definitions',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'sellable_price' => 'decimal:2',
         'stock' => 'integer',
         'has_variants' => 'boolean',
+        'is_featured' => 'boolean',
+        'attribute_definitions' => 'array',
     ];
 
     public function variants()
@@ -35,7 +41,7 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'total_stock', 'in_stock'];
 
     public function getImageUrlAttribute()
     {
@@ -46,6 +52,21 @@ class Product extends Model
             return $this->image;
         }
         return asset('storage/' . $this->image);
+    }
+
+    public function getTotalStockAttribute()
+    {
+        // If product has variants, sum their stock
+        if ($this->has_variants && $this->relationLoaded('variants')) {
+            return $this->variants->sum('stock');
+        }
+        // Otherwise return the product's own stock
+        return $this->stock;
+    }
+
+    public function getInStockAttribute()
+    {
+        return $this->total_stock > 0;
     }
 
     public function images()

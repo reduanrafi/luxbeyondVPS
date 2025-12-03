@@ -464,7 +464,7 @@ const formatDate = (dateString) => {
 const fetchCoupons = async (page = 1) => {
     loading.value = true;
     try {
-        const response = await axios.get('/coupons', {
+        const response = await axios.get('/admin/coupons', {
             params: {
                 page,
                 search: filters.value.search,
@@ -511,7 +511,7 @@ const changePage = (page) => {
 
 const createCoupon = async () => {
     try {
-        await axios.post('/coupons', form.value);
+        await axios.post('/admin/coupons', form.value);
         closeModal();
         fetchCoupons(pagination.value.current_page);
     } catch (error) {

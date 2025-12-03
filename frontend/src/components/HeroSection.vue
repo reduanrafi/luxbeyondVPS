@@ -1,44 +1,86 @@
 <template>
-    <section class="relative bg-background text-primary pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        <!-- Background Gradient/Image -->
-        <div class="absolute inset-0 bg-gradient-to-r from-[#d6006e] via-[#f3c6e0] to-[#fdf2f8]"></div>
-        
-        <div class="relative max-w-7xl mx-auto text-center z-10">
-            <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-8 animate-fade-in-up leading-tight text-primary">
-                Global Shopping, <br class="hidden sm:block" />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Simplified.</span>
-            </h1>
-            <p class="text-xl sm:text-2xl max-w-2xl mx-auto mb-12 text-primary/80 animate-fade-in-up delay-100 leading-relaxed font-medium">
-                Request any product from anywhere in the world. We handle the purchase, shipping, and delivery to your doorstep.
-            </p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up delay-200">
-                <router-link to="/request-product" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-full text-white bg-primary hover:bg-primary-hover transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                    Request a Product
-                </router-link>
-                <a href="#how-it-works" class="inline-flex items-center justify-center px-8 py-4 border-2 border-primary text-lg font-bold rounded-full text-primary hover:bg-primary hover:text-white transition-all duration-200">
-                    How It Works
-                </a>
+    <section class="relative w-full overflow-hidden group">
+        <!-- Slides -->
+        <div class="relative w-full h-auto">
+            <div v-for="(slide, index) in slides" :key="index"
+                class="transition-opacity duration-700 ease-in-out w-full"
+                :class="{ 'opacity-100 relative': currentSlide === index, 'opacity-0 absolute top-0 left-0': currentSlide !== index }">
+
+                <!-- Desktop Banner -->
+                <img :src="slide.desktop" :alt="slide.alt" class="hidden lg:block w-full h-auto object-cover">
+
+                <!-- Mobile Banner -->
+                <img :src="slide.mobile" :alt="slide.alt" class="block lg:hidden w-full h-auto object-cover">
             </div>
         </div>
-        <!-- Decorative Elements -->
-        <div class="absolute top-1/4 left-10 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-30 animate-blob"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
+
+        <!-- Navigation Arrows -->
+        <button @click="prevSlide"
+            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white text-slate-800 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+            <ChevronLeft class="w-6 h-6" />
+        </button>
+        <button @click="nextSlide"
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white text-slate-800 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+            <ChevronRight class="w-6 h-6" />
+        </button>
+
+        <!-- Dots -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+            <button v-for="(slide, index) in slides" :key="index" @click="goToSlide(index)"
+                class="w-3 h-3 rounded-full transition-all duration-300"
+                :class="currentSlide === index ? 'bg-primary scale-110' : 'bg-white/60 hover:bg-white'">
+            </button>
+        </div>
     </section>
 </template>
 
-<style scoped>
-.animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out forwards;
-    opacity: 0;
-    transform: translateY(20px);
-}
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
+const currentSlide = ref(0);
+const autoplayInterval = ref(null);
+
+const slides = [
+    {
+        desktop: '/assets/large-image.png',
+        mobile: '/assets/luxbeyond-mobile.png',
+        alt: 'Global Shopping Simplified'
+    },
+    {
+        desktop: '/assets/large-image.png', // Placeholder for second slide
+        mobile: '/assets/luxbeyond-mobile.png',
+        alt: 'Shop from Anywhere'
     }
-}
-</style>
+];
+
+const nextSlide = () => {
+    currentSlide.value = (currentSlide.value + 1) % slides.length;
+};
+
+const prevSlide = () => {
+    currentSlide.value = (currentSlide.value - 1 + slides.length) % slides.length;
+};
+
+const goToSlide = (index) => {
+    currentSlide.value = index;
+};
+
+const startAutoplay = () => {
+    autoplayInterval.value = setInterval(nextSlide, 5000); // Change slide every 5 seconds
+};
+
+const stopAutoplay = () => {
+    if (autoplayInterval.value) {
+        clearInterval(autoplayInterval.value);
+    }
+};
+
+onMounted(() => {
+    startAutoplay();
+});
+
+onUnmounted(() => {
+    stopAutoplay();
+});
+</script>

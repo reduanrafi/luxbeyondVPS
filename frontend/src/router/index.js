@@ -69,12 +69,24 @@ const routes = [
                 component: () => import('../views/admin/CategoriesManagement.vue'),
             },
             {
+                path: 'brands',
+                component: () => import('../views/admin/BrandsManagement.vue'),
+            },
+            {
+                path: 'charges',
+                component: () => import('../views/admin/ChargesManagement.vue'),
+            },
+            {
                 path: 'coupons',
                 component: () => import('../views/admin/CouponsManagement.vue'),
             },
             {
                 path: 'orders',
                 component: () => import('../views/admin/OrdersManagement.vue'),
+            },
+            {
+                path: 'order-statuses',
+                component: () => import('../views/admin/OrderStatusManagement.vue'),
             },
             {
                 path: 'customers',
@@ -101,9 +113,22 @@ const routes = [
         meta: { requiresAuth: true }
     },
 
+
+    {
+        path: '/shop',
+        component: () => import('../views/Shop.vue'),
+    },
+    {
+        path: '/products/:id',
+        component: () => import('../views/ProductDetails.vue'),
+    },
+    {
+        path: '/checkout',
+        component: () => import('../views/Checkout.vue'),
+        meta: { requiresAuth: true },
+    },
+
     // Public Pages
-    { path: '/shop', component: () => import('../views/Shop.vue') },
-    { path: '/product/:id', component: () => import('../views/ProductDetails.vue') },
     { path: '/blogs', component: () => import('../views/BlogList.vue') },
     { path: '/blog/:id', component: () => import('../views/BlogDetails.vue') },
     { path: '/travellers', component: () => import('../views/TravellerLanding.vue') },

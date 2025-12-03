@@ -1,12 +1,22 @@
 <template>
     <Teleport to="body">
-        <div v-if="isOpen" class="fixed inset-0 z-[60] overflow-hidden" aria-labelledby="notification-title"
-            role="dialog" aria-modal="true">
-            <div class="absolute inset-0 bg-gray-500/75 backdrop-blur-sm transition-opacity" @click="$emit('close')">
-            </div>
-            <div class="fixed inset-y-0 right-0 max-w-full flex pointer-events-none">
-                <div
-                    class="w-screen max-w-md transform transition ease-in-out duration-500 sm:duration-700 bg-white shadow-2xl flex flex-col pointer-events-auto">
+        <div class="fixed inset-0 z-[60] flex justify-end pointer-events-none">
+            <!-- Backdrop -->
+            <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
+                enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
+                leave-from-class="opacity-100" leave-to-class="opacity-0">
+                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 backdrop-blur-sm pointer-events-auto"
+                    @click="$emit('close')">
+                </div>
+            </Transition>
+
+            <!-- Panel -->
+            <Transition enter-active-class="transform transition ease-in-out duration-500 sm:duration-700"
+                enter-from-class="translate-x-full" enter-to-class="translate-x-0"
+                leave-active-class="transform transition ease-in-out duration-500 sm:duration-700"
+                leave-from-class="translate-x-0" leave-to-class="translate-x-full">
+                <div v-if="isOpen"
+                    class="w-screen max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
                     <!-- Header -->
                     <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-primary/5 to-purple-50">
                         <div class="flex items-center justify-between">
@@ -64,7 +74,7 @@
                         </button>
                     </div>
                 </div>
-            </div>
+            </Transition>
         </div>
     </Teleport>
 </template>

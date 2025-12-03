@@ -18,33 +18,37 @@
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <input type="text" placeholder="Search orders..."
+                <input v-model="filters.search" @input="fetchOrders" type="text" placeholder="Search orders..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
-                <select
+                <select v-model="filters.status_id" @change="fetchOrders"
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
-                    <option>All Status</option>
-                    <option>Pending</option>
-                    <option>Processing</option>
-                    <option>Shipped</option>
-                    <option>Completed</option>
-                    <option>Cancelled</option>
+                    <option value="">All Status</option>
+                    <option v-for="status in orderStatuses" :key="status.id" :value="status.id">
+                        {{ status.label }}
+                    </option>
                 </select>
-                <input type="date"
+                <input v-model="filters.date_from" @change="fetchOrders" type="date"
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
-                <input type="date"
+                <input v-model="filters.date_to" @change="fetchOrders" type="date"
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
-                <button
+                <button @click="resetFilters"
                     class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Reset</button>
             </div>
         </div>
 
+        <!-- Loading State -->
+        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p class="text-slate-600 mt-2">Loading orders...</p>
+        </div>
+
         <!-- Orders Table -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div v-else class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Order ID</th>
+                            <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Order Number</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Customer</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Date</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Items</th>
@@ -54,30 +58,41 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr v-if="orders.length === 0">
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">No orders found</td>
+                        </tr>
                         <tr v-for="order in orders" :key="order.id" class="border-b border-gray-100 hover:bg-gray-50">
-                            <td class="py-4 px-6 text-sm font-medium text-slate-900">#{{ order.id }}</td>
-                            <td class="py-4 px-6 text-sm text-slate-600">{{ order.customer }}</td>
-                            <td class="py-4 px-6 text-sm text-slate-600">{{ order.date }}</td>
-                            <td class="py-4 px-6 text-sm text-slate-600">{{ order.items }} items</td>
-                            <td class="py-4 px-6 text-sm font-semibold text-slate-900">৳{{ order.total.toLocaleString()
-                                }}</td>
+                            <td class="py-4 px-6 text-sm font-medium text-slate-900">#{{ order.order_number }}</td>
+                            <td class="py-4 px-6 text-sm text-slate-600">
+                                {{ order.user?.name || 'N/A' }}
+                            </td>
+                            <td class="py-4 px-6 text-sm text-slate-600">
+                                {{ new Date(order.created_at).toLocaleDateString() }}
+                            </td>
+                            <td class="py-4 px-6 text-sm text-slate-600">
+                                {{ order.items?.length || 0 }} items
+                            </td>
+                            <td class="py-4 px-6 text-sm font-semibold text-slate-900">
+                                {{ order.currency?.symbol || '৳' }}{{ parseFloat(order.total_amount).toLocaleString() }}
+                            </td>
                             <td class="py-4 px-6">
                                 <select
+                                    :value="order.status_id"
+                                    @change="updateOrderStatus(order.id, $event.target.value)"
                                     class="px-3 py-1 rounded-full text-xs font-semibold border-0 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    :class="getStatusClass(order.status)">
-                                    <option>Pending</option>
-                                    <option>Processing</option>
-                                    <option>Shipped</option>
-                                    <option>Completed</option>
-                                    <option>Cancelled</option>
+                                    :class="getStatusClass(order.status)"
+                                    :disabled="updatingStatus === order.id">
+                                    <option v-for="status in availableStatuses(order)" :key="status.id" :value="status.id">
+                                        {{ status.label }}
+                                    </option>
                                 </select>
                             </td>
                             <td class="py-4 px-6">
                                 <div class="flex items-center gap-2">
-                                    <button class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <button @click="viewOrder(order.id)" class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
                                         <Eye class="w-4 h-4 text-blue-600" />
                                     </button>
-                                    <button class="p-2 hover:bg-green-50 rounded-lg transition-colors">
+                                    <button @click="printOrder(order.id)" class="p-2 hover:bg-green-50 rounded-lg transition-colors">
                                         <Printer class="w-4 h-4 text-green-600" />
                                     </button>
                                 </div>
@@ -91,33 +106,149 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Eye, Printer } from 'lucide-vue-next';
+import axios from '../../axios';
+
+const loading = ref(false);
+const updatingStatus = ref(null);
+const orders = ref([]);
+const orderStatuses = ref([]);
+
+const filters = ref({
+    search: '',
+    status_id: '',
+    date_from: '',
+    date_to: '',
+});
 
 const orderStats = ref([
-    { label: 'Total Orders', value: '1,234' },
-    { label: 'Pending', value: '45' },
-    { label: 'Processing', value: '23' },
-    { label: 'Completed', value: '1,156' },
+    { label: 'Total Orders', value: '0' },
+    { label: 'Pending', value: '0' },
+    { label: 'Processing', value: '0' },
+    { label: 'Completed', value: '0' },
 ]);
 
-const orders = ref([
-    { id: 'ORD-1234', customer: 'John Doe', date: '2024-01-15', items: 3, total: 12500, status: 'Completed' },
-    { id: 'ORD-1235', customer: 'Jane Smith', date: '2024-01-15', items: 2, total: 8900, status: 'Processing' },
-    { id: 'ORD-1236', customer: 'Mike Johnson', date: '2024-01-14', items: 5, total: 15600, status: 'Shipped' },
-    { id: 'ORD-1237', customer: 'Sarah Williams', date: '2024-01-14', items: 1, total: 6700, status: 'Pending' },
-    { id: 'ORD-1238', customer: 'Tom Brown', date: '2024-01-13', items: 4, total: 23400, status: 'Completed' },
-    { id: 'ORD-1239', customer: 'Emily Davis', date: '2024-01-13', items: 2, total: 9800, status: 'Cancelled' },
-]);
+const fetchOrders = async () => {
+    loading.value = true;
+    try {
+        const params = {};
+        if (filters.value.search) params.search = filters.value.search;
+        if (filters.value.status_id) params.status_id = filters.value.status_id;
+        if (filters.value.date_from) params.date_from = filters.value.date_from;
+        if (filters.value.date_to) params.date_to = filters.value.date_to;
+
+        const response = await axios.get('/admin/orders', { params });
+        orders.value = response.data.data || response.data;
+        
+        // Update stats
+        updateStats();
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const fetchOrderStatuses = async () => {
+    try {
+        const response = await axios.get('/admin/order-statuses', { params: { all: true } });
+        orderStatuses.value = response.data.data || response.data;
+    } catch (error) {
+        console.error('Error fetching order statuses:', error);
+    }
+};
+
+const updateOrderStatus = async (orderId, statusId) => {
+    if (!confirm('Are you sure you want to update the order status?')) {
+        return;
+    }
+
+    updatingStatus.value = orderId;
+    try {
+        await axios.post(`/admin/orders/${orderId}/update-status`, {
+            status_id: parseInt(statusId),
+            note: 'Status updated by admin'
+        });
+        
+        // Refresh orders
+        await fetchOrders();
+        alert('Order status updated successfully');
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        alert(error.response?.data?.message || 'Error updating order status');
+        // Refresh to reset the select
+        await fetchOrders();
+    } finally {
+        updatingStatus.value = null;
+    }
+};
+
+const availableStatuses = (order) => {
+    const currentStatus = orderStatuses.value.find(s => s.id === order.status_id);
+    if (!currentStatus) return orderStatuses.value.filter(s => s.is_active);
+    
+    // If current status has allowed transitions, show only those
+    if (currentStatus.allowed_next_statuses && currentStatus.allowed_next_statuses.length > 0) {
+        return orderStatuses.value.filter(s => 
+            s.is_active && (
+                s.id === order.status_id || 
+                currentStatus.allowed_next_statuses.includes(s.id)
+            )
+        );
+    }
+    
+    // Otherwise show all active statuses
+    return orderStatuses.value.filter(s => s.is_active);
+};
 
 const getStatusClass = (status) => {
-    const classes = {
+    if (!status) return 'bg-gray-100 text-gray-700';
+    
+    const statusObj = orderStatuses.value.find(s => s.id === status.id || s.label === status.label);
+    if (!statusObj) return 'bg-gray-100 text-gray-700';
+    
+    // Use the color from the status, or default classes
+    return {
         'Completed': 'bg-green-100 text-green-700',
         'Processing': 'bg-blue-100 text-blue-700',
         'Shipped': 'bg-purple-100 text-purple-700',
         'Pending': 'bg-yellow-100 text-yellow-700',
         'Cancelled': 'bg-red-100 text-red-700'
-    };
-    return classes[status] || 'bg-gray-100 text-gray-700';
+    }[statusObj.label] || 'bg-gray-100 text-gray-700';
 };
+
+const updateStats = () => {
+    orderStats.value = [
+        { label: 'Total Orders', value: orders.value.length.toString() },
+        { label: 'Pending', value: orders.value.filter(o => o.status?.label === 'Pending').length.toString() },
+        { label: 'Processing', value: orders.value.filter(o => o.status?.label === 'Processing').length.toString() },
+        { label: 'Completed', value: orders.value.filter(o => o.status?.label === 'Completed').length.toString() },
+    ];
+};
+
+const viewOrder = (orderId) => {
+    // TODO: Implement order detail view
+    console.log('View order:', orderId);
+};
+
+const printOrder = (orderId) => {
+    // TODO: Implement order printing
+    console.log('Print order:', orderId);
+};
+
+const resetFilters = () => {
+    filters.value = {
+        search: '',
+        status_id: '',
+        date_from: '',
+        date_to: '',
+    };
+    fetchOrders();
+};
+
+onMounted(() => {
+    fetchOrderStatuses();
+    fetchOrders();
+});
 </script>
