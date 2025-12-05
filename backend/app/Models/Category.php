@@ -47,7 +47,7 @@ class Category extends Model
 
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return $this->hasMany(Category::class, 'parent_id')->where('is_active', true)->orderBy('name', 'asc')->with('children');
     }
 
     public function isParent()
@@ -66,5 +66,37 @@ class Category extends Model
         }
 
         return implode(' → ', $path);
+    }
+
+    /**
+     * Get all descendant category names recursively (including self)
+     */
+    public function getAllDescendantNames()
+    {
+        $names = [$this->name];
+        
+        $children = $this->children()->get();
+        foreach ($children as $child) {
+            $names = array_merge($names, $child->getAllDescendantNames());
+        }
+        
+        return $names;
+    }
+
+    /**
+     * Static method to get all category names by slug or name
+     */
+    public static function getCategoryNamesWithChildren($identifier)
+    {
+        // Try to find by slug first, then by name
+        $category = self::where('slug', $identifier)
+            ->orWhere('name', $identifier)
+            ->first();
+        
+        if (!$category) {
+            return [$identifier]; // Return the identifier itself if category not found
+        }
+        
+        return $category->getAllDescendantNames();
     }
 }

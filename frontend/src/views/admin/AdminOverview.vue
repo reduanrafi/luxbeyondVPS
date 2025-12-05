@@ -142,14 +142,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { DollarSign, ShoppingBag, Package, Users } from 'lucide-vue-next';
+import axios from '../../axios';
 
 const stats = ref([
-    { label: 'Total Revenue', value: '৳2,45,000', change: 12.5, icon: DollarSign, bgColor: 'bg-green-100', iconColor: 'text-green-600' },
-    { label: 'Total Orders', value: '1,234', change: 8.2, icon: ShoppingBag, bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
-    { label: 'Total Products', value: '456', change: 3.1, icon: Package, bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
-    { label: 'Total Customers', value: '892', change: 15.3, icon: Users, bgColor: 'bg-orange-100', iconColor: 'text-orange-600' },
+    { label: 'Total Revenue', value: '৳0', change: 0, icon: DollarSign, bgColor: 'bg-green-100', iconColor: 'text-green-600' },
+    { label: 'Total Orders', value: '0', change: 0, icon: ShoppingBag, bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
+    { label: 'Total Products', value: '0', change: 0, icon: Package, bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
+    { label: 'Total Customers', value: '0', change: 0, icon: Users, bgColor: 'bg-orange-100', iconColor: 'text-orange-600' },
 ]);
 
 const revenueData = ref([45, 52, 38, 65, 72, 58]);
@@ -161,15 +162,96 @@ const topProducts = ref([
     { id: 4, name: 'USB-C Cable', sales: 298, revenue: 89400, image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=100' },
 ]);
 
-const recentOrders = ref([
-    { id: 'ORD-1234', customer: 'John Doe', date: '2024-01-15', total: 12500, status: 'Completed' },
-    { id: 'ORD-1235', customer: 'Jane Smith', date: '2024-01-15', total: 8900, status: 'Processing' },
-    { id: 'ORD-1236', customer: 'Mike Johnson', date: '2024-01-14', total: 15600, status: 'Shipped' },
-    { id: 'ORD-1237', customer: 'Sarah Williams', date: '2024-01-14', total: 6700, status: 'Pending' },
-    { id: 'ORD-1238', customer: 'Tom Brown', date: '2024-01-13', total: 23400, status: 'Completed' },
-]);
+const recentOrders = ref([]);
+
+const fetchRecentOrders = async () => {
+    try {
+        const response = await axios.get('/admin/orders', {
+            params: {
+                per_page: 5
+            }
+        });
+        
+        const orders = response.data.data || response.data;
+        recentOrders.value = (Array.isArray(orders) ? orders : orders.data || []).map(order => ({
+            id: order.order_number || `ORD-${order.id}`,
+            customer: order.user?.name || 'N/A',
+            date: new Date(order.created_at).toLocaleDateString(),
+            total: parseFloat(order.total || order.total_amount || 0),
+            status: order.status?.label || order.status || 'Pending'
+        }));
+    } catch (error) {
+        console.error('Error fetching recent orders:', error);
+        recentOrders.value = [];
+    }
+};
+
+const fetchStats = async () => {
+    try {
+        // Fetch orders count
+        const ordersResponse = await axios.get('/admin/orders', { params: { per_page: 1 } });
+        const ordersData = ordersResponse.data;
+        const totalOrders = ordersData.total || ordersData.meta?.total || 0;
+        
+        // Fetch products count
+        const productsResponse = await axios.get('/admin/products', { params: { per_page: 1 } });
+        const productsData = productsResponse.data;
+        const totalProducts = productsData.total || productsData.meta?.total || 0;
+        
+        // Fetch customers count
+        const customersResponse = await axios.get('/admin/customers', { params: { per_page: 1 } });
+        const customersData = customersResponse.data;
+        const totalCustomers = customersData.total || customersData.meta?.total || 0;
+        
+        // Calculate total revenue from orders
+        const allOrdersResponse = await axios.get('/admin/orders', { params: { per_page: 1000 } });
+        const allOrders = allOrdersResponse.data.data || allOrdersResponse.data;
+        const ordersArray = Array.isArray(allOrders) ? allOrders : (allOrders.data || []);
+        const totalRevenue = ordersArray.reduce((sum, order) => {
+            return sum + parseFloat(order.total || order.total_amount || 0);
+        }, 0);
+        
+        stats.value = [
+            { 
+                label: 'Total Revenue', 
+                value: `৳${totalRevenue.toLocaleString()}`, 
+                change: 0, 
+                icon: DollarSign, 
+                bgColor: 'bg-green-100', 
+                iconColor: 'text-green-600' 
+            },
+            { 
+                label: 'Total Orders', 
+                value: totalOrders.toLocaleString(), 
+                change: 0, 
+                icon: ShoppingBag, 
+                bgColor: 'bg-blue-100', 
+                iconColor: 'text-blue-600' 
+            },
+            { 
+                label: 'Total Products', 
+                value: totalProducts.toLocaleString(), 
+                change: 0, 
+                icon: Package, 
+                bgColor: 'bg-purple-100', 
+                iconColor: 'text-purple-600' 
+            },
+            { 
+                label: 'Total Customers', 
+                value: totalCustomers.toLocaleString(), 
+                change: 0, 
+                icon: Users, 
+                bgColor: 'bg-orange-100', 
+                iconColor: 'text-orange-600' 
+            },
+        ];
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+    }
+};
 
 const getStatusClass = (status) => {
+    const statusStr = typeof status === 'string' ? status : (status?.label || 'Pending');
     const classes = {
         'Completed': 'bg-green-100 text-green-700',
         'Processing': 'bg-blue-100 text-blue-700',
@@ -177,6 +259,11 @@ const getStatusClass = (status) => {
         'Pending': 'bg-yellow-100 text-yellow-700',
         'Cancelled': 'bg-red-100 text-red-700'
     };
-    return classes[status] || 'bg-gray-100 text-gray-700';
+    return classes[statusStr] || 'bg-gray-100 text-gray-700';
 };
+
+onMounted(() => {
+    fetchRecentOrders();
+    fetchStats();
+});
 </script>

@@ -26,6 +26,22 @@ h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight text-primary;
 }
 
+h1{
+  @apply text-[20px] font-semibold;
+}
+
+h2 {
+  @apply text-[18px] font-semibold;
+}
+
+h3{
+  @apply text-[15px] font-semibold;
+}
 [v-cloak] {
   display: none;
+}
+
+
+button:hover {
+  cursor: pointer !important;  
 }

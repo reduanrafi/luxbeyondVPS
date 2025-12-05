@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-gray-50 min-h-screen pt-20 pb-12">
+    <div class="bg-gray-50 min-h-screen pt-20 pb-10">
         <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="animate-pulse">
                 <div class="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
@@ -33,14 +33,14 @@
             </nav>
 
             <!-- Product Main Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
                 <!-- Product Images -->
                 <div class="space-y-4">
-                    <div class="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-lg h-96 lg:h-[500px] relative group">
+                    <div class="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-lg h-80 lg:h-[420px] relative group">
                         <img
                             :src="selectedImage"
                             :alt="product.name"
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                         />
                         <!-- Zoom on hover -->
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors"></div>
@@ -53,7 +53,7 @@
                             class="rounded-lg overflow-hidden border-2 transition-all hover:scale-105"
                             :class="selectedImage === img ? 'border-primary shadow-md ring-2 ring-primary/20' : 'border-gray-200 hover:border-gray-300'"
                         >
-                            <img :src="img" :alt="`${product.name} ${index + 1}`" class="w-full h-20 object-cover">
+                            <img :src="img" :alt="`${product.name} ${index + 1}`" class="w-full h-20 object-contain">
                         </button>
                     </div>
                 </div>
@@ -74,32 +74,35 @@
                         </span>
                     </div>
 
-                    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
+                    <h1 class="font-bold text-gray-900">{{ product.name }}</h1>
 
                     <!-- SKU -->
                     <p v-if="product.sku" class="text-sm text-gray-500 mb-4">SKU: {{ product.sku }}</p>
 
                     <!-- Price -->
                     <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
-                        <span class="text-4xl font-bold text-primary">
-                            ৳{{ formatPrice(product.sellable_price || product.price) }}
+                        <span class="text-xl font-bold text-primary">
+                            ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
                         </span>
                         <span
-                            v-if="product.sellable_price && product.price > product.sellable_price"
-                            class="text-xl text-gray-400 line-through"
+                            v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
+                            class="text-sm text-gray-400 line-through"
                         >
-                            ৳{{ formatPrice(product.price) }}
+                            ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
                         </span>
                         <span
-                            v-if="product.sellable_price && product.price > product.sellable_price"
+                            v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
                             class="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full"
                         >
-                            -{{ calculateDiscount(product.price, product.sellable_price) }}%
+                            -{{ calculateDiscount(
+                                product.event_price ? product.original_price : product.price,
+                                product.event_price || product.sellable_price || product.price
+                            ) }}%
                         </span>
                     </div>
 
                     <!-- Short Description -->
-                    <p v-if="product.short_description" class="text-gray-600 mb-6 leading-relaxed">
+                    <p v-if="product.short_description" class="text-gray-600 mb-4">
                         {{ product.short_description }}
                     </p>
 
@@ -137,9 +140,10 @@
                                 v-for="variant in product.variants"
                                 :key="variant.id"
                                 @click="selectedVariant = variant"
-                                class="p-3 border-2 rounded-lg text-left transition-all hover:border-primary"
+                                class="p-3 border-2 rounded-lg text-left transition-all hover:border-primary flex justify-between"
                                 :class="selectedVariant?.id === variant.id ? 'border-primary bg-primary/5' : 'border-gray-200'"
                             >
+                            <div>
                                 <div class="text-sm font-medium text-gray-900">
                                     {{ formatVariantAttributes(variant.attributes) }}
                                 </div>
@@ -149,6 +153,8 @@
                                 <div class="text-xs text-gray-500 mt-1">
                                     Stock: {{ variant.stock }}
                                 </div>
+                            </div>
+                            <img :src="variant.image_url" :alt="variant.name" class="w-16 h-16 object-contain rounded" v-if="variant.image_url">
                             </button>
                         </div>
                     </div>
@@ -223,7 +229,7 @@
             </div>
 
             <!-- Tabs Section -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 mb-12">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-10">
                 <div class="border-b border-gray-200 mb-6">
                     <nav class="flex gap-8 overflow-x-auto">
                         <button
@@ -364,7 +370,7 @@ const maxQuantity = computed(() => {
 const fetchProduct = async () => {
     loading.value = true;
     try {
-        const response = await axios.get(`/products/${route.params.id}`);
+        const response = await axios.get(`/products/${route.params.slug}`);
         product.value = response.data;
         selectedImage.value = productImages.value[0];
         
@@ -409,7 +415,9 @@ const formatPrice = (price) => {
 
 const calculateDiscount = (originalPrice, salePrice) => {
     if (!originalPrice || !salePrice) return 0;
-    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+    const original = parseFloat(originalPrice);
+    const sale = parseFloat(salePrice);
+    return Math.round(((original - sale) / original) * 100);
 };
 
 const formatVariantAttributes = (attributes) => {
@@ -436,18 +444,38 @@ const decrementQty = () => {
 
 const addToCart = () => {
     if ((product.value.total_stock || 0) === 0) return;
-
-    const cartProduct = {
-        ...product.value,
-        price: `৳${formatPrice(selectedVariant.value?.price || product.value.sellable_price || product.value.price)}`,
-        quantity: quantity.value,
-    };
-
-    if (selectedVariant.value) {
-        cartProduct.variant = selectedVariant.value;
+    
+    // Check if variant is required but not selected
+    if (product.value.has_variants && !selectedVariant.value) {
+        alert('Please select a variant');
+        return;
     }
 
-    cartStore.addItem(cartProduct);
+    // Ensure slug is explicitly set
+    const cartProduct = {
+        id: product.value.id,
+        name: product.value.name,
+        slug: product.value.slug || product.value.id || String(product.value.id),
+        price: selectedVariant.value 
+            ? (selectedVariant.value.price || product.value.event_price || product.value.sellable_price || product.value.price)
+            : (product.value.event_price || product.value.sellable_price || product.value.price),
+        image: product.value.image_url || product.value.image,
+        category: product.value.category,
+        brand: product.value.brand
+    };
+
+    // Pass variant and quantity to cart store
+    const variant = selectedVariant.value ? {
+        id: selectedVariant.value.id,
+        attributes: selectedVariant.value.attributes,
+        price: selectedVariant.value.price,
+        stock: selectedVariant.value.stock,
+        sku: selectedVariant.value.sku,
+        image: selectedVariant.value.image || selectedVariant.value.image_url || null,
+        image_url: selectedVariant.value.image_url || (selectedVariant.value.image ? (selectedVariant.value.image.startsWith('http') ? selectedVariant.value.image : `/storage/${selectedVariant.value.image}`) : null)
+    } : null;
+
+    cartStore.addItem(cartProduct, variant, quantity.value);
 };
 
 const toggleWishlist = () => {

@@ -54,6 +54,26 @@
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                             </div>
 
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">
+                                    URL Slug
+                                    <span class="text-xs font-normal text-gray-500 ml-2">(Auto-generated from name)</span>
+                                </label>
+                                <div class="flex items-center gap-2">
+                                    <input type="text" v-model="form.slug" 
+                                        placeholder="premium-leather-jacket"
+                                        class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono text-sm">
+                                    <button 
+                                        type="button"
+                                        @click="generateSlug"
+                                        class="px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-xl transition-colors text-sm font-medium text-slate-700"
+                                        title="Regenerate slug from product name">
+                                        Regenerate
+                                    </button>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">Used in product URL: /products/{{ form.slug || 'your-slug' }}</p>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-2">Brand</label>
@@ -108,7 +128,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Status</label>
-                                        <select
+                                        <select v-model="form.status"
                                             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
                                             <option value="published">Published</option>
                                             <option value="draft">Draft</option>
@@ -300,7 +320,10 @@
                                                     class="absolute inset-0 opacity-0 cursor-pointer z-10">
                                                 <img v-if="variant.image_preview" :src="variant.image_preview"
                                                     class="w-full h-full object-cover">
-                                                <img v-else-if="variant.image" :src="variant.image"
+                                                <img v-else-if="variant.image_url" :src="variant.image_url"
+                                                    class="w-full h-full object-cover">
+                                                <img v-else-if="variant.image" 
+                                                    :src="variant.image.startsWith('http') || variant.image.startsWith('/') ? variant.image : `/storage/${variant.image}`"
                                                     class="w-full h-full object-cover">
                                                 <ImageIcon v-else class="w-5 h-5 text-gray-400" />
                                             </div>
@@ -478,6 +501,7 @@ const tabs = [
 
 const form = ref({
     name: '',
+    slug: '',
     brand: '',
     category: '',
     sku: '',
@@ -490,12 +514,25 @@ const form = ref({
     image_url: '',
     has_variants: false,
     is_featured: false,
+    status: 'published',
     variants: [],
     gallery: [],
     meta_title: '',
     meta_description: '',
     attribute_definitions: []
 });
+
+// Generate slug from name
+const generateSlug = () => {
+    if (form.value.name) {
+        form.value.slug = form.value.name
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '') // Remove special characters
+            .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+            .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+    }
+};
 
 // Variant Generator State
 const variantAttributes = ref([
@@ -541,22 +578,26 @@ const fetchProduct = async () => {
         const variants = product.variants ? product.variants.map(v => ({
             ...v,
             attributes_json: JSON.stringify(v.attributes),
-            image_preview: v.image ? `/storage/${v.image}` : null // Assuming image path is relative to storage
+            // Use image_url from API (full URL) or construct from image path
+            image_preview: v.image_url || (v.image ? (v.image.startsWith('http') || v.image.startsWith('/storage/') ? v.image : `/storage/${v.image}`) : null)
         })) : [];
 
         form.value = {
             name: product.name || '',
+            slug: product.slug || '',
             brand: product.brand || '',
             category: product.category || '',
             sku: product.sku || '',
             short_description: product.short_description || '',
             description: product.description || '',
             price: product.price || 0,
+            sellable_price: product.sellable_price || 0,
             stock: product.stock || 0,
             image: product.image || '',
             image_url: product.image_url || '',
             has_variants: product.has_variants || false,
             is_featured: product.is_featured || false,
+            status: product.status || 'published',
             variants,
             gallery: product.images || [],
             meta_title: product.meta_title || '',
@@ -579,7 +620,8 @@ const fetchProduct = async () => {
                         );
                         if (matchingVariant) {
                             imagePath = matchingVariant.image;
-                            imagePreview = `/storage/${matchingVariant.image}`;
+                            // Use image_url if available, otherwise construct from image path
+                            imagePreview = matchingVariant.image_url || (matchingVariant.image ? `/storage/${matchingVariant.image}` : null);
                         }
                     }
 
@@ -792,6 +834,9 @@ const saveProduct = async () => {
 
         const formData = new FormData();
         formData.append('name', form.value.name);
+        if (form.value.slug) {
+            formData.append('slug', form.value.slug);
+        }
         formData.append('sku', form.value.sku);
         formData.append('category', form.value.category);
         formData.append('brand', form.value.brand || '');
@@ -806,6 +851,7 @@ const saveProduct = async () => {
         formData.append('meta_description', form.value.meta_description || '');
         formData.append('has_variants', form.value.has_variants ? 1 : 0);
         formData.append('is_featured', form.value.is_featured ? 1 : 0);
+        formData.append('status', form.value.status || 'published');
         formData.append('variants', JSON.stringify(variantsData));
 
         // Only append attribute_definitions if it exists and is not empty
@@ -860,6 +906,24 @@ onMounted(() => {
     fetchBrands();
     fetchProduct();
 });
+
+// Auto-generate slug from name
+watch(() => form.value.name, (newName) => {
+    if (newName && (!form.value.slug || form.value.slug === generateSlugFromName(form.value.name))) {
+        generateSlug();
+    }
+});
+
+// Helper function to generate slug (used for comparison)
+const generateSlugFromName = (name) => {
+    if (!name) return '';
+    return name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+};
 
 // Auto-fill meta title and description based on product name and brand
 watch([() => form.value.name, () => form.value.brand], ([newName, newBrand]) => {

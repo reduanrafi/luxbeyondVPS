@@ -12,6 +12,12 @@ class ProductController extends Controller
     {
         $query = Product::query();
 
+        // Only show published products for public API (header search, shop page, etc.)
+        // Admin can see all products by passing status parameter
+        if (!$request->has('status') || $request->status !== 'all') {
+            $query->where('status', 'published');
+        }
+
         // Search
         if ($request->has('search') && $request->search) {
             $query->where(function($q) use ($request) {
@@ -22,9 +28,36 @@ class ProductController extends Controller
             });
         }
 
-        // Category filter
+        // Category filter (including all child categories)
         if ($request->has('category') && $request->category) {
-            $query->where('category', $request->category);
+            $categoryNames = \App\Models\Category::getCategoryNamesWithChildren($request->category);
+            $query->whereIn('category', $categoryNames);
+        }
+
+        // Event filter
+        $eventPrice = null;
+        $eventPriceType = null;
+        $eventDiscountPercentage = null;
+        if ($request->has('events') && $request->events) {
+            $event = \App\Models\Event::where('slug', $request->events)
+                ->where('is_active', true)
+                ->first();
+            
+            if ($event) {
+                $now = now();
+                // Only filter if event is live or upcoming
+                if (($event->start_date <= $now && $event->end_date >= $now) || $event->start_date > $now) {
+                    $productIds = $event->products()->pluck('products.id');
+                    $query->whereIn('id', $productIds);
+                    // Store event pricing info
+                    $eventPriceType = $event->price_type ?? 'fixed';
+                    if ($eventPriceType === 'fixed' && $event->price) {
+                        $eventPrice = $event->price;
+                    } elseif ($eventPriceType === 'percentage' && $event->discount_percentage) {
+                        $eventDiscountPercentage = $event->discount_percentage;
+                    }
+                }
+            }
         }
 
         // Brand filter
@@ -97,6 +130,32 @@ class ProductController extends Controller
         $perPage = $request->get('per_page', 12);
         $products = $query->paginate($perPage);
 
+        // Ensure slug is included in response and generate if missing
+        // Also apply event price if available
+        $products->getCollection()->transform(function ($product) use ($eventPrice, $eventPriceType, $eventDiscountPercentage) {
+            // Generate slug if missing
+            if (empty($product->slug) && !empty($product->name)) {
+                $product->slug = Product::generateUniqueSlug($product->name, $product->id);
+                $product->saveQuietly();
+            }
+            // Ensure slug is always set (even if null, it will be in the response)
+            if (empty($product->slug)) {
+                $product->slug = null; // Explicitly set to null so it's in JSON
+            }
+            // Apply event price if set
+            if ($eventPriceType === 'fixed' && $eventPrice !== null) {
+                $product->event_price = $eventPrice;
+                $product->original_price = $product->sellable_price ?: $product->price;
+            } elseif ($eventPriceType === 'percentage' && $eventDiscountPercentage !== null) {
+                // Calculate percentage discount
+                $originalPrice = floatval($product->sellable_price ?: $product->price);
+                $discountAmount = ($originalPrice * floatval($eventDiscountPercentage)) / 100;
+                $product->event_price = $originalPrice - $discountAmount;
+                $product->original_price = $originalPrice;
+            }
+            return $product;
+        });
+
         return response()->json($products);
     }
 
@@ -109,6 +168,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:products,slug',
             'sku' => 'required|string|unique:products,sku',
             'category' => 'required|string',
             'brand' => 'nullable|string',
@@ -126,6 +186,11 @@ class ProductController extends Controller
             'gallery' => 'nullable|array',
             'attribute_definitions' => 'nullable|json',
         ]);
+
+        // Auto-generate slug if not provided
+        if (empty($validated['slug']) && !empty($validated['name'])) {
+            $validated['slug'] = Product::generateUniqueSlug($validated['name']);
+        }
 
         // Handle attribute definition images
         if ($request->has('attribute_definitions')) {
@@ -181,9 +246,47 @@ class ProductController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show($slug)
     {
-        $product = Product::with(['variants', 'images'])->findOrFail($id);
+        // Support both slug and ID for backward compatibility
+        $product = Product::with(['variants', 'images', 'events'])
+            ->where('slug', $slug)
+            ->orWhere('id', $slug)
+            ->firstOrFail();
+        
+        // Ensure slug exists
+        if (empty($product->slug) && !empty($product->name)) {
+            $product->slug = Product::generateUniqueSlug($product->name, $product->id);
+            $product->saveQuietly();
+        }
+        
+        // Check if product is in any active event with price
+        $now = now();
+        $activeEvent = $product->events()
+            ->where('is_active', true)
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->where(function($q) {
+                $q->whereNotNull('price')
+                  ->orWhereNotNull('discount_percentage');
+            })
+            ->orderBy('priority', 'desc')
+            ->first();
+        
+        if ($activeEvent) {
+            $priceType = $activeEvent->price_type ?? 'fixed';
+            if ($priceType === 'fixed' && $activeEvent->price) {
+                $product->event_price = $activeEvent->price;
+                $product->original_price = $product->sellable_price ?: $product->price;
+            } elseif ($priceType === 'percentage' && $activeEvent->discount_percentage) {
+                // Calculate percentage discount
+                $originalPrice = floatval($product->sellable_price ?: $product->price);
+                $discountAmount = ($originalPrice * floatval($activeEvent->discount_percentage)) / 100;
+                $product->event_price = $originalPrice - $discountAmount;
+                $product->original_price = $originalPrice;
+            }
+        }
+        
         return response()->json($product);
     }
 
@@ -202,6 +305,7 @@ class ProductController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:products,slug,' . $id,
             'sku' => 'sometimes|string|unique:products,sku,' . $id,
             'category' => 'sometimes|string',
             'brand' => 'nullable|string',
@@ -220,6 +324,11 @@ class ProductController extends Controller
             'existing_gallery_ids' => 'nullable|array',
             'attribute_definitions' => 'nullable|json',
         ]);
+
+        // Auto-generate slug if name changed and slug is empty
+        if (isset($validated['name']) && empty($validated['slug'])) {
+            $validated['slug'] = Product::generateUniqueSlug($validated['name'], $id);
+        }
 
         if ($request->has('attribute_definitions')) {
             $definitions = $request->attribute_definitions;

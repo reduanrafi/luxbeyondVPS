@@ -40,6 +40,48 @@
             </div>
         </div>
 
+        <!-- API Configuration Fields -->
+        <div v-if="(form.type === 'bkash' || form.type === 'nagad' || form.type === 'rocket') && form.sub_type === 'api'" 
+            class="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-4">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">API Credentials</h3>
+            
+            <div class="mb-4">
+                <label class="flex items-center">
+                    <input v-model="apiConfig.is_sandbox" type="checkbox"
+                        class="rounded border-gray-300 text-primary focus:ring-primary">
+                    <span class="ml-2 text-sm text-gray-700">Sandbox Mode (Testing)</span>
+                </label>
+                <p class="text-xs text-gray-500 mt-1 ml-6">Enable for testing, disable for production</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">App Key *</label>
+                    <input v-model="apiConfig.app_key" type="text" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="Your App Key">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">App Secret *</label>
+                    <input v-model="apiConfig.app_secret" type="password" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="Your App Secret">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Username *</label>
+                    <input v-model="apiConfig.username" type="text" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="Your Username">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                    <input v-model="apiConfig.password" type="password" required
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="Your Password">
+                </div>
+            </div>
+        </div>
+
         <div v-if="form.type === 'bank_transfer'" class="grid grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Bank Name *</label>
@@ -171,11 +213,40 @@ const form = ref({
     sort_order: 0,
     fee: 0,
     fee_percentage: 0,
+    config: null,
+});
+
+// API Configuration (stored in form.config)
+const apiConfig = ref({
+    is_sandbox: true,
+    app_key: '',
+    app_secret: '',
+    username: '',
+    password: '',
 });
 
 watch(() => props.method, (newMethod) => {
     if (newMethod) {
         form.value = { ...newMethod };
+        // Load API config if it exists
+        if (newMethod.config && typeof newMethod.config === 'object') {
+            apiConfig.value = {
+                is_sandbox: newMethod.config.is_sandbox ?? true,
+                app_key: newMethod.config.app_key ?? '',
+                app_secret: newMethod.config.app_secret ?? '',
+                username: newMethod.config.username ?? '',
+                password: newMethod.config.password ?? '',
+            };
+        } else {
+            // Reset to defaults
+            apiConfig.value = {
+                is_sandbox: true,
+                app_key: '',
+                app_secret: '',
+                username: '',
+                password: '',
+            };
+        }
     } else {
         form.value = {
             name: '',
@@ -194,6 +265,14 @@ watch(() => props.method, (newMethod) => {
             sort_order: 0,
             fee: 0,
             fee_percentage: 0,
+            config: null,
+        };
+        apiConfig.value = {
+            is_sandbox: true,
+            app_key: '',
+            app_secret: '',
+            username: '',
+            password: '',
         };
     }
 }, { immediate: true });
@@ -209,10 +288,21 @@ const onTypeChange = () => {
 const handleSubmit = async () => {
     saving.value = true;
     try {
-        if (props.method) {
-            await axios.put(`/admin/settings/payment-methods/${props.method.id}`, form.value);
+        // Prepare form data
+        const formData = { ...form.value };
+        
+        // If API integration is selected, include config
+        if (form.value.sub_type === 'api' && (form.value.type === 'bkash' || form.value.type === 'nagad' || form.value.type === 'rocket')) {
+            formData.config = { ...apiConfig.value };
         } else {
-            await axios.post('/admin/settings/payment-methods', form.value);
+            // Clear config if not using API
+            formData.config = null;
+        }
+        
+        if (props.method) {
+            await axios.put(`/admin/settings/payment-methods/${props.method.id}`, formData);
+        } else {
+            await axios.post('/admin/settings/payment-methods', formData);
         }
         emit('save');
     } catch (error) {

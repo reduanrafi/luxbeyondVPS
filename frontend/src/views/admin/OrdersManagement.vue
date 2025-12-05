@@ -17,7 +17,7 @@
 
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <input v-model="filters.search" @input="fetchOrders" type="text" placeholder="Search orders..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status_id" @change="fetchOrders"
@@ -25,6 +25,13 @@
                     <option value="">All Status</option>
                     <option v-for="status in orderStatuses" :key="status.id" :value="status.id">
                         {{ status.label }}
+                    </option>
+                </select>
+                <select v-model="filters.event_id" @change="fetchOrders"
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    <option value="">All Events</option>
+                    <option v-for="event in events" :key="event.id" :value="event.id">
+                        {{ event.name }}
                     </option>
                 </select>
                 <input v-model="filters.date_from" @change="fetchOrders" type="date"
@@ -53,13 +60,14 @@
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Date</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Items</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Total</th>
+                            <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Event</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Status</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="orders.length === 0">
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">No orders found</td>
+                            <td colspan="8" class="px-6 py-8 text-center text-gray-500">No orders found</td>
                         </tr>
                         <tr v-for="order in orders" :key="order.id" class="border-b border-gray-100 hover:bg-gray-50">
                             <td class="py-4 px-6 text-sm font-medium text-slate-900">#{{ order.order_number }}</td>
@@ -73,7 +81,7 @@
                                 {{ order.items?.length || 0 }} items
                             </td>
                             <td class="py-4 px-6 text-sm font-semibold text-slate-900">
-                                {{ order.currency?.symbol || '৳' }}{{ parseFloat(order.total_amount).toLocaleString() }}
+                                {{ order.currency?.symbol || '৳' }}{{ parseFloat(order.total || order.total_amount || 0).toLocaleString() }}
                             </td>
                             <td class="py-4 px-6">
                                 <select
@@ -89,9 +97,11 @@
                             </td>
                             <td class="py-4 px-6">
                                 <div class="flex items-center gap-2">
-                                    <button @click="viewOrder(order.id)" class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                    <router-link :to="`/admin/orders/${order.id}`" 
+                                        class="p-2 hover:bg-blue-50 rounded-lg transition-colors inline-block"
+                                        title="View Details">
                                         <Eye class="w-4 h-4 text-blue-600" />
-                                    </button>
+                                    </router-link>
                                     <button @click="printOrder(order.id)" class="p-2 hover:bg-green-50 rounded-lg transition-colors">
                                         <Printer class="w-4 h-4 text-green-600" />
                                     </button>
@@ -114,10 +124,12 @@ const loading = ref(false);
 const updatingStatus = ref(null);
 const orders = ref([]);
 const orderStatuses = ref([]);
+const events = ref([]);
 
 const filters = ref({
     search: '',
     status_id: '',
+    event_id: '',
     date_from: '',
     date_to: '',
 });
@@ -135,6 +147,7 @@ const fetchOrders = async () => {
         const params = {};
         if (filters.value.search) params.search = filters.value.search;
         if (filters.value.status_id) params.status_id = filters.value.status_id;
+        if (filters.value.event_id) params.event_id = filters.value.event_id;
         if (filters.value.date_from) params.date_from = filters.value.date_from;
         if (filters.value.date_to) params.date_to = filters.value.date_to;
 
@@ -156,6 +169,15 @@ const fetchOrderStatuses = async () => {
         orderStatuses.value = response.data.data || response.data;
     } catch (error) {
         console.error('Error fetching order statuses:', error);
+    }
+};
+
+const fetchEvents = async () => {
+    try {
+        const response = await axios.get('/admin/events');
+        events.value = response.data.data || response.data || [];
+    } catch (error) {
+        console.error('Error fetching events:', error);
     }
 };
 
@@ -227,10 +249,6 @@ const updateStats = () => {
     ];
 };
 
-const viewOrder = (orderId) => {
-    // TODO: Implement order detail view
-    console.log('View order:', orderId);
-};
 
 const printOrder = (orderId) => {
     // TODO: Implement order printing
@@ -241,6 +259,7 @@ const resetFilters = () => {
     filters.value = {
         search: '',
         status_id: '',
+        event_id: '',
         date_from: '',
         date_to: '',
     };
@@ -249,6 +268,7 @@ const resetFilters = () => {
 
 onMounted(() => {
     fetchOrderStatuses();
+    fetchEvents();
     fetchOrders();
 });
 </script>

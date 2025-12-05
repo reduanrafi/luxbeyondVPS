@@ -5,7 +5,7 @@
             <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
                 enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 backdrop-blur-sm pointer-events-auto"
+                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 pointer-events-auto"
                     @click="$emit('close')">
                 </div>
             </Transition>
@@ -29,6 +29,17 @@
                             </div>
                         </div>
 
+                        <!-- Add All to Cart Button -->
+                        <div v-if="wishlistStore.items.length > 0" class="mt-6 mb-4">
+                            <button
+                                @click="addAllToCart"
+                                class="w-full px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                            >
+                                <ShoppingCart class="w-5 h-5" />
+                                Add All to Cart ({{ wishlistStore.items.length }})
+                            </button>
+                        </div>
+
                         <div class="mt-8">
                             <div class="flow-root">
                                 <ul role="list" class="-my-6 divide-y divide-gray-100">
@@ -39,14 +50,21 @@
                                         <div
                                             class="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
                                             <img :src="item.image_url" :alt="item.name"
-                                                class="w-full h-full object-center object-cover">
+                                                class="w-full h-full object-center object-contain">
                                         </div>
                                         <div class="ml-4 flex-1 flex flex-col">
                                             <div>
                                                 <div class="flex justify-between text-base font-medium text-slate-900">
-                                                    <h3><router-link :to="`/product/${item.id}`">{{ item.name
+                                                    <h3><router-link :to="`/products/${item.slug || item.id}`">{{ item.name
                                                     }}</router-link></h3>
-                                                    <p class="ml-4 text-primary font-bold">৳{{ item.price }}</p>
+                                                    <p class="ml-4 text-primary font-bold">
+                                                        <template v-if="typeof item.price === 'string' && (item.price.includes('৳') || item.price.includes('$'))">
+                                                            {{ item.price }}
+                                                        </template>
+                                                        <template v-else>
+                                                            ৳{{ typeof item.price === 'number' ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : item.price }}
+                                                        </template>
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div class="flex-1 flex items-end justify-between text-sm">
@@ -69,20 +87,62 @@
 </template>
 
 <script setup>
-import { X } from 'lucide-vue-next';
+import { X, ShoppingCart } from 'lucide-vue-next';
+import { watch } from 'vue';
 import { useWishlistStore } from '../stores/wishlist';
 import { useCartStore } from '../stores/cart';
+import { useAuthStore } from '../stores/auth';
+import { useModalStore } from '../stores/modal';
 
-defineProps({
+const props = defineProps({
     isOpen: Boolean
 });
-defineEmits(['close']);
+const emit = defineEmits(['close']);
 
 const wishlistStore = useWishlistStore();
 const cartStore = useCartStore();
+const authStore = useAuthStore();
+const modalStore = useModalStore();
+
+// Watch for drawer opening - if user is not authenticated, close drawer and show login modal
+watch(() => props.isOpen, (newValue) => {
+    if (newValue && !authStore.isAuthenticated) {
+        emit('close');
+        modalStore.openModal('login');
+    }
+});
 
 function moveToCart(item) {
-    cartStore.addItem(item);
+    // Ensure slug is included
+    const productWithSlug = {
+        ...item,
+        slug: item.slug || item.id || String(item.id)
+    };
+    cartStore.addItem(productWithSlug);
     wishlistStore.removeItem(item.id);
+}
+
+function addAllToCart() {
+    if (wishlistStore.items.length === 0) return;
+    
+    // Create a copy of items array to avoid mutation during iteration
+    const itemsToAdd = [...wishlistStore.items];
+    
+    // Add all items to cart with ensured slugs
+    itemsToAdd.forEach(item => {
+        const productWithSlug = {
+            ...item,
+            slug: item.slug || item.id || String(item.id)
+        };
+        cartStore.addItem(productWithSlug);
+    });
+    
+    // Clear wishlist after adding all to cart
+    itemsToAdd.forEach(item => {
+        wishlistStore.removeItem(item.id);
+    });
+    
+    // Open cart drawer to show added items
+    cartStore.shouldOpenDrawer = true;
 }
 </script>

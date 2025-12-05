@@ -19,8 +19,8 @@
                         your doorstep with ease, security, and style.
                     </p>
                     <div class="flex gap-4 pt-2">
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-accent hover:scale-110 transition-all duration-300">
+                        <a href="#" target="_blank"
+                            class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center !text-white hover:bg-accent hover:scale-110 transition-all duration-300">
                             <Facebook class="w-5 h-5" />
                         </a>
                         <a href="#"
@@ -40,7 +40,7 @@
 
                 <!-- Quick Links -->
                 <div>
-                    <h4 class="text-lg font-bold text-white mb-6 relative inline-block">
+                    <h4 class="text-lg font-bold !text-white mb-6 relative inline-block">
                         Explore
                         <span class="absolute -bottom-2 left-0 w-12 h-1 bg-accent rounded-full"></span>
                     </h4>
@@ -62,7 +62,7 @@
 
                 <!-- Support -->
                 <div>
-                    <h4 class="text-lg font-bold text-white mb-6 relative inline-block">
+                    <h4 class="text-lg font-bold !text-white mb-6 relative inline-block">
                         Support
                         <span class="absolute -bottom-2 left-0 w-12 h-1 bg-accent rounded-full"></span>
                     </h4>
@@ -84,7 +84,7 @@
 
                 <!-- Newsletter & Contact -->
                 <div>
-                    <h4 class="text-lg font-bold text-white mb-6 relative inline-block">
+                    <h4 class="text-lg font-bold !text-white mb-6 relative inline-block">
                         Stay Updated
                         <span class="absolute -bottom-2 left-0 w-12 h-1 bg-accent rounded-full"></span>
                     </h4>

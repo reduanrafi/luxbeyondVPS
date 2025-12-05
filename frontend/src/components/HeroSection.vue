@@ -48,8 +48,8 @@ const slides = [
         alt: 'Global Shopping Simplified'
     },
     {
-        desktop: '/assets/large-image.png', // Placeholder for second slide
-        mobile: '/assets/luxbeyond-mobile.png',
+        desktop: '/assets/hero-2.png', // Placeholder for second slide
+        mobile: '/assets/hero-2-mobile.png',
         alt: 'Shop from Anywhere'
     }
 ];

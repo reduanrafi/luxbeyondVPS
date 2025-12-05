@@ -5,7 +5,7 @@
             <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
                 enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 backdrop-blur-sm pointer-events-auto"
+                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 pointer-events-auto"
                     @click="$emit('close')">
                 </div>
             </Transition>
@@ -37,31 +37,42 @@
                                     </li>
                                     <li v-for="item in cartStore.items" :key="item.id" class="py-6 flex">
                                         <div
-                                            class="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
-                                            <img :src="item.image_url" :alt="item.name"
+                                            class="shrink-0 w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
+                                            <img :src="getItemImage(item)" :alt="item.name"
                                                 class="w-full h-full object-center object-cover">
                                         </div>
                                         <div class="ml-4 flex-1 flex flex-col">
+
                                             <div>
                                                 <div class="flex justify-between text-base font-medium text-slate-900">
-                                                    <h3><router-link :to="`/product/${item.id}`">{{ item.name
+                                                    <h3><router-link :to="`/products/${item.slug || item.id}`">{{ item.name
                                                     }}</router-link></h3>
-                                                    <p class="ml-4 text-primary font-bold">৳{{ item.price }}</p>
+                                                    <div class="ml-4 text-right">
+                                                        <p class="text-primary font-bold">{{ item.price }}</p>
+                                                        <p v-if="item.original_price" 
+                                                           class="text-xs text-gray-400 line-through">
+                                                            {{ item.original_price }}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <p class="mt-1 text-sm text-slate-500">{{ item.color || 'Default' }}</p>
+                                                <!-- Variant Information -->
+                                                <p v-if="item.variant && item.variant.attributes" class="mt-1 text-sm text-slate-500">
+                                                    {{ formatVariantAttributes(item.variant.attributes) }}
+                                                </p>
+                                                <p v-else-if="item.color" class="mt-1 text-sm text-slate-500">{{ item.color }}</p>
                                             </div>
                                             <div class="flex-1 flex items-end justify-between text-sm">
                                                 <div class="flex items-center border border-gray-300 rounded">
                                                     <button
-                                                        @click="cartStore.updateQuantity(item.id, item.quantity - 1)"
+                                                        @click="cartStore.updateQuantity(item.id, item.quantity - 1, item.variant)"
                                                         class="px-2 py-1 text-gray-600 hover:bg-gray-100">-</button>
                                                     <span class="px-2 py-1 text-gray-900">{{ item.quantity }}</span>
                                                     <button
-                                                        @click="cartStore.updateQuantity(item.id, item.quantity + 1)"
+                                                        @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.variant)"
                                                         class="px-2 py-1 text-gray-600 hover:bg-gray-100">+</button>
                                                 </div>
                                                 <div class="flex">
-                                                    <button type="button" @click="cartStore.removeItem(item.id)"
+                                                    <button type="button" @click="cartStore.removeItem(item.id, item.variant)"
                                                         class="font-medium text-secondary hover:text-red-600 transition-colors">Remove</button>
                                                 </div>
                                             </div>
@@ -113,4 +124,69 @@ defineProps({
 defineEmits(['close']);
 
 const cartStore = useCartStore();
+
+// Get item image - prefer variant image, fallback to product image
+const getItemImage = (item) => {
+    // Check if variant has image
+    if (item.variant && (item.variant.image || item.variant.image_url)) {
+        const variantImage = item.variant.image_url || item.variant.image;
+        // If it's already a full URL, return as is
+        if (variantImage.startsWith('http')) {
+            return variantImage;
+        }
+        // Otherwise, assume it's a storage path
+        return variantImage.startsWith('/storage/') ? variantImage : `/storage/${variantImage}`;
+    }
+    // Fallback to product image
+    if (item.image_url) {
+        return item.image_url;
+    }
+    if (item.image) {
+        return item.image.startsWith('http') || item.image.startsWith('/') 
+            ? item.image 
+            : `/storage/${item.image}`;
+    }
+    // Default placeholder
+    return '/assets/placeholder.png';
+};
+
+// Format variant attributes for display
+const formatVariantAttributes = (attributes) => {
+    if (!attributes || typeof attributes !== 'object') return '';
+    return Object.entries(attributes)
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', ');
+};
+
+// Format price to ensure BDT symbol (৳) instead of $
+const formatPrice = (price) => {
+    if (!price) return '৳0.00';
+    // Convert string to string, replacing $ with ৳
+    if (typeof price === 'string') {
+        // If it already has ৳, return as is
+        if (price.includes('৳')) {
+            return price;
+        }
+        // If it has $, replace with ৳
+        if (price.includes('$')) {
+            return price.replace(/\$/g, '৳');
+        }
+        // If it's just a number, add ৳
+        const numPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+        if (!isNaN(numPrice)) {
+            return '৳' + numPrice.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+    }
+    // If it's a number, format it
+    if (typeof price === 'number') {
+        return '৳' + price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    return price;
+};
 </script>

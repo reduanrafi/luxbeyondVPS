@@ -18,13 +18,25 @@ class ProductRequest extends Model
         'declared_shipping_cost',
         'is_inside_city',
         'status',
+        'status_id',
         'admin_image_url',
         'admin_note',
         'total_amount_bdt',
+        'weight',
+        'payment_method',
+        'tax',
+        'additional_charges',
+        'delivery_charge',
+        'payment_processing_fee',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function orderStatus()
+    {
+        return $this->belongsTo(OrderStatus::class, 'status_id');
     }
 }

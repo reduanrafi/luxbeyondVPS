@@ -86,6 +86,11 @@
                             <Calendar class="w-4 h-4 text-slate-400" />
                             <span>{{ currentDate }}</span>
                         </div>
+                        <div
+                            class="hidden md:flex items-center gap-2 text-sm font-medium text-slate-600 bg-gray-50 px-3 py-2 rounded-lg w-[110px]">
+                            <Timer class="w-4 h-4 text-slate-400" />
+                            <span>{{ currentTime }}</span>
+                        </div>
 
                         <button class="relative p-2 text-gray-400 hover:text-slate-600 transition-colors">
                             <MessageSquare class="w-5 h-5" />
@@ -118,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '../../stores/auth';
 import { useRouter, useRoute } from 'vue-router';
 import {
@@ -142,7 +147,8 @@ import {
     Earth,
     Ticket,
     Crown,
-    DollarSign
+    DollarSign,
+    Timer
 } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
@@ -201,6 +207,20 @@ const currentDate = computed(() => {
         month: 'short',
         year: '2-digit'
     });
+});
+
+const currentTime = ref("");
+
+const updateTime = () => {
+  const now = new Date();
+  currentTime.value = now.toLocaleTimeString();
+};
+
+onMounted(() => {
+  updateTime();
+  const interval = setInterval(updateTime, 1000);
+
+  onUnmounted(() => clearInterval(interval));
 });
 
 const isActive = (path) => {

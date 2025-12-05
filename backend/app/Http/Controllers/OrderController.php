@@ -13,7 +13,20 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['user', 'status', 'items']);
+        $query = Order::with(['user', 'status', 'event', 'coupon', 'items']);
+
+        // Check if this is an admin request (admin routes have /admin prefix)
+        $isAdminRequest = $request->is('api/admin/*');
+        
+        // For customer requests, automatically filter by authenticated user
+        if (!$isAdminRequest && $request->user()) {
+            $query->where('user_id', $request->user()->id);
+        }
+
+        // User filter (for admin view or explicit filtering)
+        if ($request->has('user_id') && $request->user_id) {
+            $query->where('user_id', $request->user_id);
+        }
 
         // Search
         if ($request->has('search') && $request->search) {
@@ -40,6 +53,11 @@ class OrderController extends Controller
             $query->where('payment_status', $request->payment_status);
         }
 
+        // Event filter
+        if ($request->has('event_id') && $request->event_id) {
+            $query->where('event_id', $request->event_id);
+        }
+
         // Date range filter
         if ($request->has('date_from') && $request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
@@ -47,11 +65,6 @@ class OrderController extends Controller
 
         if ($request->has('date_to') && $request->date_to) {
             $query->whereDate('created_at', '<=', $request->date_to);
-        }
-
-        // User filter (for customer view)
-        if ($request->has('user_id') && $request->user_id) {
-            $query->where('user_id', $request->user_id);
         }
 
         // Paginated response
@@ -63,6 +76,8 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
+            'event_id' => 'nullable|exists:events,id',
+            'coupon_id' => 'nullable|exists:coupons,id',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'nullable|exists:products,id',
             'items.*.product_name' => 'required|string',
@@ -99,6 +114,8 @@ class OrderController extends Controller
 
         $order = Order::create([
             'user_id' => $validated['user_id'],
+            'event_id' => $validated['event_id'] ?? null,
+            'coupon_id' => $validated['coupon_id'] ?? null,
             'status_id' => $defaultStatus?->id,
             'status' => $defaultStatus?->name ?? 'pending',
             'subtotal' => $validated['subtotal'],
@@ -136,15 +153,26 @@ class OrderController extends Controller
             $order->updateStatus($defaultStatus->id, 'Order created', Auth::id());
         }
 
-        $order->load(['user', 'status', 'items']);
+        $order->load(['user', 'status', 'event', 'coupon', 'items']);
 
         return response()->json($order, 201);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $order = Order::with(['user', 'status', 'items.product', 'statusHistories.changedBy', 'statusHistories.status'])
-                     ->findOrFail($id);
+        // Support both ID and order_number lookup
+        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy', 'statusHistories.status'])
+                     ->where(function($query) use ($id) {
+                         $query->where('id', $id)
+                               ->orWhere('order_number', $id);
+                     })
+                     ->firstOrFail();
+        
+        // For customer requests, ensure they can only view their own orders
+        if (!$request->is('api/admin/*') && $request->user() && $order->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        
         return response()->json($order);
     }
 
@@ -154,6 +182,7 @@ class OrderController extends Controller
 
         $validated = $request->validate([
             'status_id' => 'sometimes|exists:order_statuses,id',
+            'event_id' => 'nullable|exists:events,id',
             'payment_status' => 'sometimes|in:pending,paid,failed,refunded',
             'shipping_address' => 'nullable|string',
             'shipping_name' => 'nullable|string',
@@ -178,7 +207,7 @@ class OrderController extends Controller
 
         // Update other fields
         $order->update($validated);
-        $order->load(['user', 'status', 'items.product', 'statusHistories.changedBy']);
+        $order->load(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy']);
 
         return response()->json([
             'message' => 'Order updated successfully',

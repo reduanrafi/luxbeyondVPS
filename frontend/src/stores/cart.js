@@ -1,14 +1,76 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
+import axios from '../axios';
+import { useAuthStore } from './auth';
+import { useModalStore } from './modal';
 
 export const useCartStore = defineStore('cart', () => {
     const items = ref([]);
     const shouldOpenDrawer = ref(false);
 
-    // Load from local storage on init
-    if (localStorage.getItem('cart')) {
-        items.value = JSON.parse(localStorage.getItem('cart'));
+    const authStore = useAuthStore();
+    const modalStore = useModalStore();
+
+    async function loadFromServer() {
+        if (!authStore.isAuthenticated) {
+            items.value = [];
+            return;
+        }
+
+        try {
+            const response = await axios.get('/cart');
+            const serverItems = Array.isArray(response.data) ? response.data : [];
+
+            items.value = serverItems.map((item) => {
+                const rawPrice = item.price ?? item.sellable_price ?? 0;
+                const numericPrice = typeof rawPrice === 'string'
+                    ? parseFloat(rawPrice.replace(/[^\d.]/g, ''))
+                    : rawPrice;
+
+                // Format original price if available
+                let formattedOriginalPrice = null;
+                if (item.original_price) {
+                    const rawOriginalPrice = typeof item.original_price === 'string'
+                        ? parseFloat(item.original_price.replace(/[^\d.]/g, ''))
+                        : item.original_price;
+                    formattedOriginalPrice = `৳${rawOriginalPrice.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    })}`;
+                }
+
+                return {
+                    ...item,
+                    slug: item.slug || item.id || String(item.id),
+                    price: `৳${numericPrice.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    })}`,
+                    original_price: formattedOriginalPrice || item.original_price,
+                    quantity: item.quantity ?? 1,
+                };
+            });
+        } catch (error) {
+            console.error('Failed to load cart from server:', error);
+        }
     }
+
+    // Initial load if authenticated
+    if (authStore.isAuthenticated) {
+        loadFromServer();
+    }
+
+    // React to login/logout
+    watch(
+        () => authStore.isAuthenticated,
+        (isAuth) => {
+            if (isAuth) {
+                loadFromServer();
+            } else {
+                items.value = [];
+            }
+        }
+    );
 
     const totalItems = computed(() => items.value.reduce((total, item) => total + item.quantity, 0));
 
@@ -24,14 +86,47 @@ export const useCartStore = defineStore('cart', () => {
         return '৳' + subtotal.value.toLocaleString();
     });
 
-    function addItem(product) {
-        const existingItem = items.value.find(item => item.id === product.id);
-        if (existingItem) {
-            existingItem.quantity++;
-        } else {
-            items.value.push({ ...product, quantity: 1 });
+    /**
+     * Generate a unique cart key for an item
+     * For products with variants, use product_id + variant_id or attributes hash
+     * For products without variants, use just product_id
+     */
+    function getCartItemKey(product, variant = null) {
+        if (variant && variant.id) {
+            // Use variant ID if available
+            return `${product.id}_variant_${variant.id}`;
+        } else if (variant && variant.attributes) {
+            // Use attributes hash if no variant ID
+            const attrsString = JSON.stringify(variant.attributes);
+            return `${product.id}_attrs_${btoa(attrsString).replace(/[^a-zA-Z0-9]/g, '')}`;
         }
-        saveToLocalStorage();
+        // No variant, just use product ID
+        return `${product.id}`;
+    }
+
+    async function addItem(product, variant = null, quantity = 1) {
+        if (!authStore.isAuthenticated) {
+            modalStore.openModal('login');
+            return;
+        }
+
+        // Ensure slug is always present before processing
+        const productWithSlug = {
+            ...product,
+            slug: product.slug || product.id || String(product.id) // Ensure slug is always set
+        };
+        
+        try {
+            await axios.post('/cart', {
+                product_id: productWithSlug.id,
+                product_variant_id: variant?.id || null,
+                quantity,
+            });
+            await loadFromServer();
+        } catch (error) {
+            console.error('Failed to add item to cart:', error);
+        }
+
         // Trigger drawer to open
         shouldOpenDrawer.value = true;
     }
@@ -40,29 +135,55 @@ export const useCartStore = defineStore('cart', () => {
         shouldOpenDrawer.value = false;
     }
 
-    function removeItem(productId) {
-        items.value = items.value.filter(item => item.id !== productId);
-        saveToLocalStorage();
-    }
+    async function removeItem(productId, variant = null) {
+        const itemKey = variant ? getCartItemKey({ id: productId }, variant) : String(productId);
+        const item = items.value.find((i) => {
+            const existingKey = getCartItemKey(i, i.variant || null);
+            return existingKey === itemKey;
+        });
 
-    function updateQuantity(productId, quantity) {
-        const item = items.value.find(item => item.id === productId);
-        if (item) {
-            item.quantity = quantity;
-            if (item.quantity <= 0) {
-                removeItem(productId);
-            }
+        if (!item || !item.cart_item_id) {
+            return;
         }
-        saveToLocalStorage();
+
+        try {
+            await axios.delete(`/cart/${item.cart_item_id}`);
+            await loadFromServer();
+        } catch (error) {
+            console.error('Failed to remove item from cart:', error);
+        }
     }
 
-    function clearCart() {
-        items.value = [];
-        saveToLocalStorage();
+    async function updateQuantity(productId, quantity, variant = null) {
+        const itemKey = variant ? getCartItemKey({ id: productId }, variant) : String(productId);
+        const item = items.value.find(item => {
+            const existingKey = getCartItemKey(item, item.variant || null);
+            return existingKey === itemKey;
+        });
+        if (!item || !item.cart_item_id) {
+            return;
+        }
+
+        if (quantity <= 0) {
+            await removeItem(productId, variant);
+            return;
+        }
+
+        try {
+            await axios.patch(`/cart/${item.cart_item_id}`, { quantity });
+            await loadFromServer();
+        } catch (error) {
+            console.error('Failed to update cart quantity:', error);
+        }
     }
 
-    function saveToLocalStorage() {
-        localStorage.setItem('cart', JSON.stringify(items.value));
+    async function clearCart() {
+        try {
+            await axios.post('/cart/clear');
+            items.value = [];
+        } catch (error) {
+            console.error('Failed to clear cart:', error);
+        }
     }
 
     return {

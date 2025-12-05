@@ -10,6 +10,8 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'event_id',
+        'coupon_id',
         'status_id',
         'status',
         'subtotal',
@@ -21,6 +23,9 @@ class Order extends Model
         'currency',
         'payment_method',
         'payment_status',
+        'bkash_trx_id',
+        'payment_reference',
+        'payment_slip',
         'shipping_address',
         'shipping_name',
         'shipping_phone',
@@ -28,6 +33,7 @@ class Order extends Model
         'notes',
         'shipped_at',
         'delivered_at',
+        'paid_at',
     ];
 
     protected $casts = [
@@ -39,6 +45,7 @@ class Order extends Model
         'min_payment_amount' => 'decimal:2',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -60,6 +67,16 @@ class Order extends Model
     public function status()
     {
         return $this->belongsTo(OrderStatus::class, 'status_id');
+    }
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
     }
 
     public function items()

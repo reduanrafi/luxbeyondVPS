@@ -6,18 +6,45 @@ use App\Models\ProductRequest;
 use App\Models\Setting;
 use App\Models\Currency;
 use App\Models\Charge;
+use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProductRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        if ($user->hasRole('Admin')) {
-            return response()->json(ProductRequest::with('user')->latest()->get());
+        $query = $user->hasRole('Admin') 
+            ? ProductRequest::with(['user', 'orderStatus'])
+            : $user->productRequests()->with('orderStatus');
+        
+        // Filter by search
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('url', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
         }
-        return response()->json($user->productRequests()->latest()->get());
+        
+        // Filter by status_id (status parameter can be status_id)
+        if ($request->has('status') && $request->status) {
+            $query->where('status_id', $request->status);
+        }
+        
+        // Filter by date range
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        return response()->json($query->latest()->get());
     }
 
     public function store(Request $request)
@@ -135,7 +162,7 @@ class ProductRequestController extends Controller
 
     public function show($id)
     {
-        $productRequest = ProductRequest::with('user')->findOrFail($id);
+        $productRequest = ProductRequest::with(['user', 'orderStatus'])->findOrFail($id);
         $this->authorize('view', $productRequest);
         return response()->json($productRequest);
     }
@@ -151,12 +178,63 @@ class ProductRequestController extends Controller
         }
 
         $request->validate([
+            'url' => 'nullable|url',
+            'price' => 'nullable|numeric|min:0',
+            'quantity' => 'nullable|integer|min:1',
+            'currency' => 'nullable|string|max:3',
+            'declared_shipping_cost' => 'nullable|numeric|min:0',
+            'is_inside_city' => 'nullable|boolean',
+            'weight' => 'nullable|numeric|min:0',
+            'payment_method' => 'nullable|string',
+            'tax' => 'nullable|numeric|min:0',
+            'additional_charges' => 'nullable|numeric|min:0',
+            'delivery_charge' => 'nullable|numeric|min:0',
+            'payment_processing_fee' => 'nullable|numeric|min:0',
             'admin_image_url' => 'nullable|url',
-            'status' => 'required|string',
+            'status' => 'nullable|string',
+            'status_id' => 'nullable|exists:order_statuses,id',
             'admin_note' => 'nullable|string',
+            'total_amount_bdt' => 'nullable|numeric|min:0',
         ]);
 
-        $productRequest->update($request->only(['admin_image_url', 'status', 'admin_note']));
+        // Update all provided fields
+        $updateData = $request->only([
+            'url',
+            'price',
+            'quantity',
+            'currency',
+            'declared_shipping_cost',
+            'is_inside_city',
+            'weight',
+            'payment_method',
+            'tax',
+            'additional_charges',
+            'delivery_charge',
+            'payment_processing_fee',
+            'admin_image_url',
+            'status',
+            'status_id',
+            'admin_note',
+            'total_amount_bdt'
+        ]);
+
+        // Convert is_inside_city to boolean if provided
+        if ($request->has('is_inside_city')) {
+            $updateData['is_inside_city'] = filter_var($request->is_inside_city, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        // If status_id is provided, also update status name from order_status
+        if (isset($updateData['status_id'])) {
+            $orderStatus = OrderStatus::find($updateData['status_id']);
+            if ($orderStatus) {
+                $updateData['status'] = $orderStatus->name;
+            }
+        }
+
+        $productRequest->update($updateData);
+
+        // Reload with relationships
+        $productRequest->load(['user', 'orderStatus']);
 
         return response()->json($productRequest);
     }

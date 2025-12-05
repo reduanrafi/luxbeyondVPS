@@ -23,7 +23,7 @@
 
                 <!-- Navigation -->
                 <nav class="relative flex-1 overflow-y-auto py-8 px-4 space-y-2">
-                    <router-link v-for="item in navigation" :key="item.name" :to="item.href"
+                    <router-link v-for="item in navigation.filter(i => !i.action)" :key="item.name" :to="item.href"
                         class="flex items-center gap-4 px-5 py-3.5 text-sm font-semibold rounded-xl transition-all duration-200 group"
                         :class="[
                             isActive(item.href)
@@ -32,13 +32,27 @@
                         ]" @click="isSidebarOpen = false">
                         <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110"
                             :class="isActive(item.href) ? 'text-primary' : 'text-white/90'" />
-                        {{ item.name }}
+                        <span>{{ item.name }}</span>
                     </router-link>
+                    <button v-for="item in navigation.filter(i => i.action)" :key="item.name" 
+                        @click="handleAction(item.action); isSidebarOpen = false"
+                        class="w-full flex items-center gap-4 px-5 py-3.5 text-sm font-semibold rounded-xl transition-all duration-200 group text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1">
+                        <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110 text-white/90" />
+                        <span>{{ item.name }}</span>
+                        <span v-if="item.action === 'cart' && cartStore.totalItems > 0" 
+                            class="ml-auto bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ cartStore.totalItems }}
+                        </span>
+                        <span v-if="item.action === 'wishlist' && wishlistStore.items.length > 0" 
+                            class="ml-auto bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ wishlistStore.items.length }}
+                        </span>
+                    </button>
                 </nav>
 
                 <div>
-                    <router-link to="/"
-                        class="flex items-center gap-2 px-5 py-3.5 text-[12px] hover:underline font-semibold rounded-xl transition-all duration-200 group text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1 cursor-pointer"
+                    <router-link to="/shop"
+                        class="flex items-center gap-2 px-5 py-3.5 text-[12px] hover:underline font-semibold rounded-xl transition-all duration-200 group text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1 cursor-pointer z-100"
                         @click="isSidebarOpen = false">
                         <Earth class="w-4 h-4" /> Goto Website
                     </router-link>
@@ -109,12 +123,20 @@
                 <router-view></router-view>
             </main>
         </div>
+
+        <!-- Cart Drawer -->
+        <CartDrawer :isOpen="isCartOpen" @close="isCartOpen = false" />
+
+        <!-- Wishlist Drawer -->
+        <WishlistDrawer :isOpen="isWishlistOpen" @close="isWishlistOpen = false" />
     </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue';
 import { useAuthStore } from '../../stores/auth';
+import { useCartStore } from '../../stores/cart';
+import { useWishlistStore } from '../../stores/wishlist';
 import { useRouter, useRoute } from 'vue-router';
 import {
     LayoutDashboard,
@@ -125,14 +147,22 @@ import {
     Settings,
     LogOut,
     Menu,
-    Earth
+    Earth,
+    ShoppingCart,
+    Heart
 } from 'lucide-vue-next';
+import CartDrawer from '../../components/CartDrawer.vue';
+import WishlistDrawer from '../../components/WishlistDrawer.vue';
 
 const authStore = useAuthStore();
+const cartStore = useCartStore();
+const wishlistStore = useWishlistStore();
 const router = useRouter();
 const route = useRoute();
 
 const isSidebarOpen = ref(false);
+const isCartOpen = ref(false);
+const isWishlistOpen = ref(false);
 const user = computed(() => authStore.user);
 
 const userInitials = computed(() => {
@@ -144,6 +174,8 @@ const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Requests', href: '/dashboard/requests', icon: Package },
     { name: 'My Orders', href: '/dashboard/orders', icon: ShoppingBag },
+    { name: 'Cart', href: '#', icon: ShoppingCart, action: 'cart' },
+    { name: 'Wishlist', href: '#', icon: Heart, action: 'wishlist' },
     { name: 'Notifications', href: '/dashboard/notifications', icon: Bell },
     { name: 'Coupons', href: '/dashboard/coupons', icon: Ticket },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
@@ -163,5 +195,13 @@ const isActive = (path) => {
 const handleLogout = async () => {
     await authStore.logout();
     router.push('/login');
+};
+
+const handleAction = (action) => {
+    if (action === 'cart') {
+        isCartOpen.value = true;
+    } else if (action === 'wishlist') {
+        isWishlistOpen.value = true;
+    }
 };
 </script>

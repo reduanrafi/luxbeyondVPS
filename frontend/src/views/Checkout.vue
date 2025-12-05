@@ -154,11 +154,69 @@
                                         <span v-if="method.fee_percentage">Processing fee: {{ method.fee_percentage }}%</span>
                                         <span v-else-if="method.fee">Processing fee: ৳{{ method.fee }}</span>
                                     </div>
+                                    <!-- Show payment instructions for manual methods -->
+                                    <div v-if="!method.is_online && method.instructions" class="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
+                                        {{ method.instructions }}
+                                    </div>
+                                    <!-- Show account details for manual methods -->
+                                    <div v-if="!method.is_online && method.account_number" class="text-xs text-gray-600 mt-2 p-2 bg-gray-50 rounded">
+                                        <div><strong>Account:</strong> {{ method.account_number }}</div>
+                                        <div v-if="method.account_name"><strong>Name:</strong> {{ method.account_name }}</div>
+                                        <div v-if="method.bank_name"><strong>Bank:</strong> {{ method.bank_name }}</div>
+                                        <div v-if="method.branch_name"><strong>Branch:</strong> {{ method.branch_name }}</div>
+                                    </div>
                                 </div>
                             </label>
                         </div>
                         <div v-else class="text-center py-8 text-gray-500">
                             No payment methods available
+                        </div>
+                    </div>
+
+                    <!-- Payment Slip Upload (for bank transfer) -->
+                    <div v-if="selectedPaymentMethod === 'bank_transfer' && currentOrder" class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <Upload class="w-6 h-6 text-primary" />
+                            Upload Payment Slip
+                        </h2>
+                        <div v-if="!currentOrder.payment_slip" class="space-y-4">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                <input
+                                    type="file"
+                                    ref="paymentSlipInput"
+                                    @change="handlePaymentSlipUpload"
+                                    accept="image/*"
+                                    class="hidden"
+                                />
+                                <Upload class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                <p class="text-gray-600 mb-2">Upload your payment slip</p>
+                                <p class="text-xs text-gray-500 mb-4">Accepted formats: JPG, PNG, GIF (Max 5MB)</p>
+                                <button
+                                    @click="$refs.paymentSlipInput?.click()"
+                                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all"
+                                >
+                                    Choose File
+                                </button>
+                            </div>
+                            <div v-if="paymentSlipPreview" class="mt-4">
+                                <img :src="paymentSlipPreview" alt="Payment slip preview" class="max-w-full h-48 object-contain rounded-lg border border-gray-200" />
+                                <button
+                                    @click="uploadPaymentSlip"
+                                    :disabled="uploadingSlip"
+                                    class="mt-2 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-all"
+                                >
+                                    <span v-if="uploadingSlip">Uploading...</span>
+                                    <span v-else>Upload Payment Slip</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div v-else class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                            <div class="flex items-center gap-2 text-green-700 mb-2">
+                                <CheckCircle class="w-5 h-5" />
+                                <span class="font-semibold">Payment slip uploaded</span>
+                            </div>
+                            <img :src="getPaymentSlipUrl(currentOrder.payment_slip)" alt="Payment slip" class="max-w-full h-48 object-contain rounded-lg border border-gray-200 mt-2" />
+                            <p class="text-sm text-gray-600 mt-2">Your payment is pending verification by our team.</p>
                         </div>
                     </div>
 
@@ -190,7 +248,7 @@
                                     <img
                                         :src="getProductImage(item)"
                                         :alt="item.name"
-                                        class="w-full h-full object-cover"
+                                        class="w-full h-full object-contain"
                                     />
                                 </div>
                                 <div class="flex-1 min-w-0">
@@ -203,15 +261,58 @@
                             </div>
                         </div>
 
+                        <!-- Coupon Code -->
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div v-if="!appliedCoupon" class="space-y-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Have a coupon code?</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <input
+                                        v-model="couponCode"
+                                        type="text"
+                                        placeholder="Enter coupon code"
+                                        class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        @keyup.enter="applyCoupon"
+                                    />
+                                    <button
+                                        @click="applyCoupon"
+                                        :disabled="applyingCoupon || !couponCode.trim()"
+                                        class="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    >
+                                        <span v-if="applyingCoupon">Applying...</span>
+                                        <span v-else>Apply</span>
+                                    </button>
+                                </div>
+                                <p v-if="couponError" class="text-xs text-red-600 mt-1">{{ couponError }}</p>
+                            </div>
+                            <div v-else class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <CheckCircle class="w-5 h-5 text-green-600" />
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900">{{ appliedCoupon.code }}</p>
+                                        <p class="text-xs text-gray-600">{{ appliedCoupon.description || 'Coupon applied' }}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    @click="removeCoupon"
+                                    class="text-sm text-red-600 hover:text-red-700 font-semibold"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Price Breakdown -->
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Subtotal</span>
                                 <span class="font-semibold text-gray-900">৳{{ formatPrice(orderSummary.subtotal) }}</span>
                             </div>
-                            <div v-if="orderSummary.delivery_charge > 0" class="flex justify-between text-sm">
+                            <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Delivery Charge</span>
-                                <span class="font-semibold text-gray-900">৳{{ formatPrice(orderSummary.delivery_charge) }}</span>
+                                <span class="font-semibold text-gray-900">
+                                    <span v-if="orderSummary.delivery_charge > 0">৳{{ formatPrice(orderSummary.delivery_charge) }}</span>
+                                    <span v-else class="text-green-600">Free</span>
+                                </span>
                             </div>
                             <div v-if="orderSummary.payment_processing_fee > 0" class="flex justify-between text-sm">
                                 <span class="text-gray-600">Payment Processing Fee</span>
@@ -266,7 +367,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useAuthStore } from '../stores/auth';
-import { MapPin, CreditCard, ShoppingCart, Lock } from 'lucide-vue-next';
+import { MapPin, CreditCard, ShoppingCart, Lock, Upload, CheckCircle } from 'lucide-vue-next';
 import axios from '../axios';
 
 const router = useRouter();
@@ -289,6 +390,10 @@ const paymentMethodsLoading = ref(false);
 const orderNotes = ref('');
 const processing = ref(false);
 const bdtCurrencyId = ref(1); // Default, will be fetched
+const currentOrder = ref(null);
+const paymentSlipFile = ref(null);
+const paymentSlipPreview = ref(null);
+const uploadingSlip = ref(false);
 const orderSummary = ref({
     subtotal: 0,
     delivery_charge: 0,
@@ -298,6 +403,11 @@ const orderSummary = ref({
     total: 0,
     min_payment: 0,
 });
+
+const couponCode = ref('');
+const appliedCoupon = ref(null);
+const applyingCoupon = ref(false);
+const couponError = ref('');
 
 const isFormValid = computed(() => {
     return (
@@ -353,9 +463,10 @@ const calculateCharges = async () => {
         orderSummary.value.delivery_charge = response.data.delivery_charge || 0;
         orderSummary.value.payment_processing_fee = response.data.payment_processing_fee || 0;
 
-        // Calculate total
+        // Calculate total (subtract coupon discount if applied)
         const totalCharges = response.data.total_charges || 0;
-        orderSummary.value.total = subtotal + totalCharges;
+        const discountAmount = orderSummary.value.discount || 0;
+        orderSummary.value.total = subtotal + totalCharges - discountAmount;
 
         // Calculate minimum payment
         const minPaymentPercentage = 0; // Get from settings if needed
@@ -384,6 +495,43 @@ const fetchPaymentMethods = async () => {
     }
 };
 
+const applyCoupon = async () => {
+    if (!couponCode.value.trim()) return;
+    
+    applyingCoupon.value = true;
+    couponError.value = '';
+    
+    try {
+        const productIds = cartStore.items.map(item => item.id).filter(id => id);
+        const response = await axios.post('/coupons/apply', {
+            code: couponCode.value.trim(),
+            subtotal: orderSummary.value.subtotal,
+            product_ids: productIds.length > 0 ? productIds : null,
+        });
+        
+        if (response.data.valid) {
+            appliedCoupon.value = response.data.coupon;
+            orderSummary.value.discount = response.data.discount || 0;
+            await calculateCharges(); // Recalculate total with discount
+            couponCode.value = '';
+        } else {
+            couponError.value = response.data.message || 'Invalid coupon code';
+        }
+    } catch (error) {
+        console.error('Error applying coupon:', error);
+        couponError.value = error.response?.data?.message || 'Failed to apply coupon';
+    } finally {
+        applyingCoupon.value = false;
+    }
+};
+
+const removeCoupon = () => {
+    appliedCoupon.value = null;
+    orderSummary.value.discount = 0;
+    calculateCharges(); // Recalculate total without discount
+    couponError.value = '';
+};
+
 const placeOrder = async () => {
     if (!isFormValid.value) return;
 
@@ -403,6 +551,7 @@ const placeOrder = async () => {
         // Prepare order data
         const orderData = {
             user_id: authStore.user?.id,
+            coupon_id: appliedCoupon.value?.id || null,
             items: items,
             subtotal: orderSummary.value.subtotal,
             shipping: orderSummary.value.delivery_charge,
@@ -418,18 +567,109 @@ const placeOrder = async () => {
         };
 
         const response = await axios.post('/orders', orderData);
+        const order = response.data;
 
-        // Clear cart
-        cartStore.clearCart();
+        // Store current order for payment processing
+        currentOrder.value = order;
 
-        // Redirect to order confirmation
-        router.push(`/dashboard/orders/${response.data.id || response.data.order?.id}`);
+        // Handle bKash payment
+        const selectedMethod = paymentMethods.value.find(m => m.type === selectedPaymentMethod.value);
+        if (selectedMethod?.is_online && selectedMethod?.type === 'bkash') {
+            // Initiate bKash payment
+            try {
+                const paymentResponse = await axios.post('/payments/bkash/initiate', {
+                    order_id: order.id,
+                    amount: orderSummary.value.total,
+                });
+
+                if (paymentResponse.data.bkashURL) {
+                    // Redirect to bKash payment page
+                    window.location.href = paymentResponse.data.bkashURL;
+                } else {
+                    throw new Error('Failed to get bKash payment URL');
+                }
+            } catch (error) {
+                console.error('Error initiating bKash payment:', error);
+                alert('Failed to initiate payment. Please try again.');
+                processing.value = false;
+                return;
+            }
+        } else {
+            // For manual payment methods, clear cart and redirect
+            cartStore.clearCart();
+            
+            // If bank transfer, stay on page to upload slip
+            if (selectedPaymentMethod.value === 'bank_transfer') {
+                // Stay on page for payment slip upload
+                processing.value = false;
+            } else {
+                // Redirect to order confirmation
+                router.push(`/dashboard/orders/${order.id}`);
+            }
+        }
     } catch (error) {
         console.error('Error placing order:', error);
         alert(error.response?.data?.message || 'Failed to place order. Please try again.');
-    } finally {
         processing.value = false;
     }
+};
+
+const handlePaymentSlipUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            return;
+        }
+        paymentSlipFile.value = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            paymentSlipPreview.value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const uploadPaymentSlip = async () => {
+    if (!paymentSlipFile.value || !currentOrder.value) return;
+
+    uploadingSlip.value = true;
+    try {
+        const formData = new FormData();
+        formData.append('payment_slip', paymentSlipFile.value);
+        formData.append('order_id', currentOrder.value.id);
+
+        const response = await axios.post(`/orders/${currentOrder.value.id}/upload-payment-slip`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        currentOrder.value = response.data.order;
+        paymentSlipFile.value = null;
+        paymentSlipPreview.value = null;
+        
+        // Clear cart after successful upload
+        cartStore.clearCart();
+        
+        alert('Payment slip uploaded successfully! Your order is pending verification.');
+        
+        // Redirect to order page after a delay
+        setTimeout(() => {
+            router.push(`/dashboard/orders/${currentOrder.value.id}`);
+        }, 2000);
+    } catch (error) {
+        console.error('Error uploading payment slip:', error);
+        alert(error.response?.data?.message || 'Failed to upload payment slip. Please try again.');
+    } finally {
+        uploadingSlip.value = false;
+    }
+};
+
+const getPaymentSlipUrl = (path) => {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `/storage/${path}`;
 };
 
 const fetchBDTCurrency = async () => {
@@ -456,6 +696,22 @@ watch(
     { deep: true }
 );
 
+// Handle payment callback from URL params
+const handlePaymentCallback = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    const orderId = urlParams.get('order_id');
+
+    if (paymentStatus === 'success' && orderId) {
+        // Clear cart on successful payment
+        cartStore.clearCart();
+        // Redirect to order page
+        router.push(`/dashboard/orders/${orderId}`);
+    } else if (paymentStatus === 'failed' || paymentStatus === 'error') {
+        alert('Payment failed. Please try again.');
+    }
+};
+
 // Load user data if available
 onMounted(() => {
     if (authStore.user) {
@@ -466,6 +722,7 @@ onMounted(() => {
         calculateCharges();
     });
     fetchPaymentMethods();
+    handlePaymentCallback();
 });
 </script>
 

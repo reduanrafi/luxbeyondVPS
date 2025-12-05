@@ -33,6 +33,11 @@ class OrderStatusController extends Controller
             return response()->json($query->where('is_active', true)->orderBy('sort_order')->orderBy('label')->get());
         }
 
+        // Public endpoint - return active statuses
+        if (!$request->user() || !$request->user()->hasRole('Admin')) {
+            return response()->json($query->where('is_active', true)->orderBy('sort_order')->orderBy('label')->get());
+        }
+
         // Paginated response
         $statuses = $query->orderBy('sort_order')->orderBy('label')->paginate($request->per_page ?? 15);
         return response()->json($statuses);

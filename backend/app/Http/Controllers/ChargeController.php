@@ -128,8 +128,9 @@ class ChargeController extends Controller
         $weight = $additionalData['weight'] ?? 0;
         $paymentMethod = $additionalData['payment_method'] ?? null;
         
-        // Get active charges that match the selected currency
-        // Charges should be in the same currency as the selected currency, or in base currency (which applies to all)
+        // For shop orders, only calculate delivery charge from settings
+        // Skip charges table - delivery charge is handled separately below
+        // Get active charges that match the selected currency (for product requests, not shop orders)
         $query = Charge::where('is_active', true)
             ->whereHas('currency', function($q) use ($currency) {
                 // Get charges in the selected currency OR base currency (which applies to all currencies)
@@ -141,7 +142,11 @@ class ChargeController extends Controller
             $query->whereIn('type', $request->charge_types);
         }
 
-        $charges = $query->with('currency')->orderBy('sort_order')->get();
+        // Only get charges if charge_types is specified (for product requests)
+        // For shop orders (checkout), skip charges table - only use delivery charge from settings
+        $charges = $request->has('charge_types') && !empty($request->charge_types) 
+            ? $query->with('currency')->orderBy('sort_order')->get()
+            : collect([]);
         $totalCharges = 0;
         $chargeBreakdown = [];
 
@@ -193,7 +198,7 @@ class ChargeController extends Controller
             }
             if ($charge->max_value !== null && $chargeAmountInCurrency > $charge->max_value) {
                 $chargeAmountInCurrency = $charge->max_value;
-            }
+    }
 
             // Convert to base currency (BDT) for total
             $chargeAmountBDT = $chargeAmountInCurrency;
@@ -223,20 +228,19 @@ class ChargeController extends Controller
         $paymentMethod = $additionalData['payment_method'] ?? null;
         
         $deliveryCharge = $this->calculateDeliveryCharge($request->base_amount, $isInsideCity, $weight, $paymentMethod);
-        if ($deliveryCharge > 0) {
-            $totalCharges += $deliveryCharge;
-            $chargeBreakdown[] = [
-                'charge' => 'Delivery Charge',
-                'type' => 'delivery',
-                'amount_in_currency' => round($deliveryCharge, 2),
-                'amount_in_bdt' => round($deliveryCharge, 2),
-                'currency' => 'BDT',
-                'currency_symbol' => '৳',
-                'calculation_type' => 'fixed',
-                'value' => $deliveryCharge,
-                'rate_to_base' => 1,
-            ];
-        }
+        // Always add delivery charge to total (even if 0 for free delivery)
+        $totalCharges += $deliveryCharge;
+        $chargeBreakdown[] = [
+            'charge' => 'Delivery Charge',
+            'type' => 'delivery',
+            'amount_in_currency' => round($deliveryCharge, 2),
+            'amount_in_bdt' => round($deliveryCharge, 2),
+            'currency' => 'BDT',
+            'currency_symbol' => '৳',
+            'calculation_type' => 'fixed',
+            'value' => $deliveryCharge,
+            'rate_to_base' => 1,
+        ];
 
         // Calculate payment processing fee (based on grand total: product + all charges + delivery)
         $subtotalBeforePaymentFee = $request->base_amount + $totalCharges;
@@ -271,44 +275,21 @@ class ChargeController extends Controller
      */
     private function calculateDeliveryCharge($totalAmount, $isInsideCity, $weight = 0, $paymentMethod = null)
     {
-        // Get delivery charge settings
+        // Get delivery charge settings (for shop orders - simple calculation)
         $insideCityCharge = \App\Models\Setting::get('delivery_charge_inside_city', 0);
         $outsideCityCharge = \App\Models\Setting::get('delivery_charge_outside_city', 0);
         $freeDeliveryThreshold = \App\Models\Setting::get('free_delivery_threshold', 0);
-        $chargePerKg = \App\Models\Setting::get('delivery_charge_per_kg', 0);
 
         // Check if order qualifies for free delivery
         if ($freeDeliveryThreshold > 0 && $totalAmount >= $freeDeliveryThreshold) {
-            // Free delivery, but still calculate weight-based charges if applicable
-            $weightCharge = $weight > 0 ? ($weight * $chargePerKg) : 0;
-            return $weightCharge;
+            return 0; // Free delivery
         }
 
-        // Get base delivery charge based on location
-        $baseCharge = $isInsideCity ? $insideCityCharge : $outsideCityCharge;
+        // Simple calculation: just use the setting value based on location
+        // Inside Dhaka or Outside Dhaka - no conversion, no weight calculation for shop orders
+        $deliveryCharge = $isInsideCity ? $insideCityCharge : $outsideCityCharge;
 
-        // Add weight-based charge if applicable
-        $weightCharge = $weight > 0 ? ($weight * $chargePerKg) : 0;
-
-        // Check if payment method affects delivery charge
-        // Some payment methods might have different delivery charges
-        $totalDeliveryCharge = $baseCharge + $weightCharge;
-
-        // Payment method specific adjustments (if needed in future)
-        // Example: Cash on delivery might have higher charge
-        if ($paymentMethod) {
-            $paymentMethodObj = \App\Models\PaymentMethod::where('type', $paymentMethod)
-                ->orWhere('name', 'like', '%' . $paymentMethod . '%')
-                ->where('is_active', true)
-                ->first();
-            
-            // If payment method has specific delivery charge override in config, use it
-            if ($paymentMethodObj && isset($paymentMethodObj->config['delivery_charge_override'])) {
-                $totalDeliveryCharge = $paymentMethodObj->config['delivery_charge_override'] + $weightCharge;
-            }
-        }
-
-        return $totalDeliveryCharge;
+        return $deliveryCharge;
     }
 
     /**

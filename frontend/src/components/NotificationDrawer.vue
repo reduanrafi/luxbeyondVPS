@@ -5,7 +5,7 @@
             <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
                 enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 backdrop-blur-sm pointer-events-auto"
+                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 pointer-events-auto"
                     @click="$emit('close')">
                 </div>
             </Transition>

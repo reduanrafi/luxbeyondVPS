@@ -1,13 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
-import Login from '../views/Login.vue';
-import Register from '../views/Register.vue';
 
 const routes = [
     { path: '/', component: () => import('../views/LandingPage.vue') },
-    { path: '/login', component: Login },
-    { path: '/register', component: Register },
-    { path: '/forgot-password', component: () => import('../views/ForgotPassword.vue') },
+    // Auth routes redirect to home and open modals (handled by router guard)
+    { path: '/login', redirect: '/' },
+    { path: '/register', redirect: '/' },
+    { path: '/forgot-password', redirect: '/' },
 
     // Customer Dashboard
     {
@@ -26,6 +25,10 @@ const routes = [
             {
                 path: 'orders',
                 component: () => import('../views/dashboard/MyOrders.vue'),
+            },
+            {
+                path: 'orders/:orderNumber',
+                component: () => import('../views/dashboard/OrderDetails.vue'),
             },
             {
                 path: 'notifications',
@@ -97,12 +100,28 @@ const routes = [
                 component: () => import('../views/AdminRequestDashboard.vue'),
             },
             {
+                path: 'requests/:id/edit',
+                component: () => import('../views/admin/EditProductRequest.vue'),
+            },
+            {
+                path: 'orders/:id',
+                component: () => import('../views/admin/AdminOrderDetails.vue'),
+            },
+            {
+                path: 'requests/:id',
+                component: () => import('../views/admin/AdminRequestDetails.vue'),
+            },
+            {
                 path: 'analytics',
                 component: () => import('../views/admin/Analytics.vue'),
             },
             {
                 path: 'settings',
                 component: () => import('../views/admin/AdminSettings.vue'),
+            },
+            {
+                path: 'events',
+                component: () => import('../views/admin/EventsManagement.vue'),
             },
         ]
     },
@@ -119,7 +138,7 @@ const routes = [
         component: () => import('../views/Shop.vue'),
     },
     {
-        path: '/products/:id',
+        path: '/products/:slug',
         component: () => import('../views/ProductDetails.vue'),
     },
     {
@@ -141,12 +160,37 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
+    
     if (!authStore.user && authStore.token) {
         await authStore.fetchUser();
     }
 
+    // Handle direct navigation to auth routes - open modals instead
+    if ((to.path === '/login' || to.path === '/register' || to.path === '/forgot-password')) {
+        if (authStore.isAuthenticated) {
+            // If already authenticated, redirect to dashboard
+            next('/dashboard');
+        } else {
+            // Import modal store and open appropriate modal
+            const { useModalStore } = await import('../stores/modal');
+            const modalStore = useModalStore();
+            const modalName = to.path === '/login' ? 'login' : to.path === '/register' ? 'register' : 'forgot-password';
+            modalStore.openModal(modalName);
+            next('/'); // Redirect to home
+        }
+        return;
+    }
+
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-        next('/login');
+        // Import modal store dynamically
+        const { useModalStore } = await import('../stores/modal');
+        const modalStore = useModalStore();
+        
+        // Store the intended destination
+        const redirectPath = to.fullPath;
+        // Open login modal instead of redirecting
+        modalStore.openModal('login', { redirect: redirectPath });
+        next(false); // Prevent navigation, stay on current page
     } else if (to.meta.requiresAdmin && !authStore.isAdmin) {
         // Redirect non-admin users trying to access admin routes
         next('/dashboard');
