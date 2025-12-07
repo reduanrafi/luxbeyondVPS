@@ -52,8 +52,8 @@
                                         <div class="ml-4 flex-1 flex flex-col">
                                             <div>
                                                 <div class="flex justify-between text-base font-medium text-slate-900">
-                                                    <h3><router-link :to="`/products/${item.slug || item.id}`">{{
-                                                        item.name
+                                                    <h3><router-link :to="`/shop/${item.slug || item.id}`">{{
+                                                            item.name
                                                             }}</router-link></h3>
                                                     <p class="ml-4 text-primary font-bold">
                                                         <template
@@ -62,10 +62,10 @@
                                                         </template>
                                                         <template v-else>
                                                             ৳{{ typeof item.price === 'number' ?
-                                                                item.price.toLocaleString('en-US', {
-                                                                    minimumFractionDigits:
-                                                                        2, maximumFractionDigits: 2
-                                                                }) : item.price }}
+                                                            item.price.toLocaleString('en-US', {
+                                                            minimumFractionDigits:
+                                                            2, maximumFractionDigits: 2
+                                                            }) : item.price }}
                                                         </template>
                                                     </p>
                                                 </div>

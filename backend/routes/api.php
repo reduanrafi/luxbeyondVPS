@@ -48,6 +48,7 @@ Route::get('/payments/bkash/callback', [\App\Http\Controllers\PaymentController:
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
 
     Route::apiResource('requests', \App\Http\Controllers\ProductRequestController::class);
     Route::post('/requests/{id}/confirm', [\App\Http\Controllers\ProductRequestController::class, 'confirm']);

@@ -47,3 +47,7 @@ h3{
 button:hover {
   cursor: pointer !important;  
 }
+
+button:disabled {
+  cursor: not-allowed !important;
+}

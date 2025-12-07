@@ -48,6 +48,12 @@ class Order extends Model
         'paid_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'paid_amount',
+        'due_amount',
+        'is_fully_paid',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -87,6 +93,35 @@ class Order extends Model
     public function statusHistories()
     {
         return $this->hasMany(OrderStatusHistory::class)->orderBy('created_at', 'desc');
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    /**
+     * Get the total amount paid (sum of completed payments)
+     */
+    public function getPaidAmountAttribute()
+    {
+        return $this->payments()->where('status', 'completed')->sum('amount');
+    }
+
+    /**
+     * Get the remaining unpaid amount
+     */
+    public function getDueAmountAttribute()
+    {
+        return max(0, $this->total - $this->paid_amount);
+    }
+
+    /**
+     * Check if order is fully paid
+     */
+    public function getIsFullyPaidAttribute()
+    {
+        return $this->due_amount <= 0;
     }
 
     public function updateStatus($statusId, $note = null, $userId = null)

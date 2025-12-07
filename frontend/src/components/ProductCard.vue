@@ -8,7 +8,7 @@
   'relative overflow-hidden mb-6 flex items-center justify-center bg-white/[0.02]',
   viewMode === 'grid' ? 'aspect-square w-full' : 'w-48 h-48 shrink-0'
 ]">
-      <router-link :to="`/products/${product.slug || product.id}`" class="block h-full w-full p-4">
+      <router-link :to="`/shop/${product.slug || product.id}`" class="block h-full w-full p-4">
         <img :src="getProductImage(product)" :alt="product.name"
           class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
           @error="handleImageError" />
@@ -35,7 +35,7 @@
     <!-- Product Info -->
     <div class="flex-1 flex flex-col text-left">
       <!-- Name -->
-      <router-link :to="`/products/${product.slug || product.id}`" class="group/link">
+      <router-link :to="`/shop/${product.slug || product.id}`" class="group/link">
         <h3
           class="font-serif text-xl text-white uppercase tracking-widest mb-2 group-hover/link:text-primary transition-colors">
           {{ product.name }}
@@ -176,7 +176,7 @@ const router = useRouter();
 const addToCart = (product) => {
   // If product has variants, redirect to product details
   if (product.has_variants) {
-    router.push(`/products/${product.slug || product.id}`);
+    router.push(`/shop/${product.slug || product.id}`);
     return;
   }
 

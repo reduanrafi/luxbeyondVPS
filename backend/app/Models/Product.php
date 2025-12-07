@@ -72,7 +72,7 @@ class Product extends Model
         if (filter_var($this->image, FILTER_VALIDATE_URL)) {
             return $this->image;
         }
-        return asset('storage/' . $this->image);
+        return \Storage::disk('public')->url($this->image);
     }
 
     public function getTotalStockAttribute()

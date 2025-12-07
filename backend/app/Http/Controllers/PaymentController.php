@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderPayment;
 use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -74,7 +75,7 @@ class PaymentController extends Controller
             $callbackUrl = $backendUrl . '/api/payments/bkash/callback';
             
             $paymentData = [
-                'amount' => (string) $validated['amount'],
+                'amount' => number_format((float) $validated['amount'], 2, '.', ''),
                 'payer_reference' => 'order_' . $order->order_number,
                 'callback_url' => $callbackUrl,
                 'merchant_invoice_number' => $order->order_number,
@@ -168,7 +169,18 @@ class PaymentController extends Controller
 
             // Check if payment was successful
             if (isset($response['transactionStatus']) && $response['transactionStatus'] === 'Completed') {
-                // Payment successful
+                // Create payment record
+                $paymentAmount = $response['amount'] ?? 0;
+                OrderPayment::create([
+                    'order_id' => $order->id,
+                    'payment_method' => 'bkash',
+                    'amount' => $paymentAmount,
+                    'payment_reference' => $response['trxID'] ?? null,
+                    'status' => 'completed',
+                    'paid_at' => now(),
+                ]);
+
+                // Update order status
                 $order->update([
                     'payment_status' => 'paid',
                     'bkash_trx_id' => $response['trxID'] ?? null,
@@ -179,6 +191,7 @@ class PaymentController extends Controller
                     'order_id' => $order->id,
                     'paymentID' => $paymentID,
                     'trxID' => $response['trxID'] ?? null,
+                    'amount' => $paymentAmount,
                 ]);
 
                 return redirect($frontendUrl . '/checkout?payment=success&order_id=' . $order->id);

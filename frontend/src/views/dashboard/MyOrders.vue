@@ -17,7 +17,8 @@
                     <tbody class="divide-y divide-white/5">
                         <tr v-if="loading">
                             <td colspan="6" class="p-8 text-center text-slate-500">
-                                <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                                <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary">
+                                </div>
                                 <p class="mt-2 text-xs uppercase tracking-wider">Loading orders...</p>
                             </td>
                         </tr>
@@ -28,17 +29,22 @@
                             </td>
                         </tr>
                         <tr v-for="order in orders" :key="order.id" class="hover:bg-white/5 transition-colors group">
-                            <td class="p-4 font-semibold text-primary group-hover:text-white transition-colors text-xs tracking-wide">#{{ order.id }}</td>
+                            <td
+                                class="p-4 font-semibold text-primary group-hover:text-white transition-colors text-xs tracking-wide">
+                                #{{ order.id }}</td>
                             <td class="p-4 text-slate-400 text-xs">{{ order.date }}</td>
-                            <td class="p-4 text-slate-400 text-xs max-w-xs truncate" :title="order.items">{{ order.items }}</td>
+                            <td class="p-4 text-slate-400 text-xs max-w-xs truncate" :title="order.items">{{ order.items
+                                }}</td>
                             <td class="p-4 font-serif text-white text-sm tracking-wide">{{ order.total }}</td>
                             <td class="p-4">
-                                <span :class="statusClass(order.status)" class="px-2 py-1 border text-[10px] font-bold uppercase tracking-widest">
+                                <span :class="statusClass(order.status)"
+                                    class="px-2 py-1 border text-[10px] font-bold uppercase tracking-widest">
                                     {{ order.status }}
                                 </span>
                             </td>
                             <td class="p-4">
-                                <button @click="viewOrderDetails(order)" class="text-xs font-bold uppercase tracking-wider text-primary hover:text-white transition-colors">
+                                <button @click="viewOrderDetails(order)"
+                                    class="text-xs font-bold uppercase tracking-wider text-primary hover:text-white transition-colors">
                                     View
                                 </button>
                             </td>
@@ -65,15 +71,18 @@ const fetchOrders = async () => {
         const response = await axios.get('/orders');
         const ordersData = response.data.data || response.data;
         const ordersArray = Array.isArray(ordersData) ? ordersData : (ordersData.data || []);
-        
+
         orders.value = ordersArray.map(order => {
             // Format items list
             const itemsList = order.items?.map(item => item.product_name || 'Product').join(', ') || 'No items';
-            
+
             // Format total amount
-            const total = parseFloat(order.total || order.total_amount || 0);
             const currencySymbol = order.currency?.symbol || '৳';
-            const formattedTotal = `${currencySymbol}${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const formatMoney = (amount) => `${currencySymbol}${parseFloat(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const total = formatMoney(order.total || order.total_amount);
+            const paid = formatMoney(order.paid_amount);
+            const due = formatMoney(order.due_amount);
             
             // Format date
             const date = new Date(order.created_at).toLocaleDateString('en-US', { 
@@ -90,7 +99,9 @@ const fetchOrders = async () => {
                 orderId: order.id,
                 date: date,
                 items: itemsList,
-                total: formattedTotal,
+                total: total,
+                paid: paid,
+                due: due,
                 status: statusLabel,
                 rawStatus: order.status
             };

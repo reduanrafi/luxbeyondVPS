@@ -107,7 +107,7 @@ class Event extends Model
         if (filter_var($this->image, FILTER_VALIDATE_URL)) {
             return $this->image;
         }
-        return asset('storage/' . $this->image);
+        return \Storage::disk('public')->url($this->image);
     }
 
     /**
@@ -121,7 +121,7 @@ class Event extends Model
         if (filter_var($this->banner_image, FILTER_VALIDATE_URL)) {
             return $this->banner_image;
         }
-        return asset('storage/' . $this->banner_image);
+        return \Storage::disk('public')->url($this->banner_image);
     }
 
     /**

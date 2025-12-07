@@ -211,9 +211,15 @@
                         <h3 class="text-xl font-bold text-white mb-2">No products found</h3>
                         <p class="text-slate-400 mb-6">Try adjusting your filters or search query</p>
                         <button @click="clearFilters"
-                            class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover hover:rounded-full transition-all">
+                            class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-full hover:bg-primary-hover hover:rounded-full transition-all">
                             Clear Filters
                         </button>
+
+                        or
+                        <router-link to="/request-product"
+                            class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-full hover:bg-primary-hover hover:rounded-full transition-all">
+                            Request a Product
+                        </router-link>
                     </div>
 
                     <!-- Pagination -->
@@ -272,7 +278,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { Search, Filter, Grid, List, Package, ChevronLeft, ChevronRight, Layers, Tag, Sparkles, X, ChevronUp, ChevronDown } from 'lucide-vue-next';
 import axios from '../axios';
 import ProductCard from '../components/ProductCard.vue';
-import HeroSection from '../components/HeroSection.vue';
 import ShopSidebar from '@/components/shop/ShopSidebar.vue';
 
 const route = useRoute();

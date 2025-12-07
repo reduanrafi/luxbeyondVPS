@@ -1,60 +1,68 @@
 <template>
     <div>
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">My Coupons</h2>
-            <p class="text-xs text-slate-500 mt-1">Available coupons and discount codes</p>
+        <div class="mb-8">
+            <h2 class="text-2xl font-serif font-bold text-white uppercase tracking-widest">My Coupons</h2>
+            <p class="text-xs text-slate-400 mt-2 font-light tracking-wide">Exclusive offers tailored just for you</p>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-            <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <p class="mt-2 text-xs text-slate-500">Loading coupons...</p>
+        <div v-if="loading" class="bg-surface border border-white/5 p-12 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <p class="mt-4 text-xs text-slate-400 uppercase tracking-widest">Loading offers...</p>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="coupons.length === 0" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-            <p class="text-sm font-semibold mb-1">No coupons available</p>
-            <p class="text-xs text-slate-500">You don't have any active coupons at the moment.</p>
+        <div v-else-if="coupons.length === 0" class="bg-surface border border-white/5 p-12 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 text-slate-600 mb-4">
+                <Ticket class="w-8 h-8" />
+            </div>
+            <p class="text-sm font-serif text-white uppercase tracking-widest mb-2">No Active Coupons</p>
+            <p class="text-xs text-slate-400">You don't have any exclusive offers at the moment.</p>
         </div>
 
         <!-- Coupons Grid -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div v-for="coupon in coupons" :key="coupon.id || coupon.code"
-                class="bg-surface rounded-xl shadow-md border border-gray-100 overflow-hidden relative group hover:shadow-lg transition-all">
+                class="bg-surface border border-white/5 relative group hover:border-primary/30 transition-all duration-500 overflow-hidden">
                 <!-- Decorative Circle -->
-                <div class="absolute -right-6 -top-6 w-20 h-20 rounded-full opacity-10 transition-transform group-hover:scale-150"
-                    :class="isActive(coupon) ? 'bg-primary' : 'bg-gray-400'"></div>
+                <div class="absolute -right-12 -top-12 w-32 h-32 rounded-full border border-white/5 opacity-20 transition-transform duration-700 group-hover:scale-150"
+                    :class="isActive(coupon) ? 'bg-primary/20' : 'bg-slate-500/10'"></div>
 
-                <div class="p-4 flex flex-col h-full">
-                    <div class="flex justify-between items-start mb-3">
+                <div class="p-6 flex flex-col h-full relative z-10">
+                    <div class="flex justify-between items-start mb-6">
                         <div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider mb-1 block"
-                                :class="isActive(coupon) ? 'text-primary' : 'text-gray-400'">
-                                {{ coupon.type || 'Discount' }}
+                            <span class="text-[10px] font-bold uppercase tracking-widest mb-2 block"
+                                :class="isActive(coupon) ? 'text-primary' : 'text-slate-500'">
+                                {{ coupon.type || 'Special Offer' }}
                             </span>
-                            <h3 class="text-2xl font-extrabold text-slate-900">{{ formatDiscount(coupon) }}</h3>
+                            <h3 class="text-3xl font-serif text-white">{{ formatDiscount(coupon) }}</h3>
                         </div>
-                        <div class="p-2 rounded-lg bg-gray-50">
-                            <Ticket class="w-5 h-5 text-slate-400" />
+                        <div class="p-3 bg-white/5">
+                            <Ticket class="w-5 h-5 text-primary" />
                         </div>
                     </div>
 
-                    <p class="text-slate-600 text-xs mb-4 flex-1 line-clamp-2">{{ coupon.description || 'No description' }}</p>
+                    <p class="text-slate-400 text-xs mb-6 flex-1 leading-relaxed">{{ coupon.description || `Exclusive
+                        discount for our premium members.` }}</p>
 
-                    <div class="pt-3 border-t border-dashed border-white/10">
-                        <div class="flex justify-between items-center mb-2">
+                    <div class="pt-4 border-t border-dashed border-white/10">
+                        <div class="flex justify-between items-center mb-3">
                             <div
-                                class="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-bold text-slate-700 tracking-wide select-all">
+                                class="font-mono bg-white/5 px-3 py-1.5 text-xs text-primary tracking-wider select-all border border-white/5">
                                 {{ coupon.code }}
                             </div>
                             <button v-if="isActive(coupon)" @click="copyCode(coupon.code)"
-                                class="text-xs font-semibold text-primary hover:text-primary-hover">
-                                Copy
+                                class="text-[10px] font-bold text-white uppercase tracking-widest hover:text-primary transition-colors">
+                                Copy Code
                             </button>
-                            <span v-else class="text-[10px] font-bold text-red-500 uppercase">Expired</span>
+                            <span v-else
+                                class="text-[10px] font-bold text-red-500 uppercase tracking-widest">Expired</span>
                         </div>
-                        <p v-if="coupon.expires_at" class="text-[10px] text-slate-400">Expires: {{ formatDate(coupon.expires_at) }}</p>
-                        <p v-if="coupon.min_spend" class="text-[10px] text-slate-500 mt-1">Min. spend: ৳{{ parseFloat(coupon.min_spend).toLocaleString() }}</p>
+                        <div class="flex items-center gap-4 text-[10px] text-slate-500 uppercase tracking-wider">
+                            <span v-if="coupon.expires_at">Valid until: {{ formatDate(coupon.expires_at) }}</span>
+                            <span v-if="coupon.min_spend" class="pl-4 border-l border-white/10">Min. spend: ৳{{
+                                parseFloat(coupon.min_spend).toLocaleString() }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

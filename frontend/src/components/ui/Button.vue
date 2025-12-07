@@ -29,7 +29,7 @@ const props = defineProps({
 });
 
 const computedClasses = computed(() => {
-    const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseClasses = 'inline-flex items-center justify-center rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
         primary: 'bg-primary text-slate-900 hover:bg-primary-hover hover:rounded-full focus:ring-primary',

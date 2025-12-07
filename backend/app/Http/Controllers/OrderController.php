@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderPayment;
 use App\Models\OrderStatus;
 use App\Models\OrderItem;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\OrderPlacedNotification;
+use App\Notifications\OrderPendingNotification;
 
 class OrderController extends Controller
 {
@@ -74,6 +77,11 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        // Decode items if sent as JSON string (common in multipart/form-data)
+        if ($request->has('items') && is_string($request->items)) {
+            $request->merge(['items' => json_decode($request->items, true)]);
+        }
+
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'event_id' => 'nullable|exists:events,id',
@@ -94,6 +102,7 @@ class OrderController extends Controller
             'shipping_phone' => 'nullable|string',
             'shipping_email' => 'nullable|email',
             'notes' => 'nullable|string',
+            'payment_slip' => 'nullable|file|image|max:5120', // 5MB max
         ]);
 
         // Calculate total
@@ -153,7 +162,38 @@ class OrderController extends Controller
             $order->updateStatus($defaultStatus->id, 'Order created', Auth::id());
         }
 
-        $order->load(['user', 'status', 'event', 'coupon', 'items']);
+        // Handle payment slip upload for bank transfer
+        $paymentSlipPath = null;
+        if ($request->hasFile('payment_slip') && $validated['payment_method'] === 'bank_transfer') {
+            $file = $request->file('payment_slip');
+            $filename = 'payment_slips/' . $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $paymentSlipPath = $file->storeAs('public', $filename);
+            $paymentSlipPath = $filename; // Store relative path
+
+            // Create payment record with pending status for bank transfer
+            OrderPayment::create([
+                'order_id' => $order->id,
+                'payment_method' => 'bank_transfer',
+                'amount' => $total,
+                'payment_slip' => $paymentSlipPath,
+                'status' => 'pending', // Pending admin verification
+            ]);
+
+            // Update order to pending payment status
+            $order->update([
+                'payment_status' => 'pending',
+                'payment_slip' => $paymentSlipPath,
+            ]);
+        }
+
+        $order->load(['user', 'status', 'event', 'coupon', 'items', 'payments']);
+
+        // Send notification based on payment method
+        if ($validated['payment_method'] === 'bank_transfer') {
+            $order->user->notify(new OrderPendingNotification($order));
+        } else {
+            $order->user->notify(new OrderPlacedNotification($order));
+        }
 
         return response()->json($order, 201);
     }
@@ -161,7 +201,7 @@ class OrderController extends Controller
     public function show(Request $request, $id)
     {
         // Support both ID and order_number lookup
-        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy', 'statusHistories.status'])
+        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
                      ->where(function($query) use ($id) {
                          $query->where('id', $id)
                                ->orWhere('order_number', $id);
@@ -172,7 +212,10 @@ class OrderController extends Controller
         if (!$request->is('api/admin/*') && $request->user() && $order->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
+        // Append computed attributes
+        $order->append(['paid_amount', 'due_amount', 'is_fully_paid']);
+
         return response()->json($order);
     }
 
@@ -207,6 +250,31 @@ class OrderController extends Controller
 
         // Update other fields
         $order->update($validated);
+
+        // Check for Admin Approval of Bank Transfer
+        // If payment method is bank_transfer AND (status changed to Processing/Completed OR payment_status changed to paid)
+        if ($order->payment_method === 'bank_transfer') {
+            $isApproved = false;
+
+            // Check status change (assuming ID 2 is Processing, 3 is Completed, 4 is Delivered)
+            // Or simply if status is NOT Pending (1) and NOT Cancelled (5)
+            if (isset($validated['status_id']) && in_array($validated['status_id'], [2, 3, 4])) {
+                $isApproved = true;
+            }
+
+            // Check payment status change
+            if (isset($validated['payment_status']) && $validated['payment_status'] === 'paid') {
+                $isApproved = true;
+            }
+
+            if ($isApproved) {
+                // Determine if we should send the "Placed" notification (which acts as Approved/Confirmed)
+                // We typically only want to send this once.
+                // For simplicity, we send it.
+                $order->user->notify(new OrderPlacedNotification($order));
+            }
+        }
+
         $order->load(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy']);
 
         return response()->json([

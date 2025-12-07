@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Notifications;
+
+use App\Models\Order;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+
+class OrderPendingNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    protected $order;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct(Order $order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        return ['mail', 'database'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        $url = config('app.frontend_url') . '/dashboard/orders/' . $this->order->order_number;
+
+        return (new MailMessage)
+            ->subject('Order Pending Approval - #' . ($this->order->order_number ?? $this->order->id))
+            ->greeting('Hello ' . $notifiable->name . ',')
+            ->line('Thank you for your order! We have received your request.')
+            ->line('Since you selected Bank Transfer, your order is currently PENDING approval.')
+            ->line('Our team will verify your payment slip and approve your order shortly.')
+            ->line('Order Summary:')
+            ->line('Order Number: #' . ($this->order->order_number ?? $this->order->id))
+            ->line('Total Amount: ' . $this->order->currency . ' ' . number_format($this->order->total, 2))
+            ->action('View Order Status', $url)
+            ->line('You will receive another notification once your order is approved.')
+            ->line('Thank you for shopping with us!');
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'title' => 'Order Pending Approval',
+            'message' => 'Your order #' . ($this->order->order_number ?? $this->order->id) . ' is pending admin approval.',
+            'order_id' => $this->order->id,
+            'order_number' => $this->order->order_number,
+            'amount' => $this->order->total,
+            'type' => 'order_pending'
+        ];
+    }
+}

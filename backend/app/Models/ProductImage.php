@@ -26,7 +26,7 @@ class ProductImage extends Model
         if (filter_var($this->path, FILTER_VALIDATE_URL)) {
             return $this->path;
         }
-        return asset('storage/' . $this->path);
+        return \Storage::disk('public')->url($this->path);
     }
 
     public function product()

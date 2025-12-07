@@ -41,22 +41,7 @@ class ProductVariant extends Model
         if (filter_var($this->image, FILTER_VALIDATE_URL)) {
             return $this->image;
         }
-        
-        // Get the raw image value to check what's actually stored
-        $imagePath = $this->getRawOriginal('image') ?? $this->image;
-        
-        // If it already starts with /storage/, use asset() to get full URL
-        if (str_starts_with($imagePath, '/storage/')) {
-            return asset($imagePath);
-        }
-        
-        // If it starts with storage/ (without leading slash), add leading slash
-        if (str_starts_with($imagePath, 'storage/')) {
-            return asset('/' . $imagePath);
-        }
-        
-        // Otherwise, assume it's a storage path (e.g., "products/variants/file.avif")
-        // and prepend storage/ to make it accessible with full URL
-        return asset('storage/' . $imagePath);
+
+        return \Storage::disk('public')->url($this->image);
     }
 }

@@ -39,7 +39,7 @@
                                 Products ({{ searchResults.length }})
                             </div>
                             <router-link v-for="product in searchResults" :key="product.id"
-                                :to="`/products/${product.slug || product.id}`" @click="closeSearchDropdown"
+                                :to="`/shop/${product.slug || product.id}`" @click="closeSearchDropdown"
                                 class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors group">
                                 <img :src="product.image_url ? product.image_url : '/assets/placeholder.png'"
                                     :alt="product.name"
@@ -85,19 +85,19 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
                     <router-link to="/"
-                        class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
                         Home
                     </router-link>
                     <router-link to="/shop"
-                        class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
                         Shop
                     </router-link>
                     <router-link to="/travellers"
-                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-lg transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
                         Travellers
                     </router-link>
                     <router-link to="/request-product"
-                        class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-primary hover:bg-primary/90 rounded-lg transition-colors shadow-sm">
+                        class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-primary hover:bg-primary/90 rounded-full transition-colors shadow-sm">
                         Request Order
                     </router-link>
                 </div>
@@ -105,7 +105,7 @@
                 <!-- Action Icons (Desktop) -->
                 <div class="hidden lg:flex items-center space-x-3 ml-6 pl-6 border-l border-white/10">
                     <button @click="handleWishlistClick"
-                        class="relative p-2 text-slate-300  hover:text-primary hover:bg-white/10 rounded-lg transition-colors"
+                        class="relative p-2 text-slate-300  hover:text-primary hover:bg-white/10 rounded-full transition-colors"
                         title="Wishlist">
                         <Heart class="h-6 w-6" />
                         <span v-if="wishlistStore.totalItems > 0"
@@ -114,7 +114,7 @@
                         </span>
                     </button>
                     <button @click="handleCartClick"
-                        class="relative p-2 text-slate-300  hover:text-primary hover:bg-white/10 rounded-lg transition-colors"
+                        class="relative p-2 text-slate-300  hover:text-primary hover:bg-white/10 rounded-full transition-colors"
                         title="Cart">
                         <ShoppingCart class="h-6 w-6" />
                         <span v-if="cartStore.totalItems > 0"
@@ -123,7 +123,7 @@
                         </span>
                     </button>
                     <button v-if="authStore.isAuthenticated" @click="isNotificationOpen = true"
-                        class="relative p-2 text-slate-300 hover:text-primary  hover:bg-white/10 rounded-lg transition-colors"
+                        class="relative p-2 text-slate-300 hover:text-primary  hover:bg-white/10 rounded-full transition-colors"
                         title="Notifications">
                         <Bell class="h-6 w-6" />
                         <span v-if="unreadCount > 0"
@@ -224,7 +224,7 @@
                     </div>
                     <div v-else-if="searchResults.length > 0" class="py-2">
                         <router-link v-for="product in searchResults" :key="product.id"
-                            :to="`/products/${product.slug || product.id}`" @click="closeSearchDropdown"
+                            :to="`/shop/${product.slug || product.id}`" @click="closeSearchDropdown"
                             class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
                             <img :src="product.image_url" :alt="product.name"
                                 class="w-16 h-16 object-cover rounded-lg border border-white/10" />

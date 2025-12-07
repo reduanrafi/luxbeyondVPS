@@ -138,7 +138,7 @@ const routes = [
         component: () => import('../views/Shop.vue'),
     },
     {
-        path: '/products/:slug',
+        path: '/shop/:slug',
         component: () => import('../views/ProductDetails.vue'),
     },
     {

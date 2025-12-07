@@ -76,7 +76,7 @@
                                             <div>
                                                 <div class="flex justify-between text-base font-medium">
                                                     <h3>
-                                                        <router-link :to="`/products/${item.slug || item.id}`"
+                                                        <router-link :to="`/shop/${item.slug || item.id}`"
                                                             class="font-serif text-sm tracking-wide transition-colors"
                                                             :class="isOutOfStock(item) ? 'text-red-400' : 'text-white hover:text-primary'">
                                                             {{ item.name }}
