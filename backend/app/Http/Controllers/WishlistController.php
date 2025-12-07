@@ -31,6 +31,7 @@ class WishlistController extends Controller
                     'image_url' => $variant?->image_url ?? $product->image_url,
                     'sellable_price' => $variant?->price ?? $product->sellable_price ?? $product->price,
                     'price' => $variant?->price ?? $product->sellable_price ?? $product->price,
+                    'total_stock' => $variant ? $variant->stock : $product->stock,
                     'variant' => $variant ? [
                         'id' => $variant->id,
                         'attributes' => $variant->attributes,

@@ -46,7 +46,7 @@ class BrandController extends Controller
             'name' => 'required|string|max:255|unique:brands',
             'description' => 'nullable|string',
             'url' => 'nullable|url|max:255',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
             'is_active' => 'boolean',
         ]);
 
@@ -74,7 +74,7 @@ class BrandController extends Controller
             'name' => 'sometimes|string|max:255|unique:brands,name,' . $id,
             'description' => 'nullable|string',
             'url' => 'nullable|url|max:255',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
             'is_active' => 'boolean',
         ]);
 

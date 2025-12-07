@@ -53,7 +53,7 @@ class CategoryController extends Controller
                 })
             ],
             'description' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
             'is_active' => 'boolean',
             'parent_id' => 'nullable|exists:categories,id',
         ]);
@@ -88,7 +88,7 @@ class CategoryController extends Controller
                 })->ignore($category->id)
             ],
             'description' => 'nullable|string',
-            'image' => 'nullable',
+            'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
             'is_active' => 'boolean',
             'parent_id' => 'nullable|exists:categories,id',
         ]);

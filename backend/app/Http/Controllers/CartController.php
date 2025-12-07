@@ -64,6 +64,7 @@ class CartController extends Controller
                     'sellable_price' => $finalPrice,
                     'price' => $finalPrice,
                     'original_price' => $originalPrice,
+                    'total_stock' => $variant ? $variant->stock : $product->stock,
                     'event_price' => $activeEvent ? $finalPrice : null,
                     'quantity' => $item->quantity,
                     'variant' => $variant ? [
