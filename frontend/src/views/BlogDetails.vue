@@ -1,9 +1,9 @@
 <template>
-    <div class="bg-white min-h-screen pt-20 pb-12">
+    <div class="bg-surface min-h-screen pt-20 pb-12">
         <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-8">
                 <span class="text-primary font-semibold">{{ blog.category }}</span>
-                <h1 class="text-4xl sm:text-5xl font-bold text-gray-900 mt-2 mb-4">{{ blog.title }}</h1>
+                <h1 class="text-4xl sm:text-5xl font-bold text-white mt-2 mb-4">{{ blog.title }}</h1>
                 <div class="flex items-center text-gray-500">
                     <span>By {{ blog.author }}</span>
                     <span class="mx-2">•</span>
@@ -15,7 +15,7 @@
                 <img :src="blog.image" :alt="blog.title" class="w-full h-full object-cover">
             </div>
 
-            <div class="prose prose-lg max-w-none text-gray-700">
+            <div class="prose prose-lg max-w-none text-slate-300">
                 <p class="lead text-xl mb-6 font-medium">{{ blog.excerpt }}</p>
                 <div v-html="blog.content"></div>
             </div>

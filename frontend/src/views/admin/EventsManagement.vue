@@ -7,19 +7,19 @@
                 <p class="text-sm text-slate-600 mt-1">Manage flash sales, promotions, and special events</p>
             </div>
             <button @click="openAddModal"
-                class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Create Event
             </button>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search events..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status" @change="fetchEvents(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -28,7 +28,7 @@
                     <option value="expired">Expired</option>
                 </select>
                 <select v-model="filters.position" @change="fetchEvents(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Positions</option>
                     <option value="hero">Hero Banner</option>
                     <option value="sidebar">Sidebar</option>
@@ -42,16 +42,16 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading events...</p>
         </div>
 
         <!-- Events Table -->
-        <div v-else class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div v-else class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 border-b border-white/10">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
@@ -63,7 +63,7 @@
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-surface divide-y divide-gray-200">
                         <tr v-if="events.length === 0">
                             <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                                 No events found
@@ -77,7 +77,7 @@
                                         <Calendar v-else class="h-full w-full p-2 text-gray-400" />
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-gray-900">{{ event.name }}</div>
+                                        <div class="text-sm font-medium text-white">{{ event.name }}</div>
                                         <div class="text-sm text-gray-500">{{ event.slug }}</div>
                                     </div>
                                 </div>
@@ -92,15 +92,15 @@
                                     {{ event.position === 'hero' ? 'Hero' : event.position === 'sidebar' ? 'Sidebar' : 'Both' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                                 {{ event.products_count || 0 }} products
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">{{ formatDate(event.start_date) }}</div>
+                                <div class="text-sm text-white">{{ formatDate(event.start_date) }}</div>
                                 <div class="text-sm text-gray-500">to {{ formatDate(event.end_date) }}</div>
                             </td>
                            
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                                 {{ event.is_active ? 'Active' : 'Inactive' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -109,12 +109,12 @@
                                         'bg-green-100 text-green-700': event.is_live,
                                         'bg-yellow-100 text-yellow-700': event.is_upcoming,
                                         'bg-red-100 text-red-700': event.is_expired,
-                                        'bg-gray-100 text-gray-700': !event.is_active
+                                        'bg-gray-100 text-slate-300': !event.is_active
                                     }">
                                     {{ getStatusLabel(event) }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                                 {{ event.priority }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -135,7 +135,7 @@
             </div>
 
             <!-- Pagination -->
-            <div v-if="pagination.total > 0" class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div v-if="pagination.total > 0" class="px-6 py-4 border-t border-white/10 flex items-center justify-between">
                 <p class="text-sm text-gray-600">
                     Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} events
                 </p>
@@ -145,7 +145,7 @@
                         Previous
                     </button>
                     <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                        :class="page === pagination.current_page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'"
+                        :class="page === pagination.current_page ? 'bg-primary text-slate-900' : 'border border-gray-300 hover:bg-gray-50'"
                         class="px-4 py-2 rounded-lg font-medium text-sm transition-colors">
                         {{ page }}
                     </button>

@@ -3,7 +3,7 @@
         <div v-if="requestStore.loading" class="text-gray-500">Loading...</div>
         <div v-else-if="requestStore.requests.length === 0" class="text-gray-500">No requests found.</div>
         <div v-else class="grid gap-4">
-            <div v-for="req in requestStore.requests" :key="req.id" class="bg-white p-4 rounded shadow border">
+            <div v-for="req in requestStore.requests" :key="req.id" class="bg-surface p-4 rounded shadow border">
                 <div class="flex justify-between items-start">
                     <div>
                         <a :href="req.url" target="_blank"

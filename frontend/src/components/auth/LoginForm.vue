@@ -1,7 +1,7 @@
 <template>
     <div class="space-y-6">
         <div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Login</h2>
+            <h2 class="text-3xl font-bold text-white mb-2">Login</h2>
             <p class="text-sm text-gray-600">
                 Login to make an order, access your orders, special offers, and more!
             </p>
@@ -10,7 +10,7 @@
         <form class="space-y-5" @submit.prevent="handleLogin">
             <!-- Email Input -->
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
+                <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">
                     Email Address
                 </label>
                 <input
@@ -20,14 +20,14 @@
                     autocomplete="email"
                     required
                     v-model="email"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 placeholder-gray-400 transition-all"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-white placeholder-gray-400 transition-all"
                     placeholder="Enter your email"
                 />
             </div>
 
             <!-- Password Input -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">
+                <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">
                     Password
                 </label>
                 <div class="relative">
@@ -38,7 +38,7 @@
                         autocomplete="current-password"
                         required
                         v-model="password"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 placeholder-gray-400 pr-10 transition-all"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-white placeholder-gray-400 pr-10 transition-all"
                         placeholder="Enter your password"
                     />
                     <button
@@ -94,7 +94,7 @@
                     <div class="w-full border-t border-gray-300"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-white text-gray-500">or</span>
+                    <span class="px-2 bg-surface text-gray-500">or</span>
                 </div>
             </div>
 

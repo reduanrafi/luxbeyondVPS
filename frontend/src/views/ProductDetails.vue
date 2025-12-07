@@ -1,14 +1,14 @@
 <template>
-    <div class="bg-gray-50 min-h-screen pt-20 pb-10">
+    <div class="bg-background min-h-screen pt-20 pb-10">
         <div v-if="loading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="animate-pulse">
-                <div class="h-6 bg-gray-200 rounded w-1/4 mb-6"></div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div class="h-96 bg-gray-200 rounded-2xl"></div>
-                    <div class="space-y-4">
-                        <div class="h-8 bg-gray-200 rounded w-3/4"></div>
-                        <div class="h-4 bg-gray-200 rounded w-1/2"></div>
-                        <div class="h-12 bg-gray-200 rounded w-full"></div>
+                <div class="h-6 bg-white/5 rounded w-1/4 mb-6"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="h-[500px] bg-white/5 rounded-sm"></div>
+                    <div class="space-y-6">
+                        <div class="h-10 bg-white/5 rounded w-3/4"></div>
+                        <div class="h-6 bg-white/5 rounded w-1/2"></div>
+                        <div class="h-16 bg-white/5 rounded w-full"></div>
                     </div>
                 </div>
             </div>
@@ -16,290 +16,222 @@
 
         <div v-else-if="product" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Breadcrumb -->
-            <nav class="mb-6">
-                <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <nav class="mb-8">
+                <ol class="flex items-center space-x-2 text-xs font-medium uppercase tracking-wider text-slate-500">
                     <li><router-link to="/" class="hover:text-primary transition-colors">Home</router-link></li>
                     <li>/</li>
                     <li><router-link to="/shop" class="hover:text-primary transition-colors">Shop</router-link></li>
                     <li v-if="product.category">/</li>
                     <li v-if="product.category">
-                        <router-link :to="`/shop?category=${product.category}`" class="hover:text-primary transition-colors">
+                        <router-link :to="`/shop?category=${product.category}`"
+                            class="hover:text-primary transition-colors">
                             {{ product.category }}
                         </router-link>
                     </li>
                     <li>/</li>
-                    <li class="text-gray-900 font-medium">{{ product.name }}</li>
+                    <li class="text-white">{{ product.name }}</li>
                 </ol>
             </nav>
 
             <!-- Product Main Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                 <!-- Product Images -->
                 <div class="space-y-4">
-                    <div class="rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-lg h-80 lg:h-[420px] relative group">
-                        <img
-                            :src="selectedImage"
-                            :alt="product.name"
-                            class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <!-- Zoom on hover -->
-                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors"></div>
+                    <div
+                        class="overflow-hidden bg-surface border border-white/5 h-[500px] relative group flex items-center justify-center p-8">
+                        <img :src="selectedImage" :alt="product.name"
+                            class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-110" />
                     </div>
-                    <div v-if="productImages.length > 1" class="grid grid-cols-4 gap-3">
-                        <button
-                            v-for="(img, index) in productImages"
-                            :key="index"
-                            @click="selectedImage = img"
-                            class="rounded-lg overflow-hidden border-2 transition-all hover:scale-105"
-                            :class="selectedImage === img ? 'border-primary shadow-md ring-2 ring-primary/20' : 'border-gray-200 hover:border-gray-300'"
-                        >
-                            <img :src="img" :alt="`${product.name} ${index + 1}`" class="w-full h-20 object-contain">
+                    <div v-if="productImages.length > 1" class="grid grid-cols-5 gap-4">
+                        <button v-for="(img, index) in productImages" :key="index" @click="selectedImage = img"
+                            class="aspect-square flex items-center justify-center bg-surface border transition-all hover:border-primary p-2"
+                            :class="selectedImage === img ? 'border-primary' : 'border-white/5'">
+                            <img :src="img" :alt="`${product.name} ${index + 1}`" class="w-full h-full object-contain">
                         </button>
                     </div>
                 </div>
 
                 <!-- Product Info -->
-                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-                    <!-- Category & Brand -->
-                    <div class="flex items-center gap-3 mb-4">
-                        <span v-if="product.category" class="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
-                            {{ product.category }}
-                        </span>
-                        <span v-if="product.brand" class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full">
-                            {{ product.brand }}
-                        </span>
-                        <span v-if="product.is_featured" class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full flex items-center gap-1">
-                            <Star class="w-3 h-3 fill-current" />
-                            Featured
-                        </span>
-                    </div>
+                <div class="flex flex-col h-full">
+                    <!-- Heading -->
+                    <div class="mb-6 border-b border-white/5 pb-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span v-if="product.brand" class="text-primary text-sm font-bold uppercase tracking-widest">
+                                {{ product.brand }}
+                            </span>
+                            <span v-if="product.is_featured"
+                                class="px-2 py-0.5 border border-primary/30 text-primary text-[10px] uppercase tracking-wide">
+                                Featured
+                            </span>
+                        </div>
 
-                    <h1 class="font-bold text-gray-900">{{ product.name }}</h1>
+                        <h1 class="text-4xl font-serif text-white mb-4 leading-tight">{{ product.name }}</h1>
 
-                    <!-- SKU -->
-                    <p v-if="product.sku" class="text-sm text-gray-500 mb-4">SKU: {{ product.sku }}</p>
-
-                    <!-- Price -->
-                    <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
-                        <span class="text-xl font-bold text-primary">
-                            ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
-                        </span>
-                        <span
-                            v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-                            class="text-sm text-gray-400 line-through"
-                        >
-                            ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
-                        </span>
-                        <span
-                            v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-                            class="px-3 py-1 bg-red-100 text-red-700 text-sm font-bold rounded-full"
-                        >
-                            -{{ calculateDiscount(
-                                product.event_price ? product.original_price : product.price,
-                                product.event_price || product.sellable_price || product.price
-                            ) }}%
-                        </span>
+                        <!-- Price -->
+                        <div class="flex items-baseline gap-4">
+                            <span class="text-3xl font-serif text-primary">
+                                ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
+                            </span>
+                            <span
+                                v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
+                                class="text-lg text-slate-500 line-through font-serif">
+                                ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Short Description -->
-                    <p v-if="product.short_description" class="text-gray-600 mb-4">
+                    <p v-if="product.short_description" class="text-slate-400 mb-8 leading-relaxed font-light">
                         {{ product.short_description }}
                     </p>
 
-                    <!-- Stock Status -->
-                    <div class="mb-6 p-4 rounded-lg"
-                        :class="(product.total_stock || 0) > 10 ? 'bg-green-50 border border-green-200' : (product.total_stock || 0) > 0 ? 'bg-yellow-50 border border-yellow-200' : 'bg-red-50 border border-red-200'">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div
-                                class="w-3 h-3 rounded-full"
-                                :class="(product.total_stock || 0) > 10 ? 'bg-green-500' : (product.total_stock || 0) > 0 ? 'bg-yellow-500' : 'bg-red-500'"
-                            ></div>
-                            <span
-                                class="text-sm font-semibold"
-                                :class="(product.total_stock || 0) > 10 ? 'text-green-700' : (product.total_stock || 0) > 0 ? 'text-yellow-700' : 'text-red-700'"
-                            >
-                                {{
-                                    (product.total_stock || 0) > 10
-                                        ? 'In Stock'
-                                        : (product.total_stock || 0) > 0
-                                        ? 'Low Stock'
-                                        : 'Out of Stock'
-                                }}
-                            </span>
-                        </div>
-                        <p class="text-xs text-gray-600">
-                            {{ (product.total_stock || 0) > 0 ? `${product.total_stock} units available` : 'Currently unavailable' }}
-                        </p>
-                    </div>
-
                     <!-- Variants (if available) -->
-                    <div v-if="product.has_variants && product.variants && product.variants.length > 0" class="mb-6">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-3">Select Variant</h3>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button
-                                v-for="variant in product.variants"
-                                :key="variant.id"
+                    <div v-if="product.has_variants && product.variants && product.variants.length > 0" class="mb-8">
+                        <label class="block text-xs font-bold text-white uppercase tracking-widest mb-3">Select
+                            Variant</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button v-for="variant in product.variants" :key="variant.id"
                                 @click="selectedVariant = variant"
-                                class="p-3 border-2 rounded-lg text-left transition-all hover:border-primary flex justify-between"
-                                :class="selectedVariant?.id === variant.id ? 'border-primary bg-primary/5' : 'border-gray-200'"
-                            >
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ formatVariantAttributes(variant.attributes) }}
+                                class="p-4 border bg-surface/50 text-left transition-all hover:border-primary group"
+                                :class="selectedVariant?.id === variant.id ? 'border-primary bg-primary/5' : 'border-white/10'">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span
+                                        class="text-sm font-medium text-white group-hover:text-primary transition-colors">{{
+                                            formatVariantAttributes(variant.attributes) }}</span>
+                                    <span class="text-xs text-primary font-bold">৳{{ formatPrice(variant.price)
+                                        }}</span>
                                 </div>
-                                <div class="text-sm text-primary font-semibold mt-1">
-                                    ৳{{ formatPrice(variant.price) }}
+                                <div class="text-[10px] text-slate-500 uppercase tracking-wide">
+                                    {{ variant.stock > 0 ? 'In Stock' : 'Out of Stock' }}
                                 </div>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    Stock: {{ variant.stock }}
-                                </div>
-                            </div>
-                            <img :src="variant.image_url" :alt="variant.name" class="w-16 h-16 object-contain rounded" v-if="variant.image_url">
                             </button>
                         </div>
                     </div>
 
                     <!-- Quantity & Actions -->
-                    <div class="space-y-4 mb-6">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Quantity</label>
-                            <div class="flex items-center gap-3">
-                                <button
-                                    @click="decrementQty"
-                                    :disabled="quantity <= 1"
-                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
-                                >
-                                    <Minus class="w-4 h-4" />
-                                </button>
-                                <input
-                                    type="number"
-                                    v-model.number="quantity"
-                                    min="1"
-                                    :max="maxQuantity"
-                                    class="w-20 text-center border border-gray-300 rounded-lg py-2 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                />
-                                <button
-                                    @click="incrementQty"
-                                    :disabled="quantity >= maxQuantity"
-                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all"
-                                >
-                                    <Plus class="w-4 h-4" />
-                                </button>
+                    <div class="space-y-6 mt-auto">
+                        <div class="flex items-end gap-6">
+                            <div class="w-32">
+                                <label
+                                    class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Quantity</label>
+                                <div class="flex items-center border border-white/10 bg-surface">
+                                    <button @click="decrementQty" :disabled="quantity <= 1"
+                                        class="w-10 h-12 flex items-center justify-center text-slate-400 hover:text-white transition-colors disabled:opacity-30">
+                                        <Minus class="w-4 h-4" />
+                                    </button>
+                                    <input type="number" v-model.number="quantity" min="1" :max="maxQuantity"
+                                        class="flex-1 w-full bg-transparent text-center text-white font-medium focus:outline-none" />
+                                    <button @click="incrementQty" :disabled="quantity >= maxQuantity"
+                                        class="w-10 h-12 flex items-center justify-center text-slate-400 hover:text-white transition-colors disabled:opacity-30">
+                                        <Plus class="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Stock Status -->
+                            <div class="pb-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full"
+                                        :class="(product.total_stock || 0) > 0 ? 'bg-primary' : 'bg-red-500'"></div>
+                                    <span class="text-xs font-medium uppercase tracking-wider"
+                                        :class="(product.total_stock || 0) > 0 ? 'text-primary' : 'text-red-500'">
+                                        {{ (product.total_stock || 0) > 0 ? 'In Stock' : 'Out of Stock' }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex gap-3">
-                            <button
-                                @click="addToCart"
-                                :disabled="(product.total_stock || 0) === 0"
-                                class="flex-1 bg-primary text-white font-semibold py-4 rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                            >
-                                <ShoppingCart class="w-5 h-5" />
-                                Add to Cart
+                        <div class="flex gap-4">
+                            <button @click="addToCart" :disabled="(product.total_stock || 0) === 0"
+                                class="flex-1 bg-primary text-slate-900 h-14 uppercase tracking-[0.15em] font-bold text-sm hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(200,174,125,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                                {{ (product.total_stock || 0) > 0 ? 'Add to Cart' : 'Sold Out' }}
                             </button>
-                            <button
-                                @click="toggleWishlist"
-                                class="w-14 h-14 rounded-lg border-2 transition-all flex items-center justify-center"
-                                :class="isInWishlist ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-red-500'"
-                            >
-                                <Heart class="w-6 h-6" :class="isInWishlist ? 'text-red-500 fill-red-500' : 'text-gray-400'" />
+                            <button @click="toggleWishlist"
+                                class="w-14 h-14 border border-white/10 flex items-center justify-center text-slate-400 hover:text-primary hover:border-primary transition-all"
+                                :class="isInWishlist ? 'text-red-500 border-red-500/50' : ''">
+                                <Heart class="w-6 h-6" :class="isInWishlist ? 'fill-current' : ''" />
                             </button>
                         </div>
-                    </div>
 
-                    <!-- Features -->
-                    <div class="pt-6 border-t border-gray-200">
-                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Key Features</h3>
-                        <ul class="space-y-2">
-                            <li class="flex items-start gap-2 text-sm text-gray-600">
-                                <CheckCircle class="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                                Fast & Secure Delivery
-                            </li>
-                            <li class="flex items-start gap-2 text-sm text-gray-600">
-                                <CheckCircle class="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                                7-Day Return Policy
-                            </li>
-                            <li class="flex items-start gap-2 text-sm text-gray-600">
-                                <CheckCircle class="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                                Genuine Product Guarantee
-                            </li>
-                        </ul>
+                        <!-- Trust Badges -->
+                        <div class="grid grid-cols-2 gap-4 py-6 border-t border-white/5">
+                            <div class="flex items-center gap-3">
+                                <Package class="w-5 h-5 text-primary" />
+                                <span class="text-xs text-slate-400 uppercase tracking-wide">Premium Packaging</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <CheckCircle class="w-5 h-5 text-primary" />
+                                <span class="text-xs text-slate-400 uppercase tracking-wide">Authenticity
+                                    Guaranteed</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Tabs Section -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-10">
-                <div class="border-b border-gray-200 mb-6">
-                    <nav class="flex gap-8 overflow-x-auto">
-                        <button
-                            v-for="tab in tabs"
-                            :key="tab"
-                            @click="activeTab = tab"
-                            class="pb-4 text-sm font-semibold transition-all relative whitespace-nowrap"
-                            :class="activeTab === tab ? 'text-primary' : 'text-gray-600 hover:text-gray-900'"
-                        >
+            <div class="mb-20">
+                <div class="border-b border-white/10 mb-8">
+                    <nav class="flex gap-12 overflow-x-auto">
+                        <button v-for="tab in tabs" :key="tab" @click="activeTab = tab"
+                            class="pb-4 text-sm font-bold uppercase tracking-widest transition-all relative whitespace-nowrap"
+                            :class="activeTab === tab ? 'text-primary' : 'text-slate-500 hover:text-white'">
                             {{ tab }}
-                            <div v-if="activeTab === tab" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
+                            <div v-if="activeTab === tab" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary">
+                            </div>
                         </button>
                     </nav>
                 </div>
 
                 <!-- Tab Content -->
-                <div v-if="activeTab === 'Description'" class="prose max-w-none">
-                    <div v-html="product.description || product.short_description || 'No description available.'" class="text-gray-600 leading-relaxed"></div>
+                <div v-if="activeTab === 'Description'" class="prose prose-invert max-w-none">
+                    <div v-html="product.description || product.short_description || 'No description available.'"
+                        class="text-slate-400 leading-relaxed font-light"></div>
                 </div>
 
                 <div v-if="activeTab === 'Specifications'">
-                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div v-if="product.sku" class="flex py-3 border-b border-gray-100">
-                            <dt class="font-semibold text-gray-700 w-1/2">SKU</dt>
-                            <dd class="text-gray-600 w-1/2">{{ product.sku }}</dd>
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                        <div v-if="product.sku" class="flex py-3 border-b border-white/5">
+                            <dt class="font-medium text-slate-400 w-1/3 text-sm">SKU</dt>
+                            <dd class="text-white w-2/3 text-sm">{{ product.sku }}</dd>
                         </div>
-                        <div v-if="product.category" class="flex py-3 border-b border-gray-100">
-                            <dt class="font-semibold text-gray-700 w-1/2">Category</dt>
-                            <dd class="text-gray-600 w-1/2">{{ product.category }}</dd>
+                        <div v-if="product.category" class="flex py-3 border-b border-white/5">
+                            <dt class="font-medium text-slate-400 w-1/3 text-sm">Category</dt>
+                            <dd class="text-white w-2/3 text-sm">{{ product.category }}</dd>
                         </div>
-                        <div v-if="product.brand" class="flex py-3 border-b border-gray-100">
-                            <dt class="font-semibold text-gray-700 w-1/2">Brand</dt>
-                            <dd class="text-gray-600 w-1/2">{{ product.brand }}</dd>
+                        <div v-if="product.brand" class="flex py-3 border-b border-white/5">
+                            <dt class="font-medium text-slate-400 w-1/3 text-sm">Brand</dt>
+                            <dd class="text-white w-2/3 text-sm">{{ product.brand }}</dd>
                         </div>
-                        <div class="flex py-3 border-b border-gray-100">
-                            <dt class="font-semibold text-gray-700 w-1/2">Stock</dt>
-                            <dd class="text-gray-600 w-1/2">{{ product.total_stock || 0 }} units</dd>
+                        <div class="flex py-3 border-b border-white/5">
+                            <dt class="font-medium text-slate-400 w-1/3 text-sm">Stock</dt>
+                            <dd class="text-white w-2/3 text-sm">{{ product.total_stock || 0 }} units</dd>
                         </div>
                     </dl>
                 </div>
 
                 <div v-if="activeTab === 'Reviews'">
-                    <div class="text-center py-12">
-                        <p class="text-gray-600">No reviews yet. Be the first to review this product!</p>
+                    <div class="text-center py-12 border border-white/5 bg-surface/30">
+                        <p class="text-slate-500 italic">No reviews yet. Be the first to review this product!</p>
                     </div>
                 </div>
             </div>
 
             <!-- Related Products -->
             <div v-if="relatedProducts.length > 0">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+                <h2 class="text-2xl font-bold text-white mb-6">You May Also Like</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <ProductCard
-                        v-for="item in relatedProducts"
-                        :key="item.id"
-                        :product="item"
-                        view-mode="grid"
-                    />
+                    <ProductCard v-for="item in relatedProducts" :key="item.id" :product="item" view-mode="grid" />
                 </div>
             </div>
         </div>
 
         <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
             <Package class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Product Not Found</h3>
+            <h3 class="text-xl font-bold text-white mb-2">Product Not Found</h3>
             <p class="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
-            <router-link
-                to="/shop"
-                class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all"
-            >
+            <router-link to="/shop"
+                class="inline-block px-6 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark transition-all">
                 Back to Shop
             </router-link>
         </div>
@@ -480,7 +412,7 @@ const addToCart = () => {
 
 const toggleWishlist = () => {
     if (product.value) {
-        wishlistStore.toggleItem(product.value);
+        wishlistStore.toggleItem(product.value, selectedVariant.value);
     }
 };
 

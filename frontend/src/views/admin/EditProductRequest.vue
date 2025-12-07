@@ -13,15 +13,15 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading request details...</p>
         </div>
 
         <!-- Error State -->
-        <div v-else-if="error" class="bg-white rounded-xl shadow-md border border-red-200 p-8 text-center">
+        <div v-else-if="error" class="bg-surface rounded-xl shadow-md border border-red-200 p-8 text-center">
             <p class="text-red-600 font-semibold">{{ error }}</p>
-            <button @click="$router.push('/admin/requests')" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">
+            <button @click="$router.push('/admin/requests')" class="mt-4 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors">
                 Back to Requests
             </button>
         </div>
@@ -29,7 +29,7 @@
         <!-- Edit Form -->
         <form v-else @submit.prevent="updateRequest" class="space-y-6">
             <!-- Basic Information -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Basic Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Shipping & Location -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Shipping & Location</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -112,7 +112,7 @@
             </div>
 
             <!-- Charges & Fees -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Charges & Fees</h3>
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -141,7 +141,7 @@
                                 placeholder="0.00">
                         </div>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-white/10">
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Total Amount (BDT)</label>
                         <p class="text-2xl font-bold text-primary">৳{{ calculatedTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
                         <p class="text-xs text-slate-500 mt-1">Calculated: Product Total + Charges + Shipping + Tax</p>
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Admin Information -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Admin Information</h3>
                 <div class="space-y-4">
                     <div>
@@ -176,7 +176,7 @@
                     Cancel
                 </button>
                 <button type="submit" :disabled="saving"
-                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-6 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
                     <span v-if="saving">Saving...</span>
                     <span v-else>Save Changes</span>
                 </button>

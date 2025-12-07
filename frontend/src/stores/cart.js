@@ -48,6 +48,7 @@ export const useCartStore = defineStore('cart', () => {
                     })}`,
                     original_price: formattedOriginalPrice || item.original_price,
                     quantity: item.quantity ?? 1,
+                    total_stock: item.total_stock ?? item.stock ?? 0,
                 };
             });
         } catch (error) {

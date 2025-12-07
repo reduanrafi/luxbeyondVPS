@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white">
+    <div class="bg-surface">
         
         <!-- Categories List -->
         <div class="px-4 pb-4">

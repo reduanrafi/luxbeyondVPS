@@ -1,22 +1,24 @@
 <template>
-    <section class="py-24 bg-slate-50">
+    <section class="py-24 bg-background">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl mb-4">What Our Customers Say</h2>
-                <p class="text-xl text-slate-500 max-w-2xl mx-auto">Trusted by thousands of happy shoppers.</p>
+                <h2 class="text-3xl font-serif text-primary sm:text-4xl mb-4 uppercase tracking-widest">What Our
+                    Customers Say</h2>
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto">Trusted by thousands of happy shoppers.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card v-for="review in reviews" :key="review.id" class="h-full">
+                <Card v-for="review in reviews" :key="review.id" class="h-full bg-surface border border-white/10">
                     <div class="flex items-center mb-6">
-                        <img :src="review.avatar" :alt="review.name" class="w-14 h-14 rounded-full mr-4 border-2 border-white shadow-sm">
+                        <img :src="review.avatar" :alt="review.name"
+                            class="w-14 h-14 rounded-full mr-4 border-2 border-primary/20 shadow-sm">
                         <div>
-                            <h4 class="text-lg font-bold text-slate-900">{{ review.name }}</h4>
-                            <div class="flex text-yellow-400 text-sm">
+                            <h4 class="text-lg font-serif text-white uppercase tracking-wide">{{ review.name }}</h4>
+                            <div class="flex text-primary text-sm">
                                 <span v-for="i in 5" :key="i">★</span>
                             </div>
                         </div>
                     </div>
-                    <p class="text-slate-600 italic leading-relaxed">"{{ review.comment }}"</p>
+                    <p class="text-slate-300 italic leading-relaxed">"{{ review.comment }}"</p>
                 </Card>
             </div>
         </div>

@@ -1,15 +1,15 @@
 <template>
     <div class="space-y-6">
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="mt-2 text-sm text-slate-500">Loading order details...</p>
         </div>
 
         <!-- Error State -->
-        <div v-else-if="error" class="bg-white rounded-2xl shadow-lg border border-red-100 p-8 text-center">
+        <div v-else-if="error" class="bg-surface rounded-2xl shadow-lg border border-red-100 p-8 text-center">
             <p class="text-red-600 font-semibold">{{ error }}</p>
-            <button @click="$router.push('/admin/orders')" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">
+            <button @click="$router.push('/admin/orders')" class="mt-4 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors">
                 Back to Orders
             </button>
         </div>
@@ -34,22 +34,22 @@
 
             <!-- Order Info Cards -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Order Status</p>
                     <span :style="{ backgroundColor: order.status?.color + '20', color: order.status?.color }" 
                         class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
                         {{ order.status?.label || order.status || 'Pending' }}
                     </span>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Order Date</p>
                     <p class="text-sm font-semibold text-slate-900">{{ formatDate(order.created_at) }}</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Payment Status</p>
                     <p class="text-sm font-semibold text-slate-900">{{ order.payment_status || 'Pending' }}</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Event</p>
                     <div v-if="order.event" class="flex items-center gap-2">
                         <span :style="{ backgroundColor: order.event.bg_color + '20', color: order.event.bg_color }" 
@@ -59,15 +59,15 @@
                     </div>
                     <p v-else class="text-sm text-slate-400 italic">No event</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Total Amount</p>
                     <p class="text-sm font-semibold text-slate-900">৳{{ formatPrice(order.total || order.total_amount) }}</p>
                 </div>
             </div>
 
             <!-- Customer Information -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Customer Information</h3>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,8 +95,8 @@
             </div>
 
             <!-- Order Items -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Order Items</h3>
                 </div>
                 <div class="overflow-x-auto">
@@ -131,8 +131,8 @@
             </div>
 
             <!-- Event Assignment -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Event Assignment</h3>
                 </div>
                 <div class="p-6">
@@ -151,8 +151,8 @@
             </div>
 
             <!-- Order Summary -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Order Summary</h3>
                 </div>
                 <div class="p-6 space-y-3">
@@ -172,7 +172,7 @@
                         <span class="text-slate-600">Shipping</span>
                         <span class="font-semibold text-slate-900">৳{{ formatPrice(order.shipping) }}</span>
                     </div>
-                    <div class="flex justify-between text-lg font-bold pt-3 border-t border-gray-200">
+                    <div class="flex justify-between text-lg font-bold pt-3 border-t border-white/10">
                         <span class="text-slate-900">Total</span>
                         <span class="text-primary">৳{{ formatPrice(order.total || order.total_amount) }}</span>
                     </div>
@@ -180,8 +180,8 @@
             </div>
 
             <!-- Status History -->
-            <div v-if="order.status_histories && order.status_histories.length > 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div v-if="order.status_histories && order.status_histories.length > 0" class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Status History</h3>
                 </div>
                 <div class="p-6">
@@ -206,7 +206,7 @@
 
             <!-- Invoice (Hidden, for printing) -->
             <div id="invoice-content" class="hidden">
-                <div class="p-8 bg-white">
+                <div class="p-8 bg-surface">
                     <div class="mb-8 text-center">
                         <h1 class="text-3xl font-bold text-slate-900 mb-2">INVOICE</h1>
                         <p class="text-sm text-slate-600">Order #{{ order.order_number || order.id }}</p>

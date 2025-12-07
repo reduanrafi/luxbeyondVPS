@@ -7,7 +7,7 @@
         </div>
 
         <!-- Date Range -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="flex items-center gap-4">
                 <label class="text-sm font-semibold text-slate-700">Date Range:</label>
                 <input type="date"
@@ -16,12 +16,12 @@
                 <input type="date"
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <button
-                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">Apply</button>
+                    class="px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors">Apply</button>
             </div>
         </div>
 
         <!-- Revenue Chart -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Revenue Trend</h3>
             <div class="h-80 flex items-end justify-between gap-2">
                 <div v-for="(value, index) in revenueData" :key="index"
@@ -41,7 +41,7 @@
 
         <!-- Category Performance -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Top Categories</h3>
                 <div class="space-y-4">
                     <div v-for="category in topCategories" :key="category.name">
@@ -57,7 +57,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Customer Insights</h3>
                 <div class="space-y-4">
                     <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">

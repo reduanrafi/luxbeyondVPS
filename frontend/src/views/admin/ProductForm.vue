@@ -1,7 +1,7 @@
 <template>
     <div class="space-y-6 pb-20">
         <!-- Sticky Header -->
-        <div class="sticky top-16 z-20 bg-gray-50/95 backdrop-blur-sm py-4 border-b border-gray-200 -mx-6 px-6 mb-6">
+        <div class="sticky top-16 z-20 bg-gray-50/95 backdrop-blur-sm py-4 border-b border-white/10 -mx-6 px-6 mb-6">
             <div class="flex items-center justify-between max-w-7xl mx-auto">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900">{{ isEditing ? 'Edit Product' : 'Add New Product' }}
@@ -14,11 +14,11 @@
                 </div>
                 <div class="flex gap-3">
                     <button @click="router.back()"
-                        class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-slate-700 shadow-sm">
+                        class="px-4 py-2 bg-surface border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-slate-700 shadow-sm">
                         Cancel
                     </button>
                     <button @click="saveProduct" :disabled="loading"
-                        class="px-6 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-6 py-2 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                         <Save class="w-5 h-5" />
                         {{ loading ? 'Saving...' : 'Save Product' }}
                     </button>
@@ -28,8 +28,8 @@
 
         <div class="max-w-7xl mx-auto">
             <!-- Tabs -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-                <div class="flex border-b border-gray-200 overflow-x-auto">
+            <div class="bg-surface rounded-xl shadow-sm border border-white/10 overflow-hidden mb-6">
+                <div class="flex border-b border-white/10 overflow-x-auto">
                     <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
                         class="px-6 py-4 text-sm font-bold transition-colors relative whitespace-nowrap"
                         :class="currentTab === tab.id ? 'text-primary bg-primary/5' : 'text-slate-600 hover:text-slate-900 hover:bg-gray-50'">
@@ -41,7 +41,7 @@
             </div>
 
             <!-- Content -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+            <div class="bg-surface rounded-xl shadow-sm border border-white/10 p-6 md:p-8">
                 <!-- General Tab -->
                 <div v-show="currentTab === 'general'" class="space-y-8">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -78,7 +78,7 @@
                                 <div>
                                     <label class="block text-sm font-bold text-slate-700 mb-2">Brand</label>
                                     <select v-model="form.brand"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                                         <option value="">Select Brand (Optional)</option>
                                         <option v-for="brand in brands" :key="brand.id" :value="brand.name">
                                             {{ brand.name }}
@@ -113,13 +113,13 @@
 
                         <!-- Right Column: Category & Organization -->
                         <div class="space-y-6">
-                            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <div class="bg-gray-50 p-6 rounded-xl border border-white/10">
                                 <h3 class="font-bold text-slate-900 mb-4">Organization</h3>
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Category *</label>
                                         <select v-model="form.category" required
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                                             <option value="">Select Category</option>
                                             <option v-for="cat in categories" :key="cat.id" :value="cat.name">
                                                 {{ cat.parent ? cat.parent.name + ' → ' : '' }}{{ cat.name }}
@@ -129,7 +129,7 @@
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Status</label>
                                         <select v-model="form.status"
-                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                                             <option value="published">Published</option>
                                             <option value="draft">Draft</option>
                                             <option value="archived">Archived</option>
@@ -147,7 +147,7 @@
                                 </div>
                             </div>
 
-                            <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                            <div class="bg-gray-50 p-6 rounded-xl border border-white/10">
                                 <h3 class="font-bold text-slate-900 mb-4">Pricing (Base)</h3>
                                 <div class="space-y-4">
                                     <div class="grid grid-cols-1 gap-4">
@@ -184,7 +184,7 @@
                 <div v-show="currentTab === 'variants'" class="space-y-8">
                     <div class="flex items-center justify-between bg-purple-50 p-4 rounded-xl border border-purple-100">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-white rounded-lg shadow-sm">
+                            <div class="p-2 bg-surface rounded-lg shadow-sm">
                                 <Layers class="w-6 h-6 text-primary" />
                             </div>
                             <div>
@@ -197,7 +197,7 @@
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" v-model="form.has_variants" class="sr-only peer">
                                 <div
-                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
                                 </div>
                                 <span class="ml-3 text-sm font-medium text-slate-700">Enable Variants</span>
                             </label>
@@ -206,13 +206,13 @@
 
                     <div v-if="form.has_variants" class="space-y-8 animate-in fade-in slide-in-from-top-4 duration-300">
                         <!-- Variant Generator -->
-                        <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <div class="bg-gray-50 p-6 rounded-xl border border-white/10">
                             <h4 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
                                 <Wand2 class="w-4 h-4 text-primary" /> Variant Generator (Attribute Based Pricing)
                             </h4>
                             <div class="space-y-6">
                                 <div v-for="(attr, attrIndex) in variantAttributes" :key="attrIndex"
-                                    class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                    class="bg-surface p-4 rounded-lg border border-white/10 shadow-sm">
                                     <div class="flex justify-between items-center mb-4">
                                         <input type="text" v-model="attr.name" placeholder="Attribute Name (e.g. Size)"
                                             class="font-bold text-slate-900 border-b border-transparent hover:border-gray-300 focus:border-primary focus:outline-none px-2 py-1 transition-colors w-1/3">
@@ -240,7 +240,7 @@
                                             </div>
                                             <div class="w-12">
                                                 <div
-                                                    class="relative w-10 h-10 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary transition-colors">
+                                                    class="relative w-10 h-10 bg-gray-100 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary transition-colors">
                                                     <input type="file"
                                                         @change="e => handleAttributeImageUpload(e, attrIndex, valIndex)"
                                                         accept="image/*"
@@ -264,7 +264,7 @@
 
                                 <div class="flex gap-3 pt-2">
                                     <button type="button" @click="addAttribute"
-                                        class="px-4 py-2 bg-white border border-gray-300 text-slate-700 font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
+                                        class="px-4 py-2 bg-surface border border-gray-300 text-slate-700 font-bold rounded-lg hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
                                         <Plus class="w-4 h-4" /> Add Attribute
                                     </button>
                                     <button type="button" @click="generateVariants"
@@ -276,7 +276,7 @@
                         </div>
 
                         <!-- Variants Table -->
-                        <div v-if="form.variants.length > 0" class="border border-gray-200 rounded-xl overflow-hidden">
+                        <div v-if="form.variants.length > 0" class="border border-white/10 rounded-xl overflow-hidden">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
                                     <tr>
@@ -300,21 +300,21 @@
                                             Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-surface divide-y divide-gray-200">
                                     <tr v-for="(variant, index) in form.variants" :key="index"
                                         class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                                             <div class="flex gap-2">
                                                 <span v-for="(value, key) in parseAttributes(variant.attributes_json)"
                                                     :key="key"
-                                                    class="px-2 py-1 bg-gray-100 rounded text-xs text-slate-600 border border-gray-200">
+                                                    class="px-2 py-1 bg-gray-100 rounded text-xs text-slate-600 border border-white/10">
                                                     {{ key }}: {{ value }}
                                                 </span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div
-                                                class="relative w-12 h-12 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center overflow-hidden group cursor-pointer">
+                                                class="relative w-12 h-12 bg-gray-100 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden group cursor-pointer">
                                                 <input type="file" @change="e => handleVariantImageUpload(e, index)"
                                                     accept="image/*"
                                                     class="absolute inset-0 opacity-0 cursor-pointer z-10">
@@ -388,7 +388,7 @@
                         </div>
                     </div>
 
-                    <div class="border-t border-gray-200 pt-8">
+                    <div class="border-t border-white/10 pt-8">
                         <div class="flex items-center justify-between mb-6">
                             <div>
                                 <h3 class="font-bold text-slate-900">Gallery</h3>
@@ -403,7 +403,7 @@
 
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             <div v-for="(item, index) in form.gallery" :key="index"
-                                class="group relative aspect-square bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                                class="group relative aspect-square bg-gray-50 rounded-xl border border-white/10 overflow-hidden">
                                 <!-- Existing Item -->
                                 <template v-if="item.id">
                                     <img v-if="item.type === 'image'" :src="item.url"
@@ -432,7 +432,7 @@
                                 </template>
 
                                 <button type="button" @click="removeGalleryItem(index)"
-                                    class="absolute top-2 right-2 p-1.5 bg-white/90 text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 z-20">
+                                    class="absolute top-2 right-2 p-1.5 bg-surface/90 text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 z-20">
                                     <X class="w-4 h-4" />
                                 </button>
                             </div>

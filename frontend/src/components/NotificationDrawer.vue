@@ -16,9 +16,9 @@
                 leave-active-class="transform transition ease-in-out duration-500 sm:duration-700"
                 leave-from-class="translate-x-0" leave-to-class="translate-x-full">
                 <div v-if="isOpen"
-                    class="w-screen max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
+                    class="w-screen max-w-md bg-surface shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
                     <!-- Header -->
-                    <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-primary/5 to-purple-50">
+                    <div class="p-6 border-b border-white/10 bg-gradient-to-r from-primary/5 to-purple-50">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2"
@@ -38,7 +38,7 @@
                     <div class="flex-1 overflow-y-auto p-4 space-y-3">
                         <div v-for="notification in notifications" :key="notification.id"
                             class="p-4 rounded-xl border transition-all hover:shadow-md cursor-pointer"
-                            :class="notification.read ? 'bg-white border-gray-200' : 'bg-blue-50 border-blue-200'">
+                            :class="notification.read ? 'bg-surface border-white/10' : 'bg-blue-50 border-blue-200'">
                             <div class="flex gap-3">
                                 <div class="flex-shrink-0 mt-1">
                                     <div class="w-10 h-10 rounded-full flex items-center justify-center"
@@ -67,9 +67,9 @@
                     </div>
 
                     <!-- Footer -->
-                    <div class="p-4 border-t border-gray-200 bg-gray-50">
+                    <div class="p-4 border-t border-white/10 bg-gray-50">
                         <button @click="markAllAsRead"
-                            class="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-colors">
+                            class="w-full py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-colors">
                             Mark All as Read
                         </button>
                     </div>

@@ -9,26 +9,26 @@
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div v-for="stat in orderStats" :key="stat.label"
-                class="bg-white rounded-lg shadow-md border border-gray-200 p-4">
+                class="bg-surface rounded-lg shadow-md border border-white/10 p-4">
                 <p class="text-sm text-slate-600">{{ stat.label }}</p>
                 <p class="text-2xl font-bold text-slate-900 mt-1">{{ stat.value }}</p>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <input v-model="filters.search" @input="fetchOrders" type="text" placeholder="Search orders..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status_id" @change="fetchOrders"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option v-for="status in orderStatuses" :key="status.id" :value="status.id">
                         {{ status.label }}
                     </option>
                 </select>
                 <select v-model="filters.event_id" @change="fetchOrders"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Events</option>
                     <option v-for="event in events" :key="event.id" :value="event.id">
                         {{ event.name }}
@@ -44,16 +44,16 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading orders...</p>
         </div>
 
         <!-- Orders Table -->
-        <div v-else class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div v-else class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 border-b border-white/10">
                         <tr>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Order Number</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Customer</th>
@@ -225,10 +225,10 @@ const availableStatuses = (order) => {
 };
 
 const getStatusClass = (status) => {
-    if (!status) return 'bg-gray-100 text-gray-700';
+    if (!status) return 'bg-gray-100 text-slate-300';
     
     const statusObj = orderStatuses.value.find(s => s.id === status.id || s.label === status.label);
-    if (!statusObj) return 'bg-gray-100 text-gray-700';
+    if (!statusObj) return 'bg-gray-100 text-slate-300';
     
     // Use the color from the status, or default classes
     return {
@@ -237,7 +237,7 @@ const getStatusClass = (status) => {
         'Shipped': 'bg-purple-100 text-purple-700',
         'Pending': 'bg-yellow-100 text-yellow-700',
         'Cancelled': 'bg-red-100 text-red-700'
-    }[statusObj.label] || 'bg-gray-100 text-gray-700';
+    }[statusObj.label] || 'bg-gray-100 text-slate-300';
 };
 
 const updateStats = () => {

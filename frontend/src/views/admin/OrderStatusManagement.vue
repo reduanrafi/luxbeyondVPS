@@ -7,19 +7,19 @@
                 <p class="text-sm text-slate-600 mt-1">Manage order statuses and their workflow</p>
             </div>
             <button @click="showStatusModal = true; editingStatus = null"
-                class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-sm flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary/90 transition-all shadow-sm flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Status
             </button>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search statuses..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status" @change="fetchStatuses(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -32,10 +32,10 @@
         </div>
 
         <!-- Statuses List -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 border-b border-white/10">
                         <tr>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Status</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Name</th>
@@ -56,7 +56,7 @@
                                 </div>
                             </td>
                             <td class="py-4 px-6">
-                                <code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">{{ status.name }}</code>
+                                <code class="text-sm bg-gray-100 px-2 py-1 rounded text-slate-300">{{ status.name }}</code>
                             </td>
                             <td class="py-4 px-6">
                                 <div class="flex flex-wrap gap-2">
@@ -69,7 +69,7 @@
                                         Final
                                     </span>
                                     <span v-if="!status.is_active"
-                                        class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                                        class="px-2 py-1 bg-gray-100 text-slate-300 text-xs rounded-full font-medium">
                                         Inactive
                                     </span>
                                 </div>
@@ -99,7 +99,7 @@
         <div v-if="showStatusModal" class="fixed inset-0 z-50 overflow-y-auto" @click.self="showStatusModal = false">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-gray-500 opacity-75"></div>
-                <div class="relative bg-white rounded-lg shadow-xl max-w-2xl w-full p-6" @click.stop>
+                <div class="relative bg-surface rounded-lg shadow-xl max-w-2xl w-full p-6" @click.stop>
                     <h3 class="text-lg font-bold text-slate-900 mb-4">
                         {{ editingStatus ? 'Edit Order Status' : 'Add Order Status' }}
                     </h3>
@@ -107,7 +107,7 @@
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status Name (Code) *</label>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1">Status Name (Code) *</label>
                                     <input v-model="statusForm.name" type="text" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                                         placeholder="pending" :disabled="!!editingStatus"
@@ -115,7 +115,7 @@
                                     <p class="text-xs text-gray-500 mt-1">Unique identifier (lowercase, underscores only)</p>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Display Label *</label>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1">Display Label *</label>
                                     <input v-model="statusForm.label" type="text" required
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                                         placeholder="Pending"
@@ -125,7 +125,7 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Color *</label>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1">Color *</label>
                                     <div class="flex items-center gap-2">
                                         <input v-model="statusForm.color" type="color"
                                             class="w-16 h-10 border border-gray-300 rounded-lg cursor-pointer">
@@ -135,14 +135,14 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                                    <label class="block text-sm font-medium text-slate-300 mb-1">Sort Order</label>
                                     <input v-model.number="statusForm.sort_order" type="number" min="0"
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                                         placeholder="0">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <label class="block text-sm font-medium text-slate-300 mb-1">Description</label>
                                 <textarea v-model="statusForm.description" rows="3"
                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                                     placeholder="Describe what this status means and when it should be used..."></textarea>
@@ -150,12 +150,12 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Allowed Next Statuses</label>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">Allowed Next Statuses</label>
                                     <div class="max-h-40 overflow-y-auto border border-gray-300 rounded-lg p-3">
                                         <label v-for="status in allStatuses" :key="status.id" class="flex items-center gap-2 py-1">
                                             <input type="checkbox" :value="status.id" v-model="selectedNextStatuses"
                                                 class="rounded border-gray-300 text-primary focus:ring-primary">
-                                            <span class="text-sm text-gray-700">{{ status.label }}</span>
+                                            <span class="text-sm text-slate-300">{{ status.label }}</span>
                                         </label>
                                     </div>
                                     <p class="text-xs text-gray-500 mt-1">Leave empty to allow all transitions</p>
@@ -164,17 +164,17 @@
                                     <label class="flex items-center">
                                         <input v-model="statusForm.is_default" type="checkbox"
                                             class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="ml-2 text-sm text-gray-700">Set as Default Status</span>
+                                        <span class="ml-2 text-sm text-slate-300">Set as Default Status</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input v-model="statusForm.is_final" type="checkbox"
                                             class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="ml-2 text-sm text-gray-700">Final Status (No further transitions)</span>
+                                        <span class="ml-2 text-sm text-slate-300">Final Status (No further transitions)</span>
                                     </label>
                                     <label class="flex items-center">
                                         <input v-model="statusForm.is_active" type="checkbox"
                                             class="rounded border-gray-300 text-primary focus:ring-primary">
-                                        <span class="ml-2 text-sm text-gray-700">Active</span>
+                                        <span class="ml-2 text-sm text-slate-300">Active</span>
                                     </label>
                                 </div>
                             </div>
@@ -185,7 +185,7 @@
                                 Cancel
                             </button>
                             <button type="submit"
-                                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                class="px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary/90 transition-colors">
                                 {{ editingStatus ? 'Update' : 'Create' }}
                             </button>
                         </div>

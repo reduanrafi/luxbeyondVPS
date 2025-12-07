@@ -1,8 +1,8 @@
 <template>
-    <div class="bg-white min-h-screen pt-20 pb-12">
+    <div class="bg-surface min-h-screen pt-20 pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h1 class="text-4xl font-bold text-gray-900 mb-4">Our Blog</h1>
+                <h1 class="text-4xl font-bold text-white mb-4">Our Blog</h1>
                 <p class="text-xl text-gray-600">Latest news, tips, and insights from the world of global shopping.</p>
             </div>
 
@@ -17,7 +17,7 @@
                                 <span class="text-primary font-semibold mr-2">{{ blog.category }}</span>
                                 <span>• {{ blog.date }}</span>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900 mt-2 group-hover:text-primary transition mb-3">{{ blog.title }}</h3>
+                            <h3 class="text-2xl font-bold text-white mt-2 group-hover:text-primary transition mb-3">{{ blog.title }}</h3>
                             <p class="text-gray-600 line-clamp-3">{{ blog.excerpt }}</p>
                             <span class="inline-block mt-4 text-primary font-semibold hover:underline">Read Article &rarr;</span>
                         </div>

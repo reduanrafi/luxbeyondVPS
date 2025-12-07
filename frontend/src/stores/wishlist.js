@@ -29,6 +29,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
                     ...item,
                     slug: item.slug || item.id || String(item.id),
                     price: numericPrice,
+                    total_stock: item.total_stock ?? item.stock ?? 0,
                 };
             });
         } catch (error) {

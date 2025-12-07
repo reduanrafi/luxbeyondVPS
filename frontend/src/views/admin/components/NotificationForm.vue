@@ -2,9 +2,9 @@
     <form @submit.prevent="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Event Type *</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Event Type *</label>
                 <select v-model="form.event_type" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="order_placed">Order Placed</option>
                     <option value="order_status_changed">Order Status Changed</option>
                     <option value="payment_received">Payment Received</option>
@@ -20,9 +20,9 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Channel *</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Channel *</label>
                 <select v-model="form.channel" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="email">Email</option>
                     <option value="sms">SMS</option>
                     <option value="push">Push Notification</option>
@@ -34,18 +34,18 @@
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Recipient Type *</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Recipient Type *</label>
                 <select v-model="form.recipient_type" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="customer">Customer</option>
                     <option value="admin">Admin</option>
                     <option value="both">Both</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Priority</label>
                 <select v-model="form.priority"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="low">Low</option>
                     <option value="normal">Normal</option>
                     <option value="high">High</option>
@@ -56,13 +56,13 @@
 
         <div v-if="form.channel === 'email'" class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Subject</label>
                 <input v-model="form.subject" type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Email subject">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Template Name</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Template Name</label>
                 <input v-model="form.template_name" type="text"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="email.order_placed">
@@ -70,7 +70,7 @@
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Message Template</label>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Message Template</label>
             <textarea v-model="form.message_template" rows="4"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="Hello {{customer_name}}, Your order #{{order_number}} has been placed successfully. Total: {{order_total}}"></textarea>
@@ -79,14 +79,14 @@
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Delay (minutes)</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Delay (minutes)</label>
                 <input v-model.number="form.delay_minutes" type="number" min="0"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="0">
                 <p class="text-xs text-gray-500 mt-1">Delay before sending notification</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1">Sort Order</label>
                 <input v-model.number="form.sort_order" type="number" min="0"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="0">
@@ -94,7 +94,7 @@
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label class="block text-sm font-medium text-slate-300 mb-1">Description</label>
             <textarea v-model="form.description" rows="2"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="Description of this notification rule..."></textarea>
@@ -104,7 +104,7 @@
             <label class="flex items-center">
                 <input v-model="form.enabled" type="checkbox"
                     class="rounded border-gray-300 text-primary focus:ring-primary">
-                <span class="ml-2 text-sm text-gray-700">Enabled</span>
+                <span class="ml-2 text-sm text-slate-300">Enabled</span>
             </label>
         </div>
 
@@ -114,7 +114,7 @@
                 Cancel
             </button>
             <button type="submit" :disabled="saving"
-                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50">
+                class="px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50">
                 {{ saving ? 'Saving...' : 'Save' }}
             </button>
         </div>

@@ -1,7 +1,7 @@
 <template>
     <div class="space-y-6">
         <div>
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
+            <h2 class="text-3xl font-bold text-white mb-2">Reset Password</h2>
             <p class="text-sm text-gray-600">
                 Enter your email address and we'll send you a link to reset your password.
             </p>
@@ -10,7 +10,7 @@
         <form class="space-y-5" @submit.prevent="handleReset">
             <!-- Email Input -->
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">
+                <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">
                     Email Address
                 </label>
                 <input
@@ -20,7 +20,7 @@
                     autocomplete="email"
                     required
                     v-model="email"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 placeholder-gray-400 transition-all"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-white placeholder-gray-400 transition-all"
                     placeholder="Enter your email"
                 />
             </div>

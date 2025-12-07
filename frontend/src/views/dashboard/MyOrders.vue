@@ -1,45 +1,45 @@
 <template>
     <div>
         <!-- Orders Table -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow">
+        <div class="bg-surface border border-white/5 overflow-hidden hover:border-primary/30 transition-colors">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Order ID</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Date</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Items</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Total</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Status</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Action</th>
+                        <tr class="bg-surface border-b border-white/5">
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Order ID</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Date</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Items</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Total</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Status</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-white/5">
                         <tr v-if="loading">
-                            <td colspan="6" class="p-6 text-center text-slate-500">
+                            <td colspan="6" class="p-8 text-center text-slate-500">
                                 <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                                <p class="mt-2 text-xs">Loading orders...</p>
+                                <p class="mt-2 text-xs uppercase tracking-wider">Loading orders...</p>
                             </td>
                         </tr>
                         <tr v-else-if="orders.length === 0">
-                            <td colspan="6" class="p-6 text-center text-slate-500">
+                            <td colspan="6" class="p-8 text-center text-slate-500">
                                 <p class="text-sm font-semibold mb-1">No orders found</p>
                                 <p class="text-xs">You haven't placed any orders yet.</p>
                             </td>
                         </tr>
-                        <tr v-for="order in orders" :key="order.id" class="hover:bg-blue-50/50 transition-all group">
-                            <td class="p-3 font-semibold text-primary group-hover:text-primary-hover transition-colors text-xs">#{{ order.id }}</td>
-                            <td class="p-3 text-slate-600 text-xs">{{ order.date }}</td>
-                            <td class="p-3 text-slate-600 text-xs max-w-xs truncate" :title="order.items">{{ order.items }}</td>
-                            <td class="p-3 font-semibold text-slate-900 text-sm">{{ order.total }}</td>
-                            <td class="p-3">
-                                <span :class="statusClass(order.status)" class="px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm">
+                        <tr v-for="order in orders" :key="order.id" class="hover:bg-white/5 transition-colors group">
+                            <td class="p-4 font-semibold text-primary group-hover:text-white transition-colors text-xs tracking-wide">#{{ order.id }}</td>
+                            <td class="p-4 text-slate-400 text-xs">{{ order.date }}</td>
+                            <td class="p-4 text-slate-400 text-xs max-w-xs truncate" :title="order.items">{{ order.items }}</td>
+                            <td class="p-4 font-serif text-white text-sm tracking-wide">{{ order.total }}</td>
+                            <td class="p-4">
+                                <span :class="statusClass(order.status)" class="px-2 py-1 border text-[10px] font-bold uppercase tracking-widest">
                                     {{ order.status }}
                                 </span>
                             </td>
-                            <td class="p-3">
-                                <button @click="viewOrderDetails(order)" class="text-xs font-semibold text-primary hover:text-primary-hover hover:underline transition-all">
-                                    View →
+                            <td class="p-4">
+                                <button @click="viewOrderDetails(order)" class="text-xs font-bold uppercase tracking-wider text-primary hover:text-white transition-colors">
+                                    View
                                 </button>
                             </td>
                         </tr>
@@ -108,16 +108,16 @@ const statusClass = (status) => {
     switch (statusStr) {
         case 'Processing':
         case 'Pending':
-            return 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300';
+            return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
         case 'Shipped':
-            return 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300';
+            return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
         case 'Delivered':
         case 'Completed':
-            return 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300';
+            return 'bg-green-500/10 text-green-500 border-green-500/20';
         case 'Cancelled':
-            return 'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-300';
+            return 'bg-red-500/10 text-red-500 border-red-500/20';
         default:
-            return 'bg-gray-100 text-gray-700';
+            return 'bg-slate-500/10 text-slate-400 border-white/10';
     }
 };
 

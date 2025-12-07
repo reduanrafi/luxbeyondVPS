@@ -1,15 +1,15 @@
 <template>
     <div class="space-y-6">
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="mt-2 text-sm text-slate-500">Loading request details...</p>
         </div>
 
         <!-- Error State -->
-        <div v-else-if="error" class="bg-white rounded-2xl shadow-lg border border-red-100 p-8 text-center">
+        <div v-else-if="error" class="bg-surface rounded-2xl shadow-lg border border-red-100 p-8 text-center">
             <p class="text-red-600 font-semibold">{{ error }}</p>
-            <button @click="$router.push('/admin/requests')" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">
+            <button @click="$router.push('/admin/requests')" class="mt-4 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors">
                 Back to Requests
             </button>
         </div>
@@ -27,7 +27,7 @@
                         📄 Print Invoice
                     </button>
                     <router-link :to="`/admin/requests/${request.id}/edit`" 
-                        class="px-4 py-2 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-hover transition-colors">
+                        class="px-4 py-2 text-sm font-semibold text-slate-900 bg-primary rounded-lg hover:bg-primary-hover transition-colors">
                         ✏️ Edit Request
                     </router-link>
                     <button @click="$router.push('/admin/requests')" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -38,30 +38,30 @@
 
             <!-- Request Info Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Request Status</p>
                     <span :style="{ backgroundColor: request.order_status?.color + '20', color: request.order_status?.color }" 
                         class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
                         {{ request.order_status?.label || request.status || 'Pending' }}
                     </span>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Request Date</p>
                     <p class="text-sm font-semibold text-slate-900">{{ formatDate(request.created_at) }}</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Currency</p>
                     <p class="text-sm font-semibold text-slate-900">{{ request.currency || 'N/A' }}</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+                <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Total Amount (BDT)</p>
                     <p class="text-sm font-semibold text-slate-900">৳{{ formatPrice(request.total_amount_bdt) }}</p>
                 </div>
             </div>
 
             <!-- Customer Information -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Customer Information</h3>
                 </div>
                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -77,8 +77,8 @@
             </div>
 
             <!-- Product Information -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Product Information</h3>
                 </div>
                 <div class="p-6 space-y-4">
@@ -90,7 +90,7 @@
                     </div>
                     <div v-if="request.admin_image_url" class="mt-4">
                         <p class="text-xs text-slate-500 mb-2">Admin Image</p>
-                        <img :src="request.admin_image_url" alt="Product Image" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                        <img :src="request.admin_image_url" alt="Product Image" class="w-32 h-32 object-cover rounded-lg border border-white/10">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
@@ -110,8 +110,8 @@
             </div>
 
             <!-- Shipping & Charges -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Shipping & Charges</h3>
                 </div>
                 <div class="p-6">
@@ -133,7 +133,7 @@
                             <p class="text-sm font-semibold text-slate-900">{{ request.currency }} {{ formatPrice(request.declared_shipping_cost) }}</p>
                         </div>
                     </div>
-                    <div class="border-t border-gray-200 pt-4 space-y-2">
+                    <div class="border-t border-white/10 pt-4 space-y-2">
                         <div v-if="request.tax" class="flex justify-between text-sm">
                             <span class="text-slate-600">Tax:</span>
                             <span class="font-semibold text-slate-900">৳{{ formatPrice(request.tax) }}</span>
@@ -155,8 +155,8 @@
             </div>
 
             <!-- Request Summary -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Request Summary</h3>
                 </div>
                 <div class="p-6 space-y-3">
@@ -184,7 +184,7 @@
                         <span class="text-slate-600">Payment Processing Fee</span>
                         <span class="font-semibold text-slate-900">৳{{ formatPrice(request.payment_processing_fee) }}</span>
                     </div>
-                    <div class="flex justify-between text-lg font-bold pt-3 border-t border-gray-200">
+                    <div class="flex justify-between text-lg font-bold pt-3 border-t border-white/10">
                         <span class="text-slate-900">Total Amount (BDT)</span>
                         <span class="text-primary">৳{{ formatPrice(request.total_amount_bdt) }}</span>
                     </div>
@@ -192,8 +192,8 @@
             </div>
 
             <!-- Admin Notes -->
-            <div v-if="request.admin_note" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div class="p-4 border-b border-gray-200 bg-gray-50">
+            <div v-if="request.admin_note" class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
                     <h3 class="text-lg font-bold text-slate-900">Admin Notes</h3>
                 </div>
                 <div class="p-6">
@@ -203,7 +203,7 @@
 
             <!-- Invoice (Hidden, for printing) -->
             <div id="invoice-content" class="hidden">
-                <div class="p-8 bg-white">
+                <div class="p-8 bg-surface">
                     <div class="mb-8 text-center">
                         <h1 class="text-3xl font-bold text-slate-900 mb-2">PRODUCT REQUEST INVOICE</h1>
                         <p class="text-sm text-slate-600">Request #{{ request.id }}</p>

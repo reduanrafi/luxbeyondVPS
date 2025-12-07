@@ -2,7 +2,7 @@
     <div>
         <div class="space-y-6">
             <!-- Profile Settings -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
                 <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <User class="w-6 h-6 text-primary" />
                     Profile Information
@@ -11,23 +11,23 @@
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                         <input type="text" :value="user?.name" disabled
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-slate-600">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 bg-gray-50 text-slate-600">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
                         <input type="email" :value="user?.email" disabled
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-slate-600">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 bg-gray-50 text-slate-600">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Role</label>
                         <input type="text" :value="user?.roles?.[0]?.name" disabled
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-slate-600">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 bg-gray-50 text-slate-600">
                     </div>
                 </div>
             </div>
 
             <!-- Shipping Address -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
                 <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <Truck class="w-6 h-6 text-blue-600" />
                     Shipping Address
@@ -36,32 +36,32 @@
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Street Address</label>
                         <input v-model="shippingAddress.street" type="text" placeholder="123 Main Street"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">City</label>
                         <input v-model="shippingAddress.city" type="text" placeholder="Dhaka"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">State/Province</label>
                         <input v-model="shippingAddress.state" type="text" placeholder="Dhaka Division"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Postal Code</label>
                         <input v-model="shippingAddress.postalCode" type="text" placeholder="1200"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Country</label>
                         <input v-model="shippingAddress.country" type="text" placeholder="Bangladesh"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
                         <input v-model="shippingAddress.phone" type="tel" placeholder="+880 1234 567890"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                 </div>
                 <button @click="saveShippingAddress"
@@ -71,7 +71,7 @@
             </div>
 
             <!-- Billing Address -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
                         <CreditCard class="w-6 h-6 text-green-600" />
@@ -87,35 +87,35 @@
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Street Address</label>
                         <input v-model="billingAddress.street" type="text" placeholder="123 Main Street"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">City</label>
                         <input v-model="billingAddress.city" type="text" placeholder="Dhaka"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">State/Province</label>
                         <input v-model="billingAddress.state" type="text" placeholder="Dhaka Division"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Postal Code</label>
                         <input v-model="billingAddress.postalCode" type="text" placeholder="1200"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Country</label>
                         <input v-model="billingAddress.country" type="text" placeholder="Bangladesh"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
                         <input v-model="billingAddress.phone" type="tel" placeholder="+880 1234 567890"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                            class="w-full px-4 py-3 rounded-lg border border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     </div>
                 </div>
-                <div v-else class="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                <div v-else class="p-6 bg-gray-50 rounded-xl border border-white/10">
                     <p class="text-sm text-slate-600 flex items-center gap-2">
                         <CheckCircle class="w-5 h-5 text-green-600" />
                         Billing address will be the same as your shipping address
@@ -128,7 +128,7 @@
             </div>
 
             <!-- Notification Preferences -->
-            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
                 <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <Bell class="w-6 h-6 text-purple-600" />
                     Notification Preferences

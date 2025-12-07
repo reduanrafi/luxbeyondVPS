@@ -1,86 +1,77 @@
 <template>
   <div :class="[
-    'group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 relative',
-    viewMode === 'grid' ? 'flex flex-col' : 'flex flex-row'
-  ]">
-    <!-- Product Image -->
+  'group bg-surface rounded-none border border-white/[0.05] hover:border-primary/50 transition-all duration-300 relative p-6 flex flex-col',
+  viewMode === 'grid' ? '' : 'sm:flex-row sm:items-center sm:gap-6'
+]">
+    <!-- Product Image Area -->
     <div :class="[
-      'relative overflow-hidden bg-gray-50 flex items-center justify-center',
-      viewMode === 'grid' ? 'aspect-square' : 'w-32 h-32 shrink-0'
-    ]">
-      <router-link :to="`/products/${product.slug || product.id}`" class="block h-full w-full p-2">
+  'relative overflow-hidden mb-6 flex items-center justify-center bg-white/[0.02]',
+  viewMode === 'grid' ? 'aspect-square w-full' : 'w-48 h-48 shrink-0'
+]">
+      <router-link :to="`/products/${product.slug || product.id}`" class="block h-full w-full p-4">
         <img :src="getProductImage(product)" :alt="product.name"
-          class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+          class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
           @error="handleImageError" />
       </router-link>
 
-      <!-- Discount Badge - Top Right -->
-      <div v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-        class="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow-md z-10 flex items-center gap-1">
-        <Zap class="w-3 h-3" />
+      <!-- Discount Badge (Minimalist) -->
+      <div
+        v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
+        class="absolute top-0 right-0 bg-primary text-slate-900 text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
         {{ calculateDiscount(
           product.event_price ? product.original_price : product.price,
           product.event_price || product.sellable_price || product.price
         ) }}% OFF
       </div>
 
-      <!-- Wishlist Button - Show on Hover -->
-      <button
-        v-if="showWishlist"
-        @click.stop.prevent="toggleWishlist(product)"
-        class="absolute bottom-3 right-3 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white shadow-md hover:scale-110 transition-all duration-200 z-10"
-        :class="isInWishlist ? 'text-red-500 opacity-100' : 'text-gray-400 opacity-0 group-hover:opacity-100'"
-      >
-        <Heart class="w-5 h-5" :fill="isInWishlist ? 'currentColor' : 'none'" />
+      <!-- Wishlist Button (Minimalist) -->
+      <button v-if="showWishlist" @click.stop.prevent="toggleWishlist(product)"
+        class="absolute bottom-2 right-2 text-primary shadow-md hover:text-primary transition-colors duration-200"
+        :class="{ 'text-primary': isInWishlist }">
+        <Heart class="w-6 h-6" :class="{ 'fill-primary': isInWishlist }" />
       </button>
     </div>
 
     <!-- Product Info -->
-    <div :class="['flex-1 flex flex-col', viewMode === 'grid' ? 'p-4' : 'p-3']">
-      <!-- Product Name -->
-      <router-link :to="`/products/${product.slug || product.id}`" class="mb-1 group/link">
-        <h3 :class="[
-          'font-bold text-gray-900 line-clamp-1 group-hover/link:text-primary transition-colors',
-          viewMode === 'grid' ? 'text-base' : 'text-sm'
-        ]">
+    <div class="flex-1 flex flex-col text-left">
+      <!-- Name -->
+      <router-link :to="`/products/${product.slug || product.id}`" class="group/link">
+        <h3
+          class="font-serif text-xl text-white uppercase tracking-widest mb-2 group-hover/link:text-primary transition-colors">
           {{ product.name }}
         </h3>
       </router-link>
 
-      <p class="text-xs text-gray-500 mb-1.5 pr-4" v-if="viewMode === 'list'">
-        {{ product.short_description }}
+      <!-- Subtitle/Description -->
+      <p class="text-xs text-slate-500 uppercase tracking-wide mb-4 line-clamp-1">
+        {{ product.short_description || 'Precision Engineered' }}
       </p>
 
-      <!-- Rating -->
-      <div class="flex items-center gap-1.5 mb-1.5">
-        <div class="flex items-center gap-0.5">
-          <Star v-for="i in 5" :key="i" :class="['text-yellow-400 fill-yellow-400', viewMode === 'grid' ? 'w-4 h-4' : 'w-3 h-3']" />
-        </div>
-        <span class="text-xs text-gray-500">({{ product.reviews_count || 0 }})</span>
+      <!-- Price -->
+      <div class="mb-4">
+        <span
+          v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
+          class="text-sm text-slate-600 line-through mr-2">
+          ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
+        </span>
+        <span class="text-2xl font-serif text-primary font-bold">
+          ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
+        </span>
       </div>
 
-      <!-- Add Button - Bottom Right -->
-      <div class="mt-auto flex justify-between items-center">
-        <!-- Price -->
-        <div>
-          <div class=" flex-col items-baseline">
-            <!-- Show original price if event price is applied or if there's a discount -->
-            <span v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-              class="text-sm text-gray-400 line-through">
-              ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
-            </span>
-            <span class="font-bold text-gray-900 text-[15px]">
-              ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
-            </span>
-          </div>
-        </div>
-        <button @click="addToCart(product)" :disabled="(product.total_stock || 0) === 0"
-          :class="[
-            'bg-purple-50 border border-purple-200 text-gray-900 font-semibold rounded-lg hover:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all',
-            viewMode === 'grid' ? 'px-6 py-2.5 text-sm' : 'px-4 py-1.5 text-xs'
-          ]">
-          ADD
-        </button>
+      <!-- Rating -->
+      <div class="flex items-center gap-1 mb-6">
+        <Star v-for="i in 5" :key="i" class="w-3 h-3 text-primary fill-primary" />
+      </div>
+
+      <!-- Add to Cart / Out of Stock -->
+      <button v-if="(product.total_stock || 0) > 0" @click="addToCart(product)"
+        class="mt-auto flex items-center gap-2 text-sm text-white font-bold uppercase tracking-widest hover:underline hover:text-primary transition-colors group/btn">
+        Add to Cart
+        <ArrowRight class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+      </button>
+      <div v-else class="mt-auto text-sm text-red-500 font-bold uppercase tracking-widest cursor-not-allowed">
+        Out of Stock
       </div>
     </div>
   </div>
@@ -90,7 +81,8 @@
 <script setup>
 
 import { computed } from 'vue';
-import { Star, Heart, ShoppingCart, Eye, EyeIcon, Zap, Rocket } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
+import { Star, Heart, ShoppingCart, Eye, EyeIcon, Zap, Rocket, ArrowRight } from 'lucide-vue-next';
 import { useWishlistStore } from '../stores/wishlist';
 import { useCartStore } from '../stores/cart';
 import { useAuthStore } from '../stores/auth';
@@ -179,7 +171,15 @@ const calculateDiscount = (originalPrice, salePrice) => {
   return Math.round(((original - sale) / original) * 100);
 };
 
+const router = useRouter();
+
 const addToCart = (product) => {
+  // If product has variants, redirect to product details
+  if (product.has_variants) {
+    router.push(`/products/${product.slug || product.id}`);
+    return;
+  }
+
   // Check authentication first
   if (!authStore.isAuthenticated) {
     modalStore.openModal('login');

@@ -5,7 +5,7 @@
             <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
                 enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 pointer-events-auto"
+                <div v-if="isOpen" class="absolute inset-0 bg-black/80 backdrop-blur-sm pointer-events-auto"
                     @click="$emit('close')">
                 </div>
             </Transition>
@@ -16,64 +16,116 @@
                 leave-active-class="transform transition ease-in-out duration-500 sm:duration-700"
                 leave-from-class="translate-x-0" leave-to-class="translate-x-full">
                 <div v-if="isOpen"
-                    class="w-screen max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
+                    class="w-screen max-w-md bg-surface shadow-2xl flex flex-col pointer-events-auto h-full relative z-10 border-l border-white/5">
                     <div class="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
-                        <div class="flex items-start justify-between">
-                            <h2 class="text-lg font-bold text-primary" id="slide-over-title">Shopping Cart</h2>
+                        <div class="flex items-start justify-between border-b border-white/5 pb-4">
+                            <h2 class="text-xl font-serif text-white tracking-wide" id="slide-over-title">Shopping Cart
+                            </h2>
+
                             <div class="ml-3 h-7 flex items-center">
                                 <button @click="$emit('close')"
-                                    class="-m-2 p-2 text-gray-400 hover:text-primary transition-colors">
+                                    class="-m-2 p-2 text-slate-400 hover:text-white transition-colors">
                                     <span class="sr-only">Close panel</span>
                                     <X class="h-6 w-6" />
                                 </button>
                             </div>
                         </div>
 
+                        <!-- Stock Issue Warning -->
+                        <div v-if="hasStockIssues"
+                            class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-sm flex items-start gap-3">
+                            <AlertCircle class="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                            <div>
+                                <h3 class="text-xs font-bold text-red-500">Stock Issues Detected</h3>
+                                <p class="text-[10px] text-red-400 mt-1">Some items in your cart are no longer
+                                    available.
+                                    Please remove them to proceed.</p>
+                            </div>
+                        </div>
+
                         <div class="mt-8">
                             <div class="flow-root">
-                                <ul role="list" class="-my-6 divide-y divide-gray-100">
-                                    <li v-if="cartStore.items.length === 0" class="py-6 text-center text-gray-500">
-                                        Your cart is empty.
-                                    </li>
-                                    <li v-for="item in cartStore.items" :key="item.id" class="py-6 flex">
+                                <ul role="list" class="-my-6 divide-y divide-white/5">
+                                    <li v-if="cartStore.items.length === 0" class="py-12 text-center">
                                         <div
-                                            class="shrink-0 w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
-                                            <img :src="getItemImage(item)" :alt="item.name"
-                                                class="w-full h-full object-center object-cover">
+                                            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
+                                            <ShoppingCart class="w-8 h-8 text-slate-500" />
                                         </div>
-                                        <div class="ml-4 flex-1 flex flex-col">
+                                        <p class="text-slate-400 text-lg font-light">Your cart is empty.</p>
+                                        <button @click="$emit('close')"
+                                            class="mt-4 text-primary hover:text-primary-hover text-sm font-medium uppercase tracking-wider">Start
+                                            Shopping</button>
+                                    </li>
+                                    <li v-for="item in cartStore.items" :key="item.id" class="py-4 flex">
+                                        <div class="shrink-0 w-20 h-24 border bg-white/5 rounded-sm overflow-hidden relative"
+                                            :class="isOutOfStock(item) ? 'border-red-500/50' : 'border-white/10'">
+                                            <img :src="getItemImage(item)" :alt="item.name"
+                                                class="w-full h-full object-center object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                                :class="{ 'opacity-50 grayscale': isOutOfStock(item) }">
+
+                                            <!-- Out of Stock Overlay -->
+                                            <div v-if="isOutOfStock(item)"
+                                                class="absolute inset-0 flex items-center justify-center bg-black/40">
+                                                <span
+                                                    class="text-[10px] font-bold text-white bg-red-500 px-2 py-1 uppercase tracking-wider">Out
+                                                    of Stock</span>
+                                            </div>
+                                        </div>
+                                        <div class="ml-3 flex-1 flex flex-col">
 
                                             <div>
-                                                <div class="flex justify-between text-base font-medium text-slate-900">
-                                                    <h3><router-link :to="`/products/${item.slug || item.id}`">{{ item.name
-                                                    }}</router-link></h3>
+                                                <div class="flex justify-between text-base font-medium">
+                                                    <h3>
+                                                        <router-link :to="`/products/${item.slug || item.id}`"
+                                                            class="font-serif text-sm tracking-wide transition-colors"
+                                                            :class="isOutOfStock(item) ? 'text-red-400' : 'text-white hover:text-primary'">
+                                                            {{ item.name }}
+                                                        </router-link>
+                                                    </h3>
                                                     <div class="ml-4 text-right">
-                                                        <p class="text-primary font-bold">{{ item.price }}</p>
-                                                        <p v-if="item.original_price" 
-                                                           class="text-xs text-gray-400 line-through">
+                                                        <p class="font-bold text-sm"
+                                                            :class="isOutOfStock(item) ? 'text-slate-500' : 'text-primary'">
+                                                            {{ item.price }}</p>
+                                                        <p v-if="item.original_price"
+                                                            class="text-xs text-slate-600 line-through">
                                                             {{ item.original_price }}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <!-- Variant Information -->
-                                                <p v-if="item.variant && item.variant.attributes" class="mt-1 text-sm text-slate-500">
+                                                <p v-if="item.variant && item.variant.attributes"
+                                                    class="mt-1 text-xs text-slate-500 uppercase tracking-wider">
                                                     {{ formatVariantAttributes(item.variant.attributes) }}
                                                 </p>
-                                                <p v-else-if="item.color" class="mt-1 text-sm text-slate-500">{{ item.color }}</p>
+                                                <!-- <p v-else-if="item.color"
+                                                    class="mt-1 text-xs text-slate-500 uppercase tracking-wider">{{
+                                                        item.color }}</p> -->
+
+                                                <!-- Stock Error Message -->
+                                                <p v-if="isOutOfStock(item)"
+                                                    class="mt-2 text-xs text-red-500 font-medium flex items-center gap-1">
+                                                    <AlertCircle class="w-3 h-3" />
+                                                    Item unavailable
+                                                </p>
                                             </div>
-                                            <div class="flex-1 flex items-end justify-between text-sm">
-                                                <div class="flex items-center border border-gray-300 rounded">
+                                            <div class="flex-1 flex items-end justify-between text-sm mt-2">
+                                                <div class="flex items-center border border-white/10 rounded-sm bg-background"
+                                                    :class="{ 'opacity-50 pointer-events-none': isOutOfStock(item) }">
                                                     <button
                                                         @click="cartStore.updateQuantity(item.id, item.quantity - 1, item.variant)"
-                                                        class="px-2 py-1 text-gray-600 hover:bg-gray-100">-</button>
-                                                    <span class="px-2 py-1 text-gray-900">{{ item.quantity }}</span>
+                                                        class="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-50">-</button>
+                                                    <span
+                                                        class="px-2 py-1 text-white font-mono min-w-[2ch] text-center">{{
+                                                        item.quantity }}</span>
                                                     <button
                                                         @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.variant)"
-                                                        class="px-2 py-1 text-gray-600 hover:bg-gray-100">+</button>
+                                                        class="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/5 transition-colors">+</button>
                                                 </div>
                                                 <div class="flex">
-                                                    <button type="button" @click="cartStore.removeItem(item.id, item.variant)"
-                                                        class="font-medium text-secondary hover:text-red-600 transition-colors">Remove</button>
+                                                    <button type="button"
+                                                        @click="cartStore.removeItem(item.id, item.variant)"
+                                                        class="font-medium transition-colors uppercase text-xs tracking-wider"
+                                                        :class="isOutOfStock(item) ? 'text-red-500 hover:text-red-400' : 'text-slate-500 hover:text-red-500'">Remove</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -83,26 +135,25 @@
                         </div>
                     </div>
 
-                    <div class="border-t border-gray-100 py-6 px-4 sm:px-6 bg-gray-50">
-                        <div class="flex justify-between text-base font-medium text-slate-900">
-                            <p>Subtotal</p>
-                            <p class="text-primary font-bold">{{ cartStore.formattedSubtotal }}</p>
+                    <div class="border-t border-white/10 py-6 px-4 sm:px-6 bg-background">
+                        <div class="flex justify-between text-base font-medium">
+                            <p class="text-white font-serif">Subtotal</p>
+                            <p class="text-primary font-serif text-xl">{{ cartStore.formattedSubtotal }}</p>
                         </div>
-                        <p class="mt-0.5 text-sm text-slate-500">Shipping and taxes calculated at checkout.</p>
+                        <p class="mt-1 text-xs text-slate-500 font-light">Shipping and taxes calculated at checkout.</p>
                         <div class="mt-6">
-                            <router-link
-                                to="/checkout"
-                                @click="$emit('close')"
-                                class="flex justify-center items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-bold text-white bg-primary hover:bg-primary-hover transition-all duration-200"
-                                :class="{ 'opacity-50 cursor-not-allowed pointer-events-none': cartStore.items.length === 0 }"
-                            >
-                                Checkout
-                            </router-link>
+                            <button @click="handleCheckout"
+                                class="w-full flex justify-center items-center px-6 py-4 border border-transparent rounded-none shadow-sm text-sm font-bold text-slate-900 transition-all duration-200 uppercase tracking-widest"
+                                :class="hasStockIssues || cartStore.items.length === 0 ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-hover'"
+                                :disabled="hasStockIssues || cartStore.items.length === 0">
+                                <span v-if="hasStockIssues">Remove Unavailable Items</span>
+                                <span v-else>Checkout</span>
+                            </button>
                         </div>
                         <div class="mt-6 flex justify-center text-sm text-center text-slate-500">
                             <p>
                                 or <button type="button"
-                                    class="text-primary font-medium hover:text-primary-hover transition-colors"
+                                    class="text-primary font-bold hover:text-primary-hover transition-colors uppercase tracking-wider text-xs ml-1"
                                     @click="$emit('close')">Continue Shopping<span aria-hidden="true">
                                         &rarr;</span></button>
                             </p>
@@ -115,15 +166,18 @@
 </template>
 
 <script setup>
-import { X } from 'lucide-vue-next';
+import { X, ShoppingCart, AlertCircle } from 'lucide-vue-next';
 import { useCartStore } from '../stores/cart';
+import { useRouter } from 'vue-router';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
     isOpen: Boolean
 });
-defineEmits(['close']);
+const emit = defineEmits(['close']);
 
 const cartStore = useCartStore();
+const router = useRouter();
 
 // Get item image - prefer variant image, fallback to product image
 const getItemImage = (item) => {
@@ -142,12 +196,28 @@ const getItemImage = (item) => {
         return item.image_url;
     }
     if (item.image) {
-        return item.image.startsWith('http') || item.image.startsWith('/') 
-            ? item.image 
+        return item.image.startsWith('http') || item.image.startsWith('/')
+            ? item.image
             : `/storage/${item.image}`;
     }
     // Default placeholder
     return '/assets/placeholder.png';
+};
+
+// Stock Validation Logic
+const isOutOfStock = (item) => {
+    return (item.total_stock !== undefined && item.total_stock <= 0);
+};
+
+const hasStockIssues = computed(() => {
+    return cartStore.items.some(item => isOutOfStock(item));
+});
+
+const handleCheckout = () => {
+    if (hasStockIssues.value || cartStore.items.length === 0) return;
+
+    emit('close');
+    router.push('/checkout');
 };
 
 // Format variant attributes for display

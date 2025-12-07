@@ -28,13 +28,13 @@
                     >
                         <div
                             v-if="modalStore.isOpen"
-                            class="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl transform transition-all overflow-hidden"
+                            class="relative bg-surface rounded-2xl shadow-2xl w-full max-w-4xl transform transition-all overflow-hidden"
                             @click.stop
                         >
                             <!-- Close Button -->
                             <button
                                 @click="modalStore.closeModal"
-                                class="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-900 transition-colors"
+                                class="absolute top-4 right-4 z-10 text-gray-400 hover:text-white transition-colors"
                             >
                                 <X class="w-6 h-6" />
                             </button>
@@ -43,12 +43,12 @@
                                 <!-- Left Side - Info Panel (Hidden on mobile) -->
                                 <div class="hidden md:flex md:w-2/5 bg-gradient-to-br from-primary/10 to-primary/100 p-8 flex-col justify-center items-center text-center">
                                     <div class="mb-6">
-                                        <div class="w-32 h-32 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
+                                        <div class="w-32 h-32 mx-auto bg-surface rounded-full flex items-center justify-center shadow-lg mb-4">
                                             <svg class="w-16 h-16 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                             </svg>
                                         </div>
-                                        <div class="w-16 h-16 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
+                                        <div class="w-16 h-16 mx-auto bg-surface rounded-full flex items-center justify-center shadow-lg mb-4">
                                             <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
                                             </svg>

@@ -1,5 +1,5 @@
 <template>
-    <div class="border border-gray-200 rounded-lg mb-2 overflow-hidden">
+    <div class="border border-white/10 rounded-lg mb-2 overflow-hidden">
         <button @click="toggle"
             class="w-full flex items-center justify-between gap-3 px-3 py-2.5 transition-all text-left font-medium hover:bg-gray-50">
             <div class="flex items-center gap-3">

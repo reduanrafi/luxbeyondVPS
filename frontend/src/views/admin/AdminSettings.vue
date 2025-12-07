@@ -7,12 +7,12 @@
         </div>
 
         <!-- Tabs -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200">
-            <div class="border-b border-gray-200">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10">
+            <div class="border-b border-white/10">
                 <nav class="flex -mb-px">
                     <button
                         @click="activeTab = 'general'"
-                        :class="activeTab === 'general' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        :class="activeTab === 'general' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-slate-300 hover:border-gray-300'"
                         class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
                     >
                         <Settings class="w-4 h-4 inline mr-2" />
@@ -20,7 +20,7 @@
                     </button>
                     <button
                         @click="activeTab = 'payments'"
-                        :class="activeTab === 'payments' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        :class="activeTab === 'payments' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-slate-300 hover:border-gray-300'"
                         class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
                     >
                         <CreditCard class="w-4 h-4 inline mr-2" />
@@ -28,7 +28,7 @@
                     </button>
                     <button
                         @click="activeTab = 'notifications'"
-                        :class="activeTab === 'notifications' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        :class="activeTab === 'notifications' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-slate-300 hover:border-gray-300'"
                         class="px-6 py-4 text-sm font-medium border-b-2 transition-colors"
                     >
                         <Bell class="w-4 h-4 inline mr-2" />
@@ -61,7 +61,7 @@
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Default Currency</label>
                                 <select v-model="generalSettings.default_currency"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                                     <option value="BDT">BDT (৳)</option>
                                     <option value="USD">USD ($)</option>
                                     <option value="CNY">CNY (¥)</option>
@@ -141,7 +141,7 @@
                     </div>
 
                     <button @click="saveGeneralSettings" :disabled="saving"
-                        class="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50">
+                        class="px-6 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50">
                         {{ saving ? 'Saving...' : 'Save Changes' }}
                     </button>
                 </div>
@@ -152,7 +152,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-bold text-slate-900">Payment Methods</h3>
                     <button @click="openPaymentModal()"
-                        class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+                        class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
                         <Plus class="w-4 h-4" />
                         Add Payment Method
                     </button>
@@ -161,13 +161,13 @@
                 <!-- Payment Methods List -->
                 <div class="space-y-4">
                     <div v-for="method in paymentMethods" :key="method.id"
-                        class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        class="border border-white/10 rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
                                     <h4 class="text-lg font-bold text-slate-900">{{ method.name }}</h4>
                                     <span class="px-2 py-1 text-xs rounded-full"
-                                        :class="method.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'">
+                                        :class="method.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-slate-300'">
                                         {{ method.is_active ? 'Active' : 'Inactive' }}
                                     </span>
                                     <span v-if="method.is_online" class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
@@ -223,7 +223,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-bold text-slate-900">Notification Settings</h3>
                     <button @click="openNotificationModal()"
-                        class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
+                        class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2">
                         <Plus class="w-4 h-4" />
                         Add Notification Rule
                     </button>
@@ -232,7 +232,7 @@
                 <!-- Notification Settings List -->
                 <div class="space-y-4">
                     <div v-for="setting in notificationSettings" :key="setting.id"
-                        class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        class="border border-white/10 rounded-lg p-4 hover:shadow-md transition-shadow">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
@@ -242,7 +242,7 @@
                                         {{ setting.channel }}
                                     </span>
                                     <span class="px-2 py-1 text-xs rounded-full capitalize"
-                                        :class="setting.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'">
+                                        :class="setting.enabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-slate-300'">
                                         {{ setting.enabled ? 'Enabled' : 'Disabled' }}
                                     </span>
                                     <span class="px-2 py-1 text-xs rounded-full capitalize"
@@ -281,7 +281,7 @@
         <div v-if="showPaymentModal" class="fixed inset-0 z-50 overflow-y-auto" @click.self="showPaymentModal = false">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-gray-500 opacity-75"></div>
-                <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto" @click.stop>
+                <div class="relative bg-surface rounded-lg shadow-xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto" @click.stop>
                     <h3 class="text-lg font-bold text-slate-900 mb-4">
                         {{ editingPayment ? 'Edit Payment Method' : 'Add Payment Method' }}
                     </h3>
@@ -298,7 +298,7 @@
         <div v-if="showNotificationModal" class="fixed inset-0 z-50 overflow-y-auto" @click.self="showNotificationModal = false">
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-gray-500 opacity-75"></div>
-                <div class="relative bg-white rounded-lg shadow-xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto" @click.stop>
+                <div class="relative bg-surface rounded-lg shadow-xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto" @click.stop>
                     <h3 class="text-lg font-bold text-slate-900 mb-4">
                         {{ editingNotification ? 'Edit Notification Rule' : 'Add Notification Rule' }}
                     </h3>
@@ -446,19 +446,19 @@ const getChannelClass = (channel) => {
         sms: 'bg-green-100 text-green-700',
         push: 'bg-purple-100 text-purple-700',
         in_app: 'bg-orange-100 text-orange-700',
-        webhook: 'bg-gray-100 text-gray-700',
+        webhook: 'bg-gray-100 text-slate-300',
     };
-    return classes[channel] || 'bg-gray-100 text-gray-700';
+    return classes[channel] || 'bg-gray-100 text-slate-300';
 };
 
 const getPriorityClass = (priority) => {
     const classes = {
-        low: 'bg-gray-100 text-gray-700',
+        low: 'bg-gray-100 text-slate-300',
         normal: 'bg-blue-100 text-blue-700',
         high: 'bg-orange-100 text-orange-700',
         urgent: 'bg-red-100 text-red-700',
     };
-    return classes[priority] || 'bg-gray-100 text-gray-700';
+    return classes[priority] || 'bg-gray-100 text-slate-300';
 };
 
 onMounted(() => {

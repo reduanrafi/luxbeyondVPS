@@ -5,8 +5,7 @@
             <Transition enter-active-class="transition-opacity ease-linear duration-300" enter-from-class="opacity-0"
                 enter-to-class="opacity-100" leave-active-class="transition-opacity ease-linear duration-300"
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
-                <div v-if="isOpen" class="absolute inset-0 bg-gray-500/45 pointer-events-auto"
-                    @click="$emit('close')">
+                <div v-if="isOpen" class="absolute inset-0 bg-black/80 pointer-events-auto" @click="$emit('close')">
                 </div>
             </Transition>
 
@@ -16,7 +15,7 @@
                 leave-active-class="transform transition ease-in-out duration-500 sm:duration-700"
                 leave-from-class="translate-x-0" leave-to-class="translate-x-full">
                 <div v-if="isOpen"
-                    class="w-screen max-w-md bg-white shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
+                    class="w-screen max-w-md bg-surface shadow-2xl flex flex-col pointer-events-auto h-full relative z-10">
                     <div class="flex-1 py-6 overflow-y-auto px-4 sm:px-6">
                         <div class="flex items-start justify-between">
                             <h2 class="text-lg font-bold text-primary" id="slide-over-title">My Wishlist</h2>
@@ -30,13 +29,11 @@
                         </div>
 
                         <!-- Add All to Cart Button -->
-                        <div v-if="wishlistStore.items.length > 0" class="mt-6 mb-4">
-                            <button
-                                @click="addAllToCart"
-                                class="w-full px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
-                            >
+                        <div v-if="wishlistStore.items.some(item => item.total_stock > 0)" class="mt-6 mb-4">
+                            <button @click="addAllToCart"
+                                class="w-full px-4 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
                                 <ShoppingCart class="w-5 h-5" />
-                                Add All to Cart ({{ wishlistStore.items.length }})
+                                Add Available to Cart
                             </button>
                         </div>
 
@@ -48,29 +45,37 @@
                                     </li>
                                     <li v-for="item in wishlistStore.items" :key="item.id" class="py-6 flex">
                                         <div
-                                            class="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-lg overflow-hidden">
+                                            class="flex-shrink-0 w-24 h-24 border border-white/10 rounded-lg overflow-hidden">
                                             <img :src="item.image_url" :alt="item.name"
                                                 class="w-full h-full object-center object-contain">
                                         </div>
                                         <div class="ml-4 flex-1 flex flex-col">
                                             <div>
                                                 <div class="flex justify-between text-base font-medium text-slate-900">
-                                                    <h3><router-link :to="`/products/${item.slug || item.id}`">{{ item.name
-                                                    }}</router-link></h3>
+                                                    <h3><router-link :to="`/products/${item.slug || item.id}`">{{
+                                                        item.name
+                                                            }}</router-link></h3>
                                                     <p class="ml-4 text-primary font-bold">
-                                                        <template v-if="typeof item.price === 'string' && (item.price.includes('৳') || item.price.includes('$'))">
+                                                        <template
+                                                            v-if="typeof item.price === 'string' && (item.price.includes('৳') || item.price.includes('$'))">
                                                             {{ item.price }}
                                                         </template>
                                                         <template v-else>
-                                                            ৳{{ typeof item.price === 'number' ? item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : item.price }}
+                                                            ৳{{ typeof item.price === 'number' ?
+                                                                item.price.toLocaleString('en-US', {
+                                                                    minimumFractionDigits:
+                                                                        2, maximumFractionDigits: 2
+                                                                }) : item.price }}
                                                         </template>
                                                     </p>
                                                 </div>
                                             </div>
                                             <div class="flex-1 flex items-end justify-between text-sm">
-                                                <button type="button" @click="moveToCart(item)"
+                                                <button v-if="item.total_stock > 0" type="button"
+                                                    @click="moveToCart(item)"
                                                     class="font-medium text-primary hover:text-primary-hover transition-colors">Add
                                                     to Cart</button>
+                                                <span v-else class="font-medium text-red-500">Out of Stock</span>
                                                 <button type="button" @click="wishlistStore.removeItem(item.id)"
                                                     class="font-medium text-secondary hover:text-red-600 transition-colors">Remove</button>
                                             </div>
@@ -113,6 +118,8 @@ watch(() => props.isOpen, (newValue) => {
 });
 
 function moveToCart(item) {
+    if (item.total_stock <= 0) return;
+
     // Ensure slug is included
     const productWithSlug = {
         ...item,
@@ -123,12 +130,14 @@ function moveToCart(item) {
 }
 
 function addAllToCart() {
-    if (wishlistStore.items.length === 0) return;
+    const availableItems = wishlistStore.items.filter(item => item.total_stock > 0);
+
+    if (availableItems.length === 0) return;
     
     // Create a copy of items array to avoid mutation during iteration
-    const itemsToAdd = [...wishlistStore.items];
+    const itemsToAdd = [...availableItems];
     
-    // Add all items to cart with ensured slugs
+    // Add all available items to cart with ensured slugs
     itemsToAdd.forEach(item => {
         const productWithSlug = {
             ...item,
@@ -137,7 +146,7 @@ function addAllToCart() {
         cartStore.addItem(productWithSlug);
     });
     
-    // Clear wishlist after adding all to cart
+    // Clear only added items from wishlist
     itemsToAdd.forEach(item => {
         wishlistStore.removeItem(item.id);
     });

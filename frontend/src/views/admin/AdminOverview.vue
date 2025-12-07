@@ -3,7 +3,7 @@
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div v-for="stat in stats" :key="stat.label"
-                class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                class="bg-surface rounded-xl shadow-md border border-white/10 p-6 hover:shadow-lg transition-shadow">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-slate-600">{{ stat.label }}</p>
@@ -22,7 +22,7 @@
         <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Revenue Chart -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Revenue Overview</h3>
                 <div class="h-64 flex items-end justify-between gap-2">
                     <div v-for="(value, index) in revenueData" :key="index"
@@ -40,7 +40,7 @@
             </div>
 
             <!-- Top Products -->
-            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Top Products</h3>
                 <div class="space-y-4">
                     <div v-for="product in topProducts" :key="product.id" class="flex items-center justify-between">
@@ -58,7 +58,7 @@
         </div>
 
         <!-- Recent Orders -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-slate-900">Recent Orders</h3>
                 <router-link to="/admin/orders" class="text-sm text-primary hover:underline font-medium">
@@ -68,7 +68,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="border-b border-gray-200">
+                        <tr class="border-b border-white/10">
                             <th class="text-left py-3 px-4 text-sm font-semibold text-slate-700">Order ID</th>
                             <th class="text-left py-3 px-4 text-sm font-semibold text-slate-700">Customer</th>
                             <th class="text-left py-3 px-4 text-sm font-semibold text-slate-700">Date</th>
@@ -99,7 +99,7 @@
         <!-- Quick Actions -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <router-link to="/admin/products"
-                class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-primary group">
+                class="bg-surface rounded-xl shadow-md border border-white/10 p-6 hover:shadow-lg transition-all hover:border-primary group">
                 <div class="flex items-center gap-4">
                     <div
                         class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
@@ -112,7 +112,7 @@
                 </div>
             </router-link>
             <router-link to="/admin/orders"
-                class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-primary group">
+                class="bg-surface rounded-xl shadow-md border border-white/10 p-6 hover:shadow-lg transition-all hover:border-primary group">
                 <div class="flex items-center gap-4">
                     <div
                         class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
@@ -125,7 +125,7 @@
                 </div>
             </router-link>
             <router-link to="/admin/customers"
-                class="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all hover:border-primary group">
+                class="bg-surface rounded-xl shadow-md border border-white/10 p-6 hover:shadow-lg transition-all hover:border-primary group">
                 <div class="flex items-center gap-4">
                     <div
                         class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all">
@@ -259,7 +259,7 @@ const getStatusClass = (status) => {
         'Pending': 'bg-yellow-100 text-yellow-700',
         'Cancelled': 'bg-red-100 text-red-700'
     };
-    return classes[statusStr] || 'bg-gray-100 text-gray-700';
+    return classes[statusStr] || 'bg-gray-100 text-slate-300';
 };
 
 onMounted(() => {

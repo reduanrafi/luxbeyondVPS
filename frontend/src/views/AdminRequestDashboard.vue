@@ -9,19 +9,19 @@
         <!-- Stats -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div v-for="stat in requestStats" :key="stat.label"
-                class="bg-white rounded-lg shadow-md border border-gray-200 p-4">
+                class="bg-surface rounded-lg shadow-md border border-white/10 p-4">
                 <p class="text-sm text-slate-600">{{ stat.label }}</p>
                 <p class="text-2xl font-bold text-slate-900 mt-1">{{ stat.value }}</p>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <input v-model="filters.search" @input="fetchRequests" type="text" placeholder="Search requests..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status" @change="fetchRequests"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option v-for="status in orderStatuses" :key="status.id" :value="status.id">
                         {{ status.label }}
@@ -37,16 +37,16 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading requests...</p>
         </div>
 
         <!-- Requests Table -->
-        <div v-else class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div v-else class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 border-b border-white/10">
                         <tr>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Request ID</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Customer</th>
@@ -125,8 +125,8 @@
                 leave-from-class="opacity-100" leave-to-class="opacity-0">
                 <div v-if="editingRequest" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                     @click.self="editingRequest = null">
-                    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <div class="bg-surface rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div class="sticky top-0 bg-surface border-b border-white/10 px-6 py-4 flex items-center justify-between">
                             <h2 class="text-xl font-bold text-slate-900">Edit Request #{{ editingRequest.id }}</h2>
                             <button @click="editingRequest = null"
                                 class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
@@ -214,18 +214,18 @@
                             </div>
 
                             <!-- Read-only Total -->
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div class="bg-gray-50 p-4 rounded-lg border border-white/10">
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">Total Amount (BDT)</label>
                                 <p class="text-lg font-bold text-slate-900">৳{{ parseFloat(editingRequest?.total_amount_bdt || 0).toLocaleString() }}</p>
                                 <p class="text-xs text-slate-500 mt-1">This is calculated automatically based on price, quantity, and charges</p>
                             </div>
-                            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                            <div class="flex justify-end gap-3 pt-4 border-t border-white/10">
                                 <button type="button" @click="editingRequest = null"
                                     class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
                                     Cancel
                                 </button>
                                 <button type="submit"
-                                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-semibold">
+                                    class="px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors font-semibold">
                                     Save Changes
                                 </button>
                             </div>

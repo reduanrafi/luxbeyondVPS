@@ -1,48 +1,38 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-background">
         <div class="flex">
             <!-- Sidebar -->
-            <aside class="hidden lg:block w-80 shrink-0 bg-white border-r border-gray-200 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto">
+            <aside
+                class="hidden lg:block w-80 shrink-0 bg-surface border-r border-white/10 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto">
                 <!-- Sidebar Events Carousel -->
-                <div v-if="sidebarEvents.length > 0" class="p-1 border-b border-gray-200">
+                <div v-if="sidebarEvents.length > 0" class="p-1 border-b border-white/10">
                     <div class="relative">
                         <!-- Carousel Container -->
                         <div class="overflow-hidden rounded-lg">
-                            <div 
-                                class="flex transition-transform duration-500 ease-in-out"
-                                :style="{ transform: `translateY(-${currentSidebarSlide * 100}%)` }"
-                            >
-                                <div 
-                                    v-for="event in sidebarEvents" 
-                                    :key="event.id" 
-                                    class="w-full shrink-0"
-                                >
-                                    <router-link 
-                                        :to="event.url || `/shop?events=${event.slug}`"
+                            <div class="flex transition-transform duration-500 ease-in-out"
+                                :style="{ transform: `translateY(-${currentSidebarSlide * 100}%)` }">
+                                <div v-for="event in sidebarEvents" :key="event.id" class="w-full shrink-0">
+                                    <router-link :to="event.url || `/shop?events=${event.slug}`"
                                         class="block rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
-                                        :style="event.image_url 
-                                            ? {} 
-                                            : { backgroundColor: event.bg_color || '#7c3aed' }"
-                                    >
-                                        <img 
-                                            v-if="event.image_url || event.banner_image_url"
-                                            :src="event.image_url || event.banner_image_url" 
-                                            :alt="event.name"
-                                            class="w-full h-20 object-cover"
-                                        />
+                                        :style="event.image_url
+                                            ? {}
+    : { backgroundColor: event.bg_color || '#7c3aed' }">
+                                        <img v-if="event.image_url || event.banner_image_url"
+                                            :src="event.image_url || event.banner_image_url" :alt="event.name"
+                                            class="w-full h-20 object-cover" />
                                         <div v-else class="w-full h-32 flex items-center justify-center p-4"
-                                            :style="{ backgroundColor: event.bg_color || '#7c3aed' }"
-                                        >
+                                            :style="{ backgroundColor: event.bg_color || '#7c3aed' }">
                                             <div class="text-center text-white">
                                                 <h3 class="text-lg font-bold mb-1">{{ event.name }}</h3>
-                                                <p v-if="event.short_description" class="text-xs opacity-90 line-clamp-2">{{ event.short_description }}</p>
+                                                <p v-if="event.short_description"
+                                                    class="text-xs opacity-90 line-clamp-2">{{ event.short_description
+                                                    }}</p>
                                             </div>
                                         </div>
                                         <!-- Only show button if no image and show_button is enabled -->
-                                        <div v-if="!event.image_url && event.show_button && event.bg_color" 
+                                        <div v-if="!event.image_url && event.show_button && event.bg_color"
                                             class="p-3 text-center"
-                                            :style="{ backgroundColor: event.button_color || '#7c3aed' }"
-                                        >
+                                            :style="{ backgroundColor: event.button_color || '#7c3aed' }">
                                             <span class="text-white font-semibold text-sm">
                                                 {{ event.button_text || 'Shop Now' }}
                                             </span>
@@ -51,80 +41,59 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Navigation Buttons -->
                         <div v-if="sidebarEvents.length > 1" class="flex items-center justify-center gap-2 mt-3">
-                            <button 
-                                @click="prevSidebarSlide"
-                                class="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                            >
+                            <button @click="prevSidebarSlide"
+                                class="p-1 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 transition-colors">
                                 <ChevronUp class="w-4 h-4" />
                             </button>
                             <div class="flex gap-1">
-                                <button 
-                                    v-for="(event, index) in sidebarEvents" 
-                                    :key="event.id"
-                                    @click="currentSidebarSlide = index"
-                                    class="w-2 h-2 rounded-full transition-all"
-                                    :class="currentSidebarSlide === index ? 'bg-primary w-4' : 'bg-gray-300'"
-                                ></button>
+                                <button v-for="(event, index) in sidebarEvents" :key="event.id"
+                                    @click="currentSidebarSlide = index" class="w-2 h-2 rounded-full transition-all"
+                                    :class="currentSidebarSlide === index ? 'bg-primary w-4' : 'bg-white/20'"></button>
                             </div>
-                            <button 
-                                @click="nextSidebarSlide"
-                                class="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                            >
+                            <button @click="nextSidebarSlide"
+                                class="p-1 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 transition-colors">
                                 <ChevronDown class="w-4 h-4" />
                             </button>
                         </div>
                     </div>
                 </div>
-                <h2 class="p-4 border-b border-gray-200 text-lg font-bold text-gray-900 mb-2" v-else>
+                <h2 class="p-4 border-b border-white/10 text-lg font-bold text-white mb-2" v-else>
                     Shop By Category
                 </h2>
-                    <ShopSidebar />
+                <ShopSidebar />
             </aside>
 
             <!-- Main content -->
-            <main class="flex-1 min-h-screen mb-5">
+            <main class="flex-1 w-full min-h-[calc(100vh-5rem)] pb-10 mx-auto">
                 <!-- Hero Events Carousel -->
                 <div v-if="heroEvents.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
                     <div class="relative">
                         <!-- Carousel Container -->
                         <div class="overflow-hidden rounded-2xl mt-5">
-                            <div 
-                                class="flex transition-transform duration-500 ease-in-out h-[400px]"
-                                :style="{ transform: `translateX(-${currentHeroSlide * 100}%)` }"
-                            >
-                                <div 
-                                    v-for="event in heroEvents" 
-                                    :key="event.id" 
-                                    class="w-full shrink-0"
-                                >
-                                    <router-link 
-                                        :to="event.url || `/shop?events=${event.slug}`"
+                            <div class="flex transition-transform duration-500 ease-in-out h-[400px]"
+                                :style="{ transform: `translateX(-${currentHeroSlide * 100}%)` }">
+                                <div v-for="event in heroEvents" :key="event.id" class="w-full shrink-0">
+                                    <router-link :to="event.url || `/shop?events=${event.slug}`"
                                         class="block overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
-                                        :style="event.banner_image_url || event.image_url 
-                                            ? {} 
-                                            : { backgroundColor: event.bg_color || '#7c3aed' }"
-                                    >
-                                        <img 
-                                            v-if="event.banner_image_url || event.image_url"
-                                            :src="event.banner_image_url || event.image_url" 
-                                            :alt="event.name"
-                                            class="w-full h-full object-cover object-center"
-                                        />
+                                        :style="event.banner_image_url || event.image_url
+                                            ? {}
+                                            : { backgroundColor: event.bg_color || '#7c3aed' }">
+                                        <img v-if="event.banner_image_url || event.image_url"
+                                            :src="event.banner_image_url || event.image_url" :alt="event.name"
+                                            class="w-full h-full object-cover object-center" />
                                         <!-- Only show text/button if no banner/image -->
                                         <div v-else class="w-full h-64 flex items-center justify-center p-8"
-                                            :style="{ backgroundColor: event.bg_color || '#7c3aed' }"
-                                        >
+                                            :style="{ backgroundColor: event.bg_color || '#7c3aed' }">
                                             <div class="text-center text-white">
                                                 <h2 class="text-3xl font-bold mb-2">{{ event.name }}</h2>
-                                                <p v-if="event.short_description" class="text-lg opacity-90">{{ event.short_description }}</p>
-                                                <button 
-                                                    v-if="event.show_button"
+                                                <p v-if="event.short_description" class="text-lg opacity-90">{{
+                                                    event.short_description }}</p>
+                                                <button v-if="event.show_button"
                                                     class="mt-4 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:scale-105"
-                                                    :style="{ backgroundColor: event.button_color || '#ffffff', color: getContrastColor(event.button_color || '#ffffff') }"
-                                                >
+                                                    :style="{ backgroundColor: event.button_color || '#ffffff', color: getContrastColor(event.button_color || '#ffffff') }">
                                                     {{ event.button_text || 'Shop Now' }}
                                                 </button>
                                             </div>
@@ -133,32 +102,23 @@
                                 </div>
                             </div>
                         </div>
-                            
+
                         <!-- Navigation Buttons -->
-                        <button 
-                            v-if="heroEvents.length > 1"
-                            @click="prevHeroSlide"
-                            class="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all z-10"
-                        >
-                            <ChevronLeft class="w-6 h-6 text-gray-700" />
+                        <button v-if="heroEvents.length > 1" @click="prevHeroSlide"
+                            class="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-surface/90 hover:bg-surface shadow-lg transition-all z-10">
+                            <ChevronLeft class="w-6 h-6 text-slate-300" />
                         </button>
-                        <button 
-                            v-if="heroEvents.length > 1"
-                            @click="nextHeroSlide"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg transition-all z-10"
-                        >
-                            <ChevronRight class="w-6 h-6 text-gray-700" />
+                        <button v-if="heroEvents.length > 1" @click="nextHeroSlide"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-surface/90 hover:bg-surface shadow-lg transition-all z-10">
+                            <ChevronRight class="w-6 h-6 text-slate-300" />
                         </button>
-                        
+
                         <!-- Indicators -->
-                        <div v-if="heroEvents.length > 1" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                            <button 
-                                v-for="(event, index) in heroEvents" 
-                                :key="event.id"
-                                @click="currentHeroSlide = index"
-                                class="w-2 h-2 rounded-full transition-all"
-                                :class="currentHeroSlide === index ? 'bg-white w-6' : 'bg-white/50'"
-                            ></button>
+                        <div v-if="heroEvents.length > 1"
+                            class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                            <button v-for="(event, index) in heroEvents" :key="event.id"
+                                @click="currentHeroSlide = index" class="w-2 h-2 rounded-full transition-all"
+                                :class="currentHeroSlide === index ? 'bg-surface w-6' : 'bg-white/50'"></button>
                         </div>
                     </div>
                 </div>
@@ -169,24 +129,30 @@
                 </div> -->
 
                 <!-- Products Section -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 px-4">
 
-                    <div class="flex items-center justify-between mb-6">
-                        <div v-if="filters.category" class="p-2 border border-gray-2 text-xs rounded-full flex items-center gap-2 cursor-pointer" @click="clearFilters">
-                            {{ filters.category }} 
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <!-- Mobile Filter Button -->
+                        <button @click="showMobileFilters = true"
+                            class="lg:hidden w-full md:w-auto px-4 py-2 bg-surface border border-white/10 text-slate-300 font-medium rounded-none hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 uppercase tracking-wider text-sm">
+                            <Filter class="w-4 h-4" />
+                            Filters
+                        </button>
+
+                        <div v-if="filters.category"
+                            class="p-2 border border-gray-2 text-xs rounded-full flex items-center gap-2 cursor-pointer"
+                            @click="clearFilters">
+                            {{ filters.category }}
                             <X class="w-4 h-4" />
                         </div>
-                        
+
                     </div>
 
                     <!-- Toolbar: View Mode & Sort -->
                     <div class="flex items-center justify-between mb-6">
-                         <!-- Sort Dropdown -->
-                         <select
-                            v-model="sortBy"
-                            @change="applyFilters"
-                            class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        >
+                        <!-- Sort Dropdown -->
+                        <select v-model="sortBy" @change="applyFilters"
+                            class="py-2 bg-surface border border-white/10 rounded-none text-sm text-slate-300 focus:outline-none focus:border-primary transition-colors cursor-pointer uppercase tracking-wider">
                             <option value="latest">Latest</option>
                             <option value="price_low">Price: Low to High</option>
                             <option value="price_high">Price: High to Low</option>
@@ -194,114 +160,110 @@
                             <option value="name_desc">Name: Z to A</option>
                         </select>
                         <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
-                                <button
-                                    @click="viewMode = 'grid'"
-                                    :class="[
-                                        'p-2 rounded transition-colors',
-                                        viewMode === 'grid' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'
-                                    ]"
-                                >
-                                    <Grid class="w-5 h-5" />
+                            <div class="flex items-center gap-1 bg-surface border border-white/10 p-1">
+                                <button @click="viewMode = 'grid'" :class="[
+                                    'p-2 transition-colors rounded-sm',
+                                    viewMode === 'grid' ? 'bg-primary text-slate-900' : 'text-slate-500 hover:text-primary'
+                                ]">
+                                    <Grid class="w-4 h-4" />
                                 </button>
-                                <button
-                                    @click="viewMode = 'list'"
-                                    :class="[
-                                        'p-2 rounded transition-colors',
-                                        viewMode === 'list' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'
-                                    ]"
-                                >
-                                    <List class="w-5 h-5" />
+                                <button @click="viewMode = 'list'" :class="[
+                                    'p-2 transition-colors rounded-sm',
+                                    viewMode === 'list' ? 'bg-primary text-slate-900' : 'text-slate-500 hover:text-primary'
+                                ]">
+                                    <List class="w-4 h-4" />
                                 </button>
                             </div>
-                            <!-- <span class="text-sm text-gray-600">
+                        </div>
+                        <!-- <span class="text-sm text-gray-600">
                                 Showing {{ products.length }} of {{ totalProducts }} products
                             </span> -->
-                        </div>
-
-                       
                     </div>
+                </div>
 
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <!-- Loading State -->
                     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        <div v-for="n in 8" :key="n" class="bg-white rounded-xl border border-gray-200 animate-pulse">
-                            <div class="aspect-square bg-gray-200"></div>
+                        <div v-for="n in 8" :key="n" class="bg-surface rounded-xl border border-white/10 animate-pulse">
+                            <div class="aspect-square bg-white/5"></div>
                             <div class="p-4 space-y-2">
-                                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
-                                <div class="h-6 bg-gray-200 rounded w-1/3"></div>
+                                <div class="h-4 bg-white/10 rounded w-3/4"></div>
+                                <div class="h-4 bg-white/10 rounded w-1/2"></div>
+                                <div class="h-6 bg-white/10 rounded w-1/3"></div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Products Grid/List -->
-                    <div
-                        v-else-if="products.length > 0"
-                        :class="[
-                            'gap-6',
-                            viewMode === 'grid'
-                                ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                                : 'flex flex-col space-y-1'
-                        ]"
-                    >
-                        <ProductCard
-                            v-for="product in products"
-                            :key="product.id"
-                            :product="product"
-                            :view-mode="viewMode"
-                        />
+                    <div v-else-if="products.length > 0" :class="[
+                        'gap-6',
+                        viewMode === 'grid'
+                            ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+                            : 'flex flex-col space-y-1'
+                    ]">
+                        <ProductCard v-for="product in products" :key="product.id" :product="product"
+                            :view-mode="viewMode" />
                     </div>
 
                     <!-- Empty State -->
                     <div v-else class="text-center py-16">
-                        <Package class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
-                        <p class="text-gray-600 mb-6">Try adjusting your filters or search query</p>
-                        <button
-                            @click="clearFilters"
-                            class="px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all"
-                        >
+                        <Package class="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                        <h3 class="text-xl font-bold text-white mb-2">No products found</h3>
+                        <p class="text-slate-400 mb-6">Try adjusting your filters or search query</p>
+                        <button @click="clearFilters"
+                            class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover hover:rounded-full transition-all">
                             Clear Filters
                         </button>
                     </div>
 
                     <!-- Pagination -->
-                    <div v-if="totalPages > 1" class="mt-8 flex items-center justify-center gap-2">
-                        <button
-                            @click="goToPage(currentPage - 1)"
-                            :disabled="currentPage === 1"
-                            class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                        >
+                    <div v-if="totalPages > 1" class="mt-12 flex items-center justify-center gap-2">
+                        <button @click="goToPage(currentPage - 1)" :disabled="currentPage === 1"
+                            class="p-2 border border-white/10 text-slate-500 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all rounded-none">
                             <ChevronLeft class="w-5 h-5" />
                         </button>
 
-                        <button
-                            v-for="page in visiblePages"
-                            :key="page"
-                            @click="goToPage(page)"
-                            :class="[
-                                'px-4 py-2 rounded-lg transition-all',
-                                page === currentPage
-                                    ? 'bg-primary text-white font-semibold'
-                                    : 'border border-gray-300 hover:bg-gray-50'
-                            ]"
-                        >
+                        <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" :class="[
+                            'px-4 py-2 border transition-all text-sm font-medium rounded-none',
+                            page === currentPage
+                                ? 'bg-primary border-primary text-slate-900 font-bold'
+                                : 'border-white/10 text-slate-500 hover:border-primary hover:text-primary'
+                        ]">
                             {{ page }}
                         </button>
 
-                        <button
-                            @click="goToPage(currentPage + 1)"
-                            :disabled="currentPage === totalPages"
-                            class="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                        >
+                        <button @click="goToPage(currentPage + 1)" :disabled="currentPage === totalPages"
+                            class="p-2 border border-white/10 text-slate-500 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-all rounded-none">
                             <ChevronRight class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
             </main>
         </div>
-    </div>
 
+        <!-- Mobile Filters Drawer -->
+        <div v-if="showMobileFilters" class="fixed inset-0 z-50 lg:hidden">
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+                @click="showMobileFilters = false"></div>
+
+            <!-- Drawer Panel -->
+            <div
+                class="absolute inset-y-0 left-0 w-80 max-w-[85vw] bg-surface border-r border-white/10 shadow-2xl transform transition-transform duration-300 flex flex-col">
+                <div class="p-4 border-b border-white/10 flex items-center justify-between bg-surface">
+                    <h2 class="text-lg font-bold text-white uppercase tracking-wider">Filters</h2>
+                    <button @click="showMobileFilters = false"
+                        class="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                        <X class="w-5 h-5" />
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-4">
+                    <ShopSidebar />
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -315,6 +277,10 @@ import ShopSidebar from '@/components/shop/ShopSidebar.vue';
 
 const route = useRoute();
 const router = useRouter();
+
+// Mobile Filters State
+const showMobileFilters = ref(false);
+
 const products = ref([]);
 const categories = ref([]);
 const brands = ref([]);
@@ -540,7 +506,7 @@ const fetchEvents = async () => {
         });
         sidebarEvents.value = sidebarResponse.data || [];
         currentSidebarSlide.value = 0; // Reset to first slide
-        
+
         // Start carousels after fetching - use nextTick to ensure DOM is ready
         await nextTick();
         setTimeout(() => {
@@ -600,7 +566,7 @@ const prevSidebarSlide = () => {
 const startCarousels = () => {
     // Stop any existing intervals first
     stopCarousels();
-    
+
     // Auto-play hero carousel (every 5 seconds)
     if (heroEvents.value && heroEvents.value.length > 1) {
         heroCarouselInterval.value = setInterval(() => {
@@ -609,7 +575,7 @@ const startCarousels = () => {
             }
         }, 5000);
     }
-    
+
     // Auto-play sidebar carousel (every 6 seconds)
     if (sidebarEvents.value && sidebarEvents.value.length > 1) {
         sidebarCarouselInterval.value = setInterval(() => {

@@ -13,7 +13,7 @@
             </div>
 
             <!-- Main Form Card -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6">
+            <div class="bg-surface rounded-2xl shadow-xl border border-white/10 overflow-hidden mb-6">
                 <!-- Form Header -->
                 <div class="bg-gradient-to-r from-primary to-primary/90 px-6 py-4">
                     <h2 class="text-xl font-bold text-white">Product Request Form</h2>
@@ -43,7 +43,7 @@
                                         type="url" 
                                         required 
                                         placeholder="https://amazon.com/product-link"
-                                        class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                     />
                                 </div>
                                 <p class="mt-2 text-xs text-slate-500 flex items-center gap-1">
@@ -70,7 +70,7 @@
                                             required 
                                             placeholder="0.00"
                                             @input="calculateEstimate"
-                                            class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                            class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -81,7 +81,7 @@
                                     <select 
                                         v-model="form.currency"
                                         @change="onCurrencyChange"
-                                        class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white"
+                                        class="w-full px-4 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-surface"
                                     >
                                         <option value="">Select Currency</option>
                                         <option v-for="currency in currencies" :key="currency.id" :value="currency.code">
@@ -108,7 +108,7 @@
                                             required 
                                             placeholder="1"
                                             @input="calculateEstimate"
-                                            class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                            class="w-full px-4 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                         />
                                     </div>
                                 </div>
@@ -125,7 +125,7 @@
                                             min="0"
                                             placeholder="0.00"
                                             @input="calculateEstimate"
-                                            class="w-full px-4 pr-12 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                            class="w-full px-4 pr-12 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                         />
                                     </div>
                                     <p class="mt-1 text-xs text-slate-500">Required for accurate shipping calculation</p>
@@ -135,7 +135,7 @@
                     </div>
 
                     <!-- Divider -->
-                    <div class="border-t border-gray-200 my-6"></div>
+                    <div class="border-t border-white/10 my-6"></div>
 
                     <!-- Step 2: Shipping & Delivery -->
                     <div class="mb-6">
@@ -163,7 +163,7 @@
                                         min="0"
                                         placeholder="0.00"
                                         @input="calculateEstimate"
-                                        class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        class="w-full pl-12 pr-4 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                     />
                                 </div>
                                 <p class="mt-2 text-xs text-slate-500">
@@ -182,12 +182,12 @@
                                         @click="form.is_inside_city = true"
                                         :class="form.is_inside_city 
                                             ? 'border-2 border-primary bg-primary/5' 
-                                            : 'border-2 border-gray-200 hover:border-gray-300'"
+                                            : 'border-2 border-white/10 hover:border-gray-300'"
                                         class="p-4 rounded-lg transition-all text-left group"
                                     >
                                         <div class="flex items-center gap-3">
                                             <div :class="form.is_inside_city 
-                                                ? 'bg-primary text-white' 
+                                                ? 'bg-primary text-slate-900' 
                                                 : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'"
                                                 class="w-5 h-5 rounded-full flex items-center justify-center transition-all">
                                                 <CheckCircle v-if="form.is_inside_city" class="w-3 h-3" />
@@ -203,12 +203,12 @@
                                         @click="form.is_inside_city = false"
                                         :class="!form.is_inside_city 
                                             ? 'border-2 border-primary bg-primary/5' 
-                                            : 'border-2 border-gray-200 hover:border-gray-300'"
+                                            : 'border-2 border-white/10 hover:border-gray-300'"
                                         class="p-4 rounded-lg transition-all text-left group"
                                     >
                                         <div class="flex items-center gap-3">
                                             <div :class="!form.is_inside_city 
-                                                ? 'bg-primary text-white' 
+                                                ? 'bg-primary text-slate-900' 
                                                 : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'"
                                                 class="w-5 h-5 rounded-full flex items-center justify-center transition-all">
                                                 <CheckCircle v-if="!form.is_inside_city" class="w-3 h-3" />
@@ -230,7 +230,7 @@
                                 <select 
                                     v-model="form.payment_method"
                                     @change="calculateEstimate"
-                                    class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white"
+                                    class="w-full px-4 py-3 rounded-lg border-2 border-white/10 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-surface"
                                 >
                                     <option value="">Select Payment Method</option>
                                     <option v-for="method in paymentMethods" :key="method.id" :value="method.type">
@@ -245,7 +245,7 @@
                     </div>
 
                     <!-- Divider -->
-                    <div class="border-t border-gray-200 my-6"></div>
+                    <div class="border-t border-white/10 my-6"></div>
 
                     <!-- Step 3: Cost Summary -->
                     <div class="mb-6">
@@ -257,7 +257,7 @@
                         </div>
 
                         <div class="pl-12">
-                            <div v-if="calculationLoading" class="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                            <div v-if="calculationLoading" class="p-6 bg-gray-50 rounded-lg border border-white/10 text-center">
                                 <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary mb-2"></div>
                                 <p class="text-sm text-gray-600">Calculating charges...</p>
                             </div>
@@ -321,10 +321,10 @@
                                             <div 
                                                 v-for="(charge, index) in costBreakdown.breakdown" 
                                                 :key="index"
-                                                class="flex items-start justify-between text-xs bg-white/70 rounded-lg p-3 hover:bg-white transition-colors border border-green-100"
+                                                class="flex items-start justify-between text-xs bg-surface/70 rounded-lg p-3 hover:bg-surface transition-colors border border-green-100"
                                             >
                                                 <div class="flex-1 min-w-0 pr-3">
-                                                    <div class="font-bold text-gray-900 truncate mb-1">{{ charge.charge }}</div>
+                                                    <div class="font-bold text-white truncate mb-1">{{ charge.charge }}</div>
                                                     <div class="text-gray-500 capitalize text-[10px] mb-1">{{ charge.type }}</div>
                                                     <div v-if="charge.calculation_type === 'percentage'" class="text-gray-400 text-[10px]">
                                                         {{ charge.value }}% of base amount
@@ -334,7 +334,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="text-right shrink-0 border-l border-green-200 pl-3 min-w-[100px]">
-                                                    <div class="font-bold text-gray-900 mb-1">
+                                                    <div class="font-bold text-white mb-1">
                                                         {{ charge.currency_symbol || charge.currency }} {{ parseFloat(charge.amount_in_currency || charge.amount || 0).toFixed(2) }}
                                                     </div>
                                                     <div v-if="charge.amount_in_bdt && charge.currency !== 'BDT'" class="text-[10px] text-gray-600 font-medium">
@@ -365,18 +365,18 @@
                                     Final amount may vary based on actual weight and exchange rates
                                 </p>
                             </div>
-                            <div v-else class="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center text-gray-500">
+                            <div v-else class="p-6 bg-gray-50 rounded-lg border border-white/10 text-center text-gray-500">
                                 Fill in product details to see cost estimate
                             </div>
                         </div>
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/10">
                         <button 
                             type="submit" 
                             :disabled="requestStore.loading || !isFormValid"
-                            class="flex-1 py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                            class="flex-1 py-4 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                         >
                             <span v-if="requestStore.loading" class="flex items-center gap-2">
                                 <span class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
@@ -389,7 +389,7 @@
                         </button>
                         <router-link 
                             to="/dashboard/requests"
-                            class="px-6 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all text-center"
+                            class="px-6 py-4 border-2 border-gray-300 text-slate-300 font-semibold rounded-lg hover:bg-gray-50 transition-all text-center"
                         >
                             View My Requests
                         </router-link>
@@ -407,28 +407,28 @@
 
             <!-- Trust Indicators -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                <div class="bg-surface p-4 rounded-xl shadow-md border border-white/10 text-center hover:shadow-lg transition-shadow">
                     <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <CheckCircle class="w-5 h-5 text-green-600" />
                     </div>
                     <p class="font-semibold text-slate-900 text-sm">100% Secure</p>
                     <p class="text-xs text-slate-500 mt-0.5">Protected Payment</p>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                <div class="bg-surface p-4 rounded-xl shadow-md border border-white/10 text-center hover:shadow-lg transition-shadow">
                     <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <CheckCircle class="w-5 h-5 text-blue-600" />
                     </div>
                     <p class="font-semibold text-slate-900 text-sm">Fast Processing</p>
                     <p class="text-xs text-slate-500 mt-0.5">24-48 hours</p>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                <div class="bg-surface p-4 rounded-xl shadow-md border border-white/10 text-center hover:shadow-lg transition-shadow">
                     <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <Globe class="w-5 h-5 text-purple-600" />
                     </div>
                     <p class="font-semibold text-slate-900 text-sm">Worldwide</p>
                     <p class="text-xs text-slate-500 mt-0.5">Any country</p>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
+                <div class="bg-surface p-4 rounded-xl shadow-md border border-white/10 text-center hover:shadow-lg transition-shadow">
                     <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <CheckCircle class="w-5 h-5 text-orange-600" />
                     </div>

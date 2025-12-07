@@ -7,19 +7,19 @@
                 <p class="text-sm text-slate-600 mt-1">Manage your product inventory</p>
             </div>
             <router-link to="/admin/products/create"
-                class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Product
             </router-link>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search products..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.category" @change="fetchProducts(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="all">All Categories</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Clothing">Clothing</option>
@@ -27,7 +27,7 @@
                     <option value="Accessories">Accessories</option>
                 </select>
                 <select v-model="filters.status" @change="fetchProducts(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option value="in_stock">In Stock</option>
                     <option value="low_stock">Low Stock</option>
@@ -41,16 +41,16 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading products...</p>
         </div>
 
         <!-- Products Table -->
-        <div v-else class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div v-else class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 border-b border-white/10">
                         <tr>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">Product</th>
                             <th class="text-left py-4 px-6 text-sm font-semibold text-slate-700">SKU</th>
@@ -117,7 +117,7 @@
                     Previous
                 </button>
                 <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                    :class="page === pagination.current_page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'"
+                    :class="page === pagination.current_page ? 'bg-primary text-slate-900' : 'border border-gray-300 hover:bg-gray-50'"
                     class="px-4 py-2 rounded-lg font-medium text-sm transition-colors">
                     {{ page }}
                 </button>

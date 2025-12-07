@@ -1,14 +1,10 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30">
+    <div class="min-h-screen bg-background">
         <!-- Sidebar -->
         <aside
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-primary via-primary to-purple-900 shadow-2xl transform transition-transform duration-300"
+            class="fixed inset-y-0 left-0 z-50 w-72 bg-surface border-r border-white/5 shadow-xl transform transition-transform duration-300"
             :class="{ '-translate-x-full': !isSidebarOpen, 'translate-x-0': isSidebarOpen, 'lg:translate-x-0': true }">
             <div class="h-full flex flex-col relative overflow-hidden">
-                <!-- Decorative Background -->
-                <div
-                    class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30">
-                </div>
 
                 <!-- Logo -->
                 <div class="relative h-20 flex items-center px-6 border-b border-white/10">
@@ -24,27 +20,28 @@
                 <!-- Navigation -->
                 <nav class="relative flex-1 overflow-y-auto py-8 px-4 space-y-2">
                     <router-link v-for="item in navigation.filter(i => !i.action)" :key="item.name" :to="item.href"
-                        class="flex items-center gap-4 px-5 py-3.5 text-sm font-semibold rounded-xl transition-all duration-200 group"
+                        class="flex items-center gap-4 px-5 py-3.5 text-sm font-semibold transition-all duration-200 group rounded-lg"
                         :class="[
                             isActive(item.href)
-                                ? 'bg-white text-primary shadow-xl shadow-black/10 scale-105'
-                                : 'text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1'
+        ? 'bg-primary text-slate-900 font-bold shadow-md'
+        : 'text-slate-400 hover:bg-white/5 hover:text-white'
                         ]" @click="isSidebarOpen = false">
                         <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110"
-                            :class="isActive(item.href) ? 'text-primary' : 'text-white/90'" />
+                            :class="isActive(item.href) ? 'text-slate-900' : 'text-current'" />
                         <span>{{ item.name }}</span>
                     </router-link>
-                    <button v-for="item in navigation.filter(i => i.action)" :key="item.name" 
+                    <button v-for="item in navigation.filter(i => i.action)" :key="item.name"
                         @click="handleAction(item.action); isSidebarOpen = false"
-                        class="w-full flex items-center gap-4 px-5 py-3.5 text-sm font-semibold rounded-xl transition-all duration-200 group text-white/80 hover:bg-white/10 hover:text-white hover:translate-x-1">
-                        <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110 text-white/90" />
+                        class="w-full flex items-center gap-4 px-5 py-3.5 text-sm font-semibold transition-all duration-200 group text-slate-400 hover:bg-white/5 hover:text-white rounded-lg">
+                        <component :is="item.icon"
+                            class="w-5 h-5 transition-transform group-hover:scale-110 text-current" />
                         <span>{{ item.name }}</span>
-                        <span v-if="item.action === 'cart' && cartStore.totalItems > 0" 
-                            class="ml-auto bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        <span v-if="item.action === 'cart' && cartStore.totalItems > 0"
+                            class="ml-auto bg-primary text-slate-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                             {{ cartStore.totalItems }}
                         </span>
-                        <span v-if="item.action === 'wishlist' && wishlistStore.items.length > 0" 
-                            class="ml-auto bg-accent text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        <span v-if="item.action === 'wishlist' && wishlistStore.items.length > 0"
+                            class="ml-auto bg-primary text-slate-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                             {{ wishlistStore.items.length }}
                         </span>
                     </button>
@@ -87,7 +84,7 @@
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden lg:ml-72">
             <!-- Desktop Header -->
             <header
-                class="hidden lg:block bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm fixed top-0 right-0 left-0 lg:left-72 z-30">
+                class="hidden lg:block bg-surface/80 backdrop-blur-md border-b border-white/10  shadow-sm fixed top-0 right-0 left-0 lg:left-72 z-30">
                 <div class="flex items-center justify-between px-8 h-20">
                     <div>
                         <h1 class="text-2xl font-bold text-slate-900">{{ currentPageTitle }}</h1>
@@ -104,7 +101,7 @@
 
             <!-- Mobile Header -->
             <header
-                class="bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm lg:hidden fixed top-0 left-0 right-0 z-30">
+                class="bg-surface/90 backdrop-blur-md border-b border-white/10 shadow-sm lg:hidden fixed top-0 left-0 right-0 z-30">
                 <div class="flex items-center justify-between px-4 h-16">
                     <button @click="isSidebarOpen = true"
                         class="p-2 -ml-2 text-gray-600 hover:text-primary transition-colors">

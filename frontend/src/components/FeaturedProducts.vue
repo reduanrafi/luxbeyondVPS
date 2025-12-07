@@ -1,16 +1,17 @@
 <template>
-    <section id="products" class="py-20 bg-gray-50">
+    <section id="products" class="py-20 bg-background">
         <div class="px-4 sm:px-6 lg:px-8 mx-10">
             <!-- Section Header -->
             <div class="text-center mb-16">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4">
                     <Star class="w-4 h-4 fill-current" />
                     Featured Collection
                 </div>
-                <h2 class="text-4xl font-bold text-gray-900 sm:text-5xl mb-4">
+                <h2 class="text-4xl font-bold text-primary sm:text-5xl mb-4">
                     Handpicked for You
                 </h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p class="text-lg text-slate-400 max-w-2xl mx-auto">
                     Discover our curated selection of premium products, ready for immediate delivery
                 </p>
             </div>
@@ -26,17 +27,9 @@
 
             <!-- Products Grid -->
             <div v-else-if="products.length > 0" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
-                <ProductCard
-                    v-for="product in products"
-                    :key="product.id"
-                    :product="product"
-                    view-mode="grid"
-                    :show-stock="true"
-                    :show-category="true"
-                    :show-brand="true"
-                    :show-quick-view="true"
-                    :show-wishlist="true"
-                />
+                <ProductCard v-for="product in products" :key="product.id" :product="product" view-mode="grid"
+                    :show-stock="true" :show-category="true" :show-brand="true" :show-quick-view="true"
+                    :show-wishlist="true" />
             </div>
 
             <!-- Empty State -->
@@ -44,7 +37,7 @@
                 <div class="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-4">
                     <Package class="w-10 h-10 text-gray-400" />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">No Featured Products</h3>
+                <h3 class="text-xl font-semibold text-white mb-2">No Featured Products</h3>
                 <p class="text-gray-500 mb-6">Check back soon for our featured collection</p>
                 <router-link to="/shop">
                     <Button variant="primary" size="lg">Browse All Products</Button>

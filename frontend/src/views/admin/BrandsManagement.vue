@@ -7,19 +7,19 @@
                 <p class="text-sm text-slate-600 mt-1">Manage product brands</p>
             </div>
             <button @click="showAddModal = true"
-                class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Brand
             </button>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search brands..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status" @change="fetchBrands(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading brands...</p>
         </div>
@@ -40,11 +40,11 @@
         <!-- Brands Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-if="brands.length === 0"
-                class="col-span-full bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center text-slate-500">
+                class="col-span-full bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center text-slate-500">
                 No brands found
             </div>
             <div v-for="brand in brands" :key="brand.id"
-                class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden hover:shadow-lg transition-shadow">
                 <div class="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                     <img v-if="brand.image_url" :src="brand.image_url" :alt="brand.name"
                         class="h-full w-full object-contain p-4">
@@ -54,7 +54,7 @@
                     <div class="flex items-start justify-between mb-2">
                         <h3 class="font-bold text-lg text-slate-900">{{ brand.name }}</h3>
                         <span class="px-2 py-1 rounded-full text-xs font-semibold"
-                            :class="brand.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'">
+                            :class="brand.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-slate-300'">
                             {{ brand.is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
@@ -63,8 +63,7 @@
                     <div class="flex items-center justify-between">
                         <span class="text-sm text-slate-500">{{ brand.products_count || 0 }} products</span>
                         <div class="flex items-center gap-2">
-                            <button @click="editBrand(brand)"
-                                class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                            <button @click="editBrand(brand)" class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
                                 <Edit class="w-4 h-4 text-blue-600" />
                             </button>
                             <button @click="deleteBrand(brand.id)"
@@ -88,7 +87,7 @@
                     Previous
                 </button>
                 <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                    :class="page === pagination.current_page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'"
+                    :class="page === pagination.current_page ? 'bg-primary text-slate-900' : 'border border-gray-300 hover:bg-gray-50'"
                     class="px-4 py-2 rounded-lg font-medium text-sm transition-colors">
                     {{ page }}
                 </button>
@@ -103,7 +102,7 @@
         <!-- Add/Edit Modal -->
         <div v-if="showAddModal || showEditModal"
             class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <div class="bg-surface rounded-xl shadow-2xl max-w-md w-full p-6">
                 <h3 class="text-xl font-bold text-slate-900 mb-4">{{ showEditModal ? 'Edit Brand' : 'Add Brand' }}
                 </h3>
                 <form @submit.prevent="showEditModal ? updateBrand() : createBrand()" class="space-y-4">
@@ -138,7 +137,7 @@
                                 <p v-if="errors.image" class="text-xs text-red-500 mt-1">{{ errors.image[0] }}</p>
                             </div>
                             <div v-if="imagePreview"
-                                class="w-16 h-16 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0">
+                                class="w-16 h-16 bg-gray-100 rounded border border-white/10 overflow-hidden flex-shrink-0">
                                 <img :src="imagePreview" class="w-full h-full object-cover">
                             </div>
                         </div>
@@ -153,7 +152,7 @@
                             Cancel
                         </button>
                         <button type="submit"
-                            class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium">
+                            class="flex-1 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors font-medium">
                             {{ showEditModal ? 'Update' : 'Create' }}
                         </button>
                     </div>
@@ -314,7 +313,7 @@ const updateBrand = async () => {
     }
 
     try {
-        await axios.post(`/brands/${editingId.value}`, formData, {
+        await axios.post(`/admin/brands/${editingId.value}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         closeModal();
@@ -333,7 +332,7 @@ const deleteBrand = async (id) => {
     if (!confirm('Are you sure you want to delete this brand?')) return;
 
     try {
-        await axios.delete(`/brands/${id}`);
+        await axios.delete(`/admin/brands/${id}`);
         fetchBrands(pagination.value.current_page);
     } catch (error) {
         console.error('Error deleting brand:', error);

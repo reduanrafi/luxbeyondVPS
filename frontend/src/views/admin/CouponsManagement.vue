@@ -7,7 +7,7 @@
                 <p class="text-sm text-slate-600 mt-1">Manage discount coupons and promotional codes</p>
             </div>
             <button @click="showAddModal = true"
-                class="px-4 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Coupon
             </button>
@@ -38,19 +38,19 @@
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-xl shadow-md border border-gray-200 p-4">
+        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search coupons..."
                     class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <select v-model="filters.status" @change="fetchCoupons(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                     <option value="expired">Expired</option>
                 </select>
                 <select v-model="filters.type" @change="fetchCoupons(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                     <option value="">All Types</option>
                     <option value="fixed">Fixed Amount</option>
                     <option value="percent">Percentage</option>
@@ -63,16 +63,16 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p class="text-slate-600 mt-2">Loading coupons...</p>
         </div>
 
         <!-- Coupons Table -->
-        <div v-else class="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+        <div v-else class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-gray-50 border-b border-white/10">
                         <tr>
                             <th class="px-6 py-3 text-left">
                                 <input type="checkbox" @change="toggleSelectAll" :checked="isAllSelected"
@@ -94,7 +94,7 @@
                                 Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody class="bg-surface divide-y divide-gray-200">
                         <tr v-if="coupons.length === 0">
                             <td colspan="8" class="px-6 py-8 text-center text-slate-500">No coupons found</td>
                         </tr>
@@ -137,7 +137,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 rounded-full text-xs font-semibold"
-                                    :class="coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'">
+                                    :class="coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-slate-300'">
                                     {{ coupon.is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
@@ -170,7 +170,7 @@
                     Previous
                 </button>
                 <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                    :class="page === pagination.current_page ? 'bg-primary text-white' : 'border border-gray-300 hover:bg-gray-50'"
+                    :class="page === pagination.current_page ? 'bg-primary text-slate-900' : 'border border-gray-300 hover:bg-gray-50'"
                     class="px-4 py-2 rounded-lg font-medium text-sm transition-colors">
                     {{ page }}
                 </button>
@@ -185,12 +185,12 @@
         <!-- Add/Edit Modal -->
         <div v-if="showAddModal || showEditModal"
             class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-            <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full p-6 my-8">
+            <div class="bg-surface rounded-xl shadow-2xl max-w-3xl w-full p-6 my-8">
                 <h3 class="text-xl font-bold text-slate-900 mb-4">{{ showEditModal ? 'Edit Coupon' : 'Add Coupon' }}
                 </h3>
 
                 <!-- Tabs -->
-                <div class="flex border-b border-gray-200 mb-6">
+                <div class="flex border-b border-white/10 mb-6">
                     <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
                         class="px-4 py-2 text-sm font-medium transition-colors relative"
                         :class="currentTab === tab.id ? 'text-primary' : 'text-slate-600 hover:text-slate-900'">
@@ -214,7 +214,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Type *</label>
                                 <select v-model="form.type" required
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
                                     <option value="percent">Percentage</option>
                                     <option value="fixed">Fixed Amount</option>
                                 </select>
@@ -296,13 +296,13 @@
                             the coupon.</p>
                     </div>
 
-                    <div class="flex gap-3 pt-4 border-t border-gray-200">
+                    <div class="flex gap-3 pt-4 border-t border-white/10">
                         <button type="button" @click="closeModal"
                             class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                             Cancel
                         </button>
                         <button type="submit"
-                            class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors font-medium">
+                            class="flex-1 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors font-medium">
                             {{ showEditModal ? 'Update' : 'Create' }}
                         </button>
                     </div>

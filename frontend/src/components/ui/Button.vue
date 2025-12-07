@@ -32,11 +32,11 @@ const computedClasses = computed(() => {
     const baseClasses = 'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
-        primary: 'bg-primary text-white hover:bg-primary-hover focus:ring-primary',
-        secondary: 'bg-secondary text-white hover:bg-blue-600 focus:ring-secondary',
-        outline: 'border border-gray-300 bg-transparent text-slate-700 hover:bg-gray-50 focus:ring-gray-200',
-        ghost: 'bg-transparent text-slate-700 hover:bg-gray-100 focus:ring-gray-200',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+        primary: 'bg-primary text-slate-900 hover:bg-primary-hover hover:rounded-full focus:ring-primary',
+        secondary: 'bg-secondary text-slate-900 hover:bg-blue-600 hover:rounded-full focus:ring-secondary',
+        outline: 'border border-white/20 bg-transparent text-slate-300 hover:bg-slate-800 hover:rounded-full focus:ring-gray-200',
+        ghost: 'bg-transparent text-slate-300 hover:bg-slate-800 hover:rounded-full focus:ring-gray-200',
+        danger: 'bg-red-600 text-white hover:bg-red-700 hover:rounded-full focus:ring-red-500'
     };
 
     const sizes = {

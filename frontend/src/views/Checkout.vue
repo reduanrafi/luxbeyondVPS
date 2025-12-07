@@ -3,18 +3,18 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Header -->
             <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+                <h1 class="text-3xl font-bold text-white">Checkout</h1>
                 <p class="text-gray-600 mt-2">Complete your order securely</p>
             </div>
 
             <!-- Empty Cart State -->
-            <div v-if="cartStore.items.length === 0" class="bg-white rounded-2xl shadow-md border border-gray-200 p-12 text-center">
+            <div v-if="cartStore.items.length === 0" class="bg-surface rounded-2xl shadow-md border border-white/10 p-12 text-center">
                 <ShoppingCart class="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Your cart is empty</h3>
+                <h3 class="text-xl font-bold text-white mb-2">Your cart is empty</h3>
                 <p class="text-gray-600 mb-6">Add some products to your cart to continue</p>
                 <router-link
                     to="/shop"
-                    class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all"
+                    class="inline-block px-6 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark transition-all"
                 >
                     Continue Shopping
                 </router-link>
@@ -24,15 +24,15 @@
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Shipping Address -->
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <div class="bg-surface rounded-2xl shadow-md border border-white/10 p-6">
+                        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                             <MapPin class="w-6 h-6 text-primary" />
                             Shipping Address
                         </h2>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-slate-300 mb-2">
                                         Full Name <span class="text-red-500">*</span>
                                     </label>
                                     <input
@@ -44,7 +44,7 @@
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-slate-300 mb-2">
                                         Phone Number <span class="text-red-500">*</span>
                                     </label>
                                     <input
@@ -57,7 +57,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label class="block text-sm font-semibold text-slate-300 mb-2">
                                     Email Address <span class="text-red-500">*</span>
                                 </label>
                                 <input
@@ -69,7 +69,7 @@
                                 />
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <label class="block text-sm font-semibold text-slate-300 mb-2">
                                     Address <span class="text-red-500">*</span>
                                 </label>
                                 <textarea
@@ -82,7 +82,7 @@
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-slate-300 mb-2">
                                         City <span class="text-red-500">*</span>
                                     </label>
                                     <input
@@ -94,7 +94,7 @@
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-slate-300 mb-2">
                                         Postal Code
                                     </label>
                                     <input
@@ -105,14 +105,14 @@
                                     />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <label class="block text-sm font-semibold text-slate-300 mb-2">
                                         Delivery Location <span class="text-red-500">*</span>
                                     </label>
                                     <select
                                         v-model="shippingForm.is_inside_city"
                                         required
                                         @change="calculateCharges"
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-surface"
                                     >
                                         <option :value="true">Inside City</option>
                                         <option :value="false">Outside City</option>
@@ -123,8 +123,8 @@
                     </div>
 
                     <!-- Payment Method -->
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <div class="bg-surface rounded-2xl shadow-md border border-white/10 p-6">
+                        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                             <CreditCard class="w-6 h-6 text-primary" />
                             Payment Method
                         </h2>
@@ -136,7 +136,7 @@
                                 v-for="method in paymentMethods"
                                 :key="method.id"
                                 class="flex items-center gap-4 p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-all"
-                                :class="selectedPaymentMethod === method.type ? 'border-primary bg-primary/5' : 'border-gray-200'"
+                                :class="selectedPaymentMethod === method.type ? 'border-primary bg-primary/5' : 'border-white/10'"
                             >
                                 <input
                                     type="radio"
@@ -146,7 +146,7 @@
                                     class="w-5 h-5 text-primary focus:ring-primary"
                                 />
                                 <div class="flex-1">
-                                    <div class="font-semibold text-gray-900">{{ method.name }}</div>
+                                    <div class="font-semibold text-white">{{ method.name }}</div>
                                     <div v-if="method.description" class="text-sm text-gray-600 mt-1">
                                         {{ method.description }}
                                     </div>
@@ -174,8 +174,8 @@
                     </div>
 
                     <!-- Payment Slip Upload (for bank transfer) -->
-                    <div v-if="selectedPaymentMethod === 'bank_transfer' && currentOrder" class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <div v-if="selectedPaymentMethod === 'bank_transfer' && currentOrder" class="bg-surface rounded-2xl shadow-md border border-white/10 p-6">
+                        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                             <Upload class="w-6 h-6 text-primary" />
                             Upload Payment Slip
                         </h2>
@@ -193,13 +193,13 @@
                                 <p class="text-xs text-gray-500 mb-4">Accepted formats: JPG, PNG, GIF (Max 5MB)</p>
                                 <button
                                     @click="$refs.paymentSlipInput?.click()"
-                                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-all"
+                                    class="px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-dark transition-all"
                                 >
                                     Choose File
                                 </button>
                             </div>
                             <div v-if="paymentSlipPreview" class="mt-4">
-                                <img :src="paymentSlipPreview" alt="Payment slip preview" class="max-w-full h-48 object-contain rounded-lg border border-gray-200" />
+                                <img :src="paymentSlipPreview" alt="Payment slip preview" class="max-w-full h-48 object-contain rounded-lg border border-white/10" />
                                 <button
                                     @click="uploadPaymentSlip"
                                     :disabled="uploadingSlip"
@@ -215,14 +215,14 @@
                                 <CheckCircle class="w-5 h-5" />
                                 <span class="font-semibold">Payment slip uploaded</span>
                             </div>
-                            <img :src="getPaymentSlipUrl(currentOrder.payment_slip)" alt="Payment slip" class="max-w-full h-48 object-contain rounded-lg border border-gray-200 mt-2" />
+                            <img :src="getPaymentSlipUrl(currentOrder.payment_slip)" alt="Payment slip" class="max-w-full h-48 object-contain rounded-lg border border-white/10 mt-2" />
                             <p class="text-sm text-gray-600 mt-2">Your payment is pending verification by our team.</p>
                         </div>
                     </div>
 
                     <!-- Order Notes -->
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4">Order Notes (Optional)</h2>
+                    <div class="bg-surface rounded-2xl shadow-md border border-white/10 p-6">
+                        <h2 class="text-xl font-bold text-white mb-4">Order Notes (Optional)</h2>
                         <textarea
                             v-model="orderNotes"
                             rows="3"
@@ -234,8 +234,8 @@
 
                 <!-- Order Summary -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-6 sticky top-4">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                    <div class="bg-surface rounded-2xl shadow-md border border-white/10 p-6 sticky top-4">
+                        <h2 class="text-xl font-bold text-white mb-6">Order Summary</h2>
 
                         <!-- Cart Items -->
                         <div class="space-y-4 mb-6 max-h-64 overflow-y-auto">
@@ -244,7 +244,7 @@
                                 :key="item.id"
                                 class="flex items-center gap-3 pb-4 border-b border-gray-100 last:border-0"
                             >
-                                <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                                <div class="w-16 h-16 rounded-lg overflow-hidden border border-white/10 flex-shrink-0">
                                     <img
                                         :src="getProductImage(item)"
                                         :alt="item.name"
@@ -252,7 +252,7 @@
                                     />
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <h3 class="text-sm font-semibold text-gray-900 truncate">{{ item.name }}</h3>
+                                    <h3 class="text-sm font-semibold text-white truncate">{{ item.name }}</h3>
                                     <p class="text-xs text-gray-500">Qty: {{ item.quantity }}</p>
                                     <p class="text-sm font-bold text-primary mt-1">
                                         ৳{{ formatPrice(getItemPrice(item) * item.quantity) }}
@@ -262,9 +262,9 @@
                         </div>
 
                         <!-- Coupon Code -->
-                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-white/10">
                             <div v-if="!appliedCoupon" class="space-y-2">
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Have a coupon code?</label>
+                                <label class="block text-sm font-semibold text-slate-300 mb-2">Have a coupon code?</label>
                                 <div class="flex flex-wrap gap-2">
                                     <input
                                         v-model="couponCode"
@@ -276,7 +276,7 @@
                                     <button
                                         @click="applyCoupon"
                                         :disabled="applyingCoupon || !couponCode.trim()"
-                                        class="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                        class="px-6 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     >
                                         <span v-if="applyingCoupon">Applying...</span>
                                         <span v-else>Apply</span>
@@ -288,7 +288,7 @@
                                 <div class="flex items-center gap-2">
                                     <CheckCircle class="w-5 h-5 text-green-600" />
                                     <div>
-                                        <p class="text-sm font-semibold text-gray-900">{{ appliedCoupon.code }}</p>
+                                        <p class="text-sm font-semibold text-white">{{ appliedCoupon.code }}</p>
                                         <p class="text-xs text-gray-600">{{ appliedCoupon.description || 'Coupon applied' }}</p>
                                     </div>
                                 </div>
@@ -305,29 +305,29 @@
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Subtotal</span>
-                                <span class="font-semibold text-gray-900">৳{{ formatPrice(orderSummary.subtotal) }}</span>
+                                <span class="font-semibold text-white">৳{{ formatPrice(orderSummary.subtotal) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Delivery Charge</span>
-                                <span class="font-semibold text-gray-900">
+                                <span class="font-semibold text-white">
                                     <span v-if="orderSummary.delivery_charge > 0">৳{{ formatPrice(orderSummary.delivery_charge) }}</span>
                                     <span v-else class="text-green-600">Free</span>
                                 </span>
                             </div>
                             <div v-if="orderSummary.payment_processing_fee > 0" class="flex justify-between text-sm">
                                 <span class="text-gray-600">Payment Processing Fee</span>
-                                <span class="font-semibold text-gray-900">৳{{ formatPrice(orderSummary.payment_processing_fee) }}</span>
+                                <span class="font-semibold text-white">৳{{ formatPrice(orderSummary.payment_processing_fee) }}</span>
                             </div>
                             <div v-if="orderSummary.tax > 0" class="flex justify-between text-sm">
                                 <span class="text-gray-600">Tax</span>
-                                <span class="font-semibold text-gray-900">৳{{ formatPrice(orderSummary.tax) }}</span>
+                                <span class="font-semibold text-white">৳{{ formatPrice(orderSummary.tax) }}</span>
                             </div>
                             <div v-if="orderSummary.discount > 0" class="flex justify-between text-sm text-green-600">
                                 <span>Discount</span>
                                 <span class="font-semibold">-৳{{ formatPrice(orderSummary.discount) }}</span>
                             </div>
-                            <div class="border-t border-gray-200 pt-3 flex justify-between">
-                                <span class="text-lg font-bold text-gray-900">Total</span>
+                            <div class="border-t border-white/10 pt-3 flex justify-between">
+                                <span class="text-lg font-bold text-white">Total</span>
                                 <span class="text-lg font-bold text-primary">৳{{ formatPrice(orderSummary.total) }}</span>
                             </div>
                             <div v-if="orderSummary.min_payment > 0" class="text-xs text-gray-500 pt-2 border-t border-gray-100">
@@ -339,7 +339,7 @@
                         <button
                             @click="placeOrder"
                             :disabled="!isFormValid || processing"
-                            class="w-full py-4 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                            class="w-full py-4 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                         >
                             <span v-if="processing" class="flex items-center gap-2">
                                 <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

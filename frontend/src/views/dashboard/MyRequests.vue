@@ -6,59 +6,59 @@
                 <p class="text-xs text-slate-500 mt-1">Track and manage your product requests</p>
             </div>
             <router-link to="/request-product"
-                class="bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-primary-hover transition-colors">
+                class="bg-primary text-slate-900 px-4 py-2 rounded-lg text-xs font-semibold hover:bg-primary-hover transition-colors">
                 + New Request
             </router-link>
         </div>
 
         <!-- Requests Table -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow">
+        <div class="bg-surface border border-white/5 overflow-hidden hover:border-primary/30 transition-colors">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Request ID</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Product URL</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Date</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Quantity</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Total</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Status</th>
-                            <th class="p-3 font-semibold text-slate-700 text-xs uppercase tracking-wide">Action</th>
+                        <tr class="bg-surface border-b border-white/5">
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Request ID</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Product URL</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Date</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Quantity</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Total</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Status</th>
+                            <th class="p-4 font-semibold text-slate-400 text-xs uppercase tracking-widest">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-white/5">
                         <tr v-if="loading">
-                            <td colspan="7" class="p-6 text-center text-slate-500">
+                            <td colspan="7" class="p-8 text-center text-slate-500">
                                 <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                                <p class="mt-2 text-xs">Loading requests...</p>
+                                <p class="mt-2 text-xs uppercase tracking-wider">Loading requests...</p>
                             </td>
                         </tr>
                         <tr v-else-if="requests.length === 0">
-                            <td colspan="7" class="p-6 text-center text-slate-500">
+                            <td colspan="7" class="p-8 text-center text-slate-500">
                                 <p class="text-sm font-semibold mb-1">No requests found</p>
                                 <p class="text-xs">You haven't made any product requests yet.</p>
                             </td>
                         </tr>
-                        <tr v-for="request in requests" :key="request.id" class="hover:bg-blue-50/50 transition-all group">
-                            <td class="p-3 font-semibold text-primary group-hover:text-primary-hover transition-colors text-xs">#{{ request.id }}</td>
-                            <td class="p-3 text-slate-600 text-xs max-w-xs truncate">
-                                <a :href="request.url" target="_blank" class="hover:underline" :title="request.url">{{ request.url }}</a>
+                        <tr v-for="request in requests" :key="request.id" class="hover:bg-white/5 transition-colors group">
+                            <td class="p-4 font-semibold text-primary group-hover:text-white transition-colors text-xs tracking-wide">#{{ request.id }}</td>
+                            <td class="p-4 text-slate-400 text-xs max-w-xs truncate">
+                                <a :href="request.url" target="_blank" class="hover:text-primary hover:underline transition-colors" :title="request.url">{{ request.url }}</a>
                             </td>
-                            <td class="p-3 text-slate-600 text-xs">{{ formatDate(request.created_at) }}</td>
-                            <td class="p-3 text-slate-600 text-xs">{{ request.quantity }}</td>
-                            <td class="p-3 font-semibold text-slate-900 text-sm">৳{{ parseFloat(request.total_amount_bdt || 0).toLocaleString() }}</td>
-                            <td class="p-3">
-                                <span :class="getStatusClass(request.status)" class="px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide shadow-sm">
+                            <td class="p-4 text-slate-400 text-xs">{{ formatDate(request.created_at) }}</td>
+                            <td class="p-4 text-slate-400 text-xs">{{ request.quantity }}</td>
+                            <td class="p-4 font-serif text-white text-sm tracking-wide">৳{{ parseFloat(request.total_amount_bdt || 0).toLocaleString() }}</td>
+                            <td class="p-4">
+                                <span :class="getStatusClass(request.status)" class="px-2 py-1 border text-[10px] font-bold uppercase tracking-widest">
                                     {{ request.status }}
                                 </span>
                             </td>
-                            <td class="p-3">
+                            <td class="p-4">
                                 <div class="flex items-center gap-2">
                                     <router-link :to="`/dashboard/requests/${request.id}`" 
-                                        class="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-all">
-                                        View →
+                                        class="text-xs font-bold uppercase tracking-wider text-primary hover:text-white hover:underline transition-all">
+                                        View
                                     </router-link>
-                                    <button v-if="request.status === 'approved'" @click="openPayment(request)" class="text-xs font-semibold text-green-600 hover:text-green-700 hover:underline transition-all">
+                                    <button v-if="request.status === 'approved'" @click="openPayment(request)" class="text-xs font-bold uppercase tracking-wider text-green-500 hover:text-green-400 hover:underline transition-all">
                                         Pay Now
                                     </button>
                                 </div>
@@ -110,15 +110,15 @@ const formatDate = (dateString) => {
 const getStatusClass = (status) => {
     switch (status) {
         case 'pending':
-            return 'bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300';
+            return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
         case 'approved':
-            return 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 border border-green-300';
+            return 'bg-green-500/10 text-green-500 border-green-500/20';
         case 'paid':
-            return 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border border-blue-300';
+            return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
         case 'rejected':
-            return 'bg-gradient-to-r from-red-100 to-red-200 text-red-800 border border-red-300';
+            return 'bg-red-500/10 text-red-500 border-red-500/20';
         default:
-            return 'bg-gray-100 text-gray-700';
+            return 'bg-slate-500/10 text-slate-400 border-white/10';
     }
 };
 

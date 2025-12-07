@@ -16,11 +16,11 @@
 
         <!-- Navigation Arrows -->
         <button @click="prevSlide"
-            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white text-slate-800 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-slate-700 text-slate-200 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
             <ChevronLeft class="w-6 h-6" />
         </button>
         <button @click="nextSlide"
-            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-white text-slate-800 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-slate-700 text-slate-200 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
             <ChevronRight class="w-6 h-6" />
         </button>
 
@@ -28,7 +28,7 @@
         <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
             <button v-for="(slide, index) in slides" :key="index" @click="goToSlide(index)"
                 class="w-3 h-3 rounded-full transition-all duration-300"
-                :class="currentSlide === index ? 'bg-primary scale-110' : 'bg-white/60 hover:bg-white'">
+                :class="currentSlide === index ? 'bg-primary scale-110' : 'bg-white/30 hover:bg-slate-700'">
             </button>
         </div>
     </section>

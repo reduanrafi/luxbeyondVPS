@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-[#F7F8FA]">
         <!-- Sidebar -->
         <aside
-            class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transition-transform duration-300"
+            class="fixed inset-y-0 left-0 z-50 w-64 bg-surface border-r border-gray-100 transition-transform duration-300"
             :class="{ '-translate-x-full': !isSidebarOpen, 'translate-x-0': isSidebarOpen, 'lg:translate-x-0': true }">
             <div class="h-full flex flex-col">
                 <!-- Logo -->
@@ -11,7 +11,7 @@
                         <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                             <span class="text-white font-bold text-sm">L</span>
                         </div>
-                        <span class="text-xl font-bold text-slate-800">Lux</span>
+                        <span class="text-xl font-bold text-slate-200">Lux</span>
                     </router-link>
                     <button class="lg:hidden text-gray-400 hover:text-gray-600" @click="isSidebarOpen = false">
                         <ChevronLeft class="w-5 h-5" />
@@ -30,7 +30,7 @@
                                 class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors relative group"
                                 :class="isActive(item.href)
                                     ? 'text-blue-600 bg-blue-50'
-                                    : 'text-gray-600 hover:text-slate-800 hover:bg-gray-50'"
+                                    : 'text-gray-600 hover:text-slate-200 hover:bg-gray-50'"
                                 @click="isSidebarOpen = false">
                                 <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
                                 <span class="flex-1">{{ item.name }}</span>
@@ -64,18 +64,18 @@
         <!-- Main Content -->
         <div class="lg:ml-64">
             <!-- Header -->
-            <header class="sticky top-0 z-30 bg-white border-b border-gray-100">
+            <header class="sticky top-0 z-30 bg-surface border-b border-gray-100">
                 <div class="px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
                     <!-- Left: Menu + Search -->
                     <div class="flex items-center gap-4 flex-1 max-w-2xl">
                         <button @click="isSidebarOpen = true"
-                            class="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700">
+                            class="lg:hidden p-2 -ml-2 text-gray-500 hover:text-slate-300">
                             <Menu class="w-6 h-6" />
                         </button>
                         <div class="relative w-full max-w-md hidden md:block">
                             <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input type="text" placeholder="Search data..."
-                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-none rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-100 focus:bg-white placeholder:text-gray-400">
+                                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-none rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-blue-100 focus:bg-surface placeholder:text-gray-400">
                         </div>
                     </div>
 
@@ -106,7 +106,7 @@
                             <img :src="`https://ui-avatars.com/api/?name=${user?.name}&background=3B82F6&color=fff`"
                                 alt="Profile" class="w-10 h-10 rounded-full">
                             <div class="hidden lg:block text-left">
-                                <p class="text-sm font-bold text-slate-800 leading-tight">{{ user?.name }}</p>
+                                <p class="text-sm font-bold text-slate-200 leading-tight">{{ user?.name }}</p>
                                 <p class="text-xs text-gray-500">Admin</p>
                             </div>
                         </div>

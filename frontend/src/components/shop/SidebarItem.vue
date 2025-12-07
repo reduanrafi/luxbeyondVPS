@@ -3,12 +3,12 @@
       <!-- Category Row -->
       <div
         class="flex items-center justify-between py-2 cursor-pointer group hover:bg-gray-50 rounded-lg"
-        :class="{'border-b border-gray-200': !isLast}"
+        :class="{'border-b border-white/10': !isLast}"
         @click="handleCategoryClick"
       >
         <!-- Category Icon -->
         <div class="flex items-center gap-3 flex-1 min-w-0">
-          <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden border border-gray-200">
+          <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden border border-white/10">
             <img
               v-if="category.image_url"
               :src="category.image_url"
@@ -27,7 +27,7 @@
           
           <!-- Category Name -->
           <span
-            class="text-gray-900 font-medium text-sm group-hover:text-primary transition-colors truncate"
+            class="text-white font-medium text-sm group-hover:text-primary transition-colors truncate"
             :class="{'text-primary font-semibold': isActive}"
           >
             {{ category.name }}

@@ -6,13 +6,13 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+        <div v-if="loading" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             <p class="mt-2 text-xs text-slate-500">Loading coupons...</p>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="coupons.length === 0" class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+        <div v-else-if="coupons.length === 0" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <p class="text-sm font-semibold mb-1">No coupons available</p>
             <p class="text-xs text-slate-500">You don't have any active coupons at the moment.</p>
         </div>
@@ -20,7 +20,7 @@
         <!-- Coupons Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="coupon in coupons" :key="coupon.id || coupon.code"
-                class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden relative group hover:shadow-lg transition-all">
+                class="bg-surface rounded-xl shadow-md border border-gray-100 overflow-hidden relative group hover:shadow-lg transition-all">
                 <!-- Decorative Circle -->
                 <div class="absolute -right-6 -top-6 w-20 h-20 rounded-full opacity-10 transition-transform group-hover:scale-150"
                     :class="isActive(coupon) ? 'bg-primary' : 'bg-gray-400'"></div>
@@ -41,7 +41,7 @@
 
                     <p class="text-slate-600 text-xs mb-4 flex-1 line-clamp-2">{{ coupon.description || 'No description' }}</p>
 
-                    <div class="pt-3 border-t border-dashed border-gray-200">
+                    <div class="pt-3 border-t border-dashed border-white/10">
                         <div class="flex justify-between items-center mb-2">
                             <div
                                 class="font-mono bg-gray-100 px-2 py-1 rounded text-xs font-bold text-slate-700 tracking-wide select-all">

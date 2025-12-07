@@ -1,15 +1,15 @@
 <template>
     <div>
         <!-- Profile Summary -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="bg-surface border border-white/5 p-6 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div class="flex items-center gap-4">
                 <div
-                    class="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-slate-900 font-bold text-xl shadow-md">
                     {{ userInitials }}
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-slate-500">Welcome back,</p>
-                    <p class="text-xl font-bold text-slate-900 leading-tight">
+                    <p class="text-sm font-medium text-slate-400">Welcome back,</p>
+                    <p class="text-xl font-bold text-white leading-tight">
                         {{ user?.name || 'Lux Customer' }}
                     </p>
                     <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
@@ -21,18 +21,18 @@
             <div class="flex flex-wrap gap-3">
                 <router-link
                     to="/dashboard/orders"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-primary bg-primary/5 hover:bg-primary/10 transition-colors">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-bold text-slate-900 bg-primary hover:bg-white transition-colors">
                     View My Orders
                     <span class="text-xs">→</span>
                 </router-link>
                 <router-link
                     to="/dashboard/requests"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-semibold text-slate-300 bg-surface border border-white/10 hover:border-primary hover:text-primary transition-colors">
                     Active Requests
                 </router-link>
                 <router-link
                     to="/dashboard/settings"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-sm text-sm font-semibold text-slate-300 bg-surface border border-white/10 hover:border-primary hover:text-primary transition-colors">
                     Manage Account
                 </router-link>
             </div>
@@ -41,59 +41,53 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- Total Orders -->
-            <div class="relative bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+            <div class="relative bg-surface p-6 border border-white/5 group hover:border-primary/50 transition-colors">
                 <div class="relative flex items-center justify-between">
                     <div>
-                        <p class="text-blue-100 text-sm font-medium mb-1">Total Orders</p>
-                        <p class="text-4xl font-extrabold text-white">{{ stats.totalOrders }}</p>
-                        <p class="text-blue-200 text-xs mt-2">{{ stats.ordersThisMonth > 0 ? `+${stats.ordersThisMonth} this month` : 'No orders this month' }}</p>
+                        <p class="text-slate-400 text-xs uppercase tracking-widest font-bold mb-2">Total Orders</p>
+                        <p class="text-3xl font-serif text-white">{{ stats.totalOrders }}</p>
+                        <p class="text-primary text-xs mt-2 font-medium">{{ stats.ordersThisMonth > 0 ? `+${stats.ordersThisMonth} this month` : 'No orders this month' }}</p>
                     </div>
-                    <div class="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
-                        <ShoppingBag class="w-8 h-8 text-white" />
+                    <div class="p-4 bg-primary/10 rounded-full">
+                        <ShoppingBag class="w-6 h-6 text-primary" />
                     </div>
                 </div>
             </div>
 
             <!-- Active Requests -->
-            <div class="relative bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+            <div class="relative bg-surface p-6 border border-white/5 group hover:border-primary/50 transition-colors">
                 <div class="relative flex items-center justify-between">
                     <div>
-                        <p class="text-purple-100 text-sm font-medium mb-1">Active Requests</p>
-                        <p class="text-4xl font-extrabold text-white">{{ stats.activeRequests }}</p>
-                        <p class="text-purple-200 text-xs mt-2">{{ stats.pendingRequests > 0 ? `${stats.pendingRequests} pending` : 'No pending requests' }}</p>
+                        <p class="text-slate-400 text-xs uppercase tracking-widest font-bold mb-2">Active Requests</p>
+                        <p class="text-3xl font-serif text-white">{{ stats.activeRequests }}</p>
+                        <p class="text-primary text-xs mt-2 font-medium">{{ stats.pendingRequests > 0 ? `${stats.pendingRequests} pending` : 'No pending requests' }}</p>
                     </div>
-                    <div class="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
-                        <Package class="w-8 h-8 text-white" />
+                    <div class="p-4 bg-primary/10 rounded-full">
+                        <Package class="w-6 h-6 text-primary" />
                     </div>
                 </div>
             </div>
 
             <!-- Total Spent -->
-            <div class="relative bg-gradient-to-br from-green-500 to-emerald-600 p-6 rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+            <div class="relative bg-surface p-6 border border-white/5 group hover:border-primary/50 transition-colors">
                 <div class="relative flex items-center justify-between">
                     <div>
-                        <p class="text-green-100 text-sm font-medium mb-1">Total Spent</p>
-                        <p class="text-4xl font-extrabold text-white">৳{{ stats.totalSpent.toLocaleString() }}</p>
-                        <p class="text-green-200 text-xs mt-2">All time</p>
+                        <p class="text-slate-400 text-xs uppercase tracking-widest font-bold mb-2">Total Spent</p>
+                        <p class="text-3xl font-serif text-white">৳{{ stats.totalSpent.toLocaleString() }}</p>
+                        <p class="text-primary text-xs mt-2 font-medium">Lifetime Value</p>
                     </div>
-                    <div class="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
-                        <DollarSign class="w-8 h-8 text-white" />
+                    <div class="p-4 bg-primary/10 rounded-full">
+                        <DollarSign class="w-6 h-6 text-primary" />
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
+        <div class="bg-surface border border-white/5 p-6 hover:border-primary/30 transition-colors">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-slate-900">Recent Activity</h3>
-                <router-link to="/dashboard/orders" class="text-xs font-semibold text-primary hover:text-primary-hover transition-colors">View All</router-link>
+                <h3 class="text-xl font-serif font-bold text-white">Recent Activity</h3>
+                <router-link to="/dashboard/orders" class="text-xs font-semibold text-primary hover:text-white transition-colors">View All</router-link>
             </div>
             <div v-if="loading" class="text-center py-8">
                 <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
@@ -104,15 +98,13 @@
             </div>
             <div v-else class="space-y-3">
                 <div v-for="activity in activities" :key="activity.id" 
-                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                    <div class="mt-0.5 p-2 rounded-lg transition-all group-hover:scale-110"
-                        :class="getActivityBgClass(activity.type)">
-                        <component :is="getActivityIcon(activity.type)" class="w-4 h-4" 
-                            :class="getActivityIconClass(activity.type)" />
+                    class="flex items-start gap-4 p-3 rounded-none hover:bg-white/5 transition-colors group border-b border-white/5 last:border-0">
+                    <div class="mt-0.5 p-2 rounded-full bg-primary/10 transition-all group-hover:bg-primary group-hover:text-slate-900 text-primary">
+                        <component :is="getActivityIcon(activity.type)" class="w-4 h-4" />
                     </div>
                     <div class="flex-1">
-                        <p class="text-xs font-semibold text-slate-900 group-hover:text-primary transition-colors">{{ activity.title }}</p>
-                        <p class="text-[10px] text-slate-500 mt-0.5">{{ activity.time }}</p>
+                        <p class="text-sm font-medium text-slate-300 group-hover:text-primary transition-colors">{{ activity.title }}</p>
+                        <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-wider">{{ activity.time }}</p>
                     </div>
                 </div>
             </div>
@@ -245,18 +237,6 @@ const getActivityIcon = (type) => {
     if (type === 'order') return ShoppingBag;
     if (type === 'request') return Package;
     return CheckCircle;
-};
-
-const getActivityBgClass = (type) => {
-    if (type === 'order') return 'bg-blue-100';
-    if (type === 'request') return 'bg-purple-100';
-    return 'bg-green-100';
-};
-
-const getActivityIconClass = (type) => {
-    if (type === 'order') return 'text-blue-600';
-    if (type === 'request') return 'text-purple-600';
-    return 'text-green-600';
 };
 
 onMounted(() => {
