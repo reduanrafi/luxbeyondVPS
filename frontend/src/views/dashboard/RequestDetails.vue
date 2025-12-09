@@ -32,6 +32,85 @@
                 </div>
             </div>
 
+            <!-- Payment Action Section -->
+            <div v-if="request.status === 'approved' && request.payment_status !== 'paid'"
+                class="bg-surface rounded-2xl shadow-lg border border-primary/20 overflow-hidden">
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">Payment Required</h3>
+                            <p class="text-sm text-slate-500 mt-1">Please complete the payment to proceed with your
+                                order.</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-slate-500">Amount Due</p>
+                            <p class="text-2xl font-bold text-primary">৳{{ formatPrice(request.total_amount_bdt) }}</p>
+                        </div>
+                    </div>
+
+                    <div v-if="request.payment_status === 'processing'"
+                        class="bg-blue-50 text-blue-700 p-4 rounded-lg flex items-center gap-3">
+                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-700"></div>
+                        <div>
+                            <p class="font-semibold">Payment Verification Pending</p>
+                            <p class="text-sm">We are verifying your payment details. This may take a while.</p>
+                        </div>
+                    </div>
+
+                    <div v-else class="space-y-6">
+                        <!-- Payment Methods -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- bKash -->
+                            <button @click="payWithBkash" :disabled="processingBkash"
+                                class="flex items-center justify-center gap-3 p-4 border rounded-xl hover:bg-slate-50 transition-all bg-white shadow-sm"
+                                :class="processingBkash ? 'opacity-70 cursor-not-allowed' : 'border-pink-200 hover:border-pink-500'">
+                                <span class="font-bold text-pink-600">Pay with bKash</span>
+                                <span v-if="processingBkash" class="animate-spin ml-2">...</span>
+                            </button>
+
+                            <!-- Bank Transfer -->
+                            <button @click="showBankTransfer = !showBankTransfer"
+                                class="flex items-center justify-center gap-3 p-4 border border-gray-200 rounded-xl hover:bg-slate-50 hover:border-primary transition-all bg-white shadow-sm">
+                                <span class="font-bold text-slate-700">Bank Transfer</span>
+                            </button>
+                        </div>
+
+                        <!-- Bank Transfer Form -->
+                        <div v-if="showBankTransfer"
+                            class="bg-slate-50 p-6 rounded-xl space-y-4 border border-gray-200">
+                            <!-- Bank Info -->
+                            <div class="text-sm text-slate-600 mb-4 p-4 bg-white rounded border border-gray-200">
+                                <p class="font-semibold text-slate-900 mb-2">Bank Details:</p>
+                                <p>Bank Name: City Bank</p>
+                                <p>Account Name: Lux Beyond</p>
+                                <p>Account No: 1234567890</p>
+                                <p>Branch: Gulshan 1</p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Payment Reference</label>
+                                <input v-model="bankTransferForm.reference" type="text"
+                                    placeholder="Enter Transaction ID or Reference"
+                                    class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-primary">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Payment Slip</label>
+                                <input @change="handleFileChange" type="file" accept="image/*,.pdf"
+                                    class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-slate-900 hover:file:bg-primary-hover border border-gray-200 rounded-lg bg-white">
+                            </div>
+
+                            <div class="flex justify-end">
+                                <button @click="submitBankTransfer" :disabled="submittingBank"
+                                    class="px-6 py-2 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50">
+                                    {{ submittingBank ? 'Submitting...' : 'Submit Payment Details' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Request Info Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
@@ -267,12 +346,19 @@ const loading = ref(true);
 const error = ref(null);
 const request = ref(null);
 const currencies = ref([]);
+const showBankTransfer = ref(false);
+const processingBkash = ref(false);
+const submittingBank = ref(false);
+const bankTransferForm = ref({
+    reference: '',
+    file: null
+});
 
 const fetchRequest = async () => {
     loading.value = true;
     error.value = null;
     try {
-        const response = await axios.get(`/requests/${requestId}`);
+        const response = await axios.get(`/product-requests/${requestId}`);
         request.value = response.data;
     } catch (err) {
         console.error('Error fetching request:', err);
@@ -340,6 +426,64 @@ const printInvoice = () => {
     `);
     printWindow.document.close();
     printWindow.print();
+};
+
+const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        bankTransferForm.value.file = file;
+    }
+};
+
+const payWithBkash = async () => {
+    if (!request.value) return;
+    processingBkash.value = true;
+    try {
+        const response = await axios.post('/product-requests/bkash/initiate', {
+            product_request_id: request.value.id,
+            amount: request.value.total_amount_bdt // Use total amount for now
+        });
+
+        if (response.data.bkashURL) {
+            window.location.href = response.data.bkashURL;
+        } else {
+            throw new Error('Invalid bKash response');
+        }
+    } catch (err) {
+        console.error('bKash Error:', err);
+        alert(err.response?.data?.message || 'Failed to initiate bKash payment');
+    } finally {
+        processingBkash.value = false;
+    }
+};
+
+const submitBankTransfer = async () => {
+    if (!bankTransferForm.value.reference && !bankTransferForm.value.file) {
+        alert('Please provide a reference or upload a slip.');
+        return;
+    }
+
+    submittingBank.value = true;
+    const formData = new FormData();
+    formData.append('payment_method', 'bank_transfer');
+    if (bankTransferForm.value.reference) formData.append('payment_reference', bankTransferForm.value.reference);
+    if (bankTransferForm.value.file) formData.append('payment_slip', bankTransferForm.value.file);
+
+    try {
+        await axios.post(`/product-requests/${request.value.id}/payment`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        // Refresh request
+        await fetchRequest();
+        showBankTransfer.value = false;
+        alert('Payment details submitted successfully!');
+    } catch (err) {
+        console.error('Submission Error:', err);
+        alert(err.response?.data?.message || 'Failed to submit payment details');
+    } finally {
+        submittingBank.value = false;
+    }
 };
 
 onMounted(() => {

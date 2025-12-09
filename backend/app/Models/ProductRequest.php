@@ -28,7 +28,20 @@ class ProductRequest extends Model
         'additional_charges',
         'delivery_charge',
         'payment_processing_fee',
+        'payment_status',
+        'payment_reference',
+        'bkash_trx_id',
+        'payment_slip',
+        'paid_at',
+        'min_payment_amount',
     ];
+
+    protected $appends = ['payment_slip_url'];
+
+    public function getPaymentSlipUrlAttribute()
+    {
+        return $this->payment_slip ? asset('storage/' . $this->payment_slip) : null;
+    }
 
     public function user()
     {

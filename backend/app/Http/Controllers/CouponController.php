@@ -236,4 +236,31 @@ class CouponController extends Controller
             'message' => 'Coupon applied successfully'
         ]);
     }
+
+    /**
+     * Get available coupons for the authenticated user
+     */
+    public function available()
+    {
+        $user = auth()->user();
+
+        // basic query for active coupons
+        // In a real app, you might check if the user has already used the coupon limit, etc.
+        $coupons = Coupon::where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->where(function ($q) {
+                // Public coupons OR coupons assigned to this user
+                $q->where('is_private', false)
+                    ->orWhereHas('users', function ($q2) {
+                    $q2->where('users.id', auth()->id());
+                });
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($coupons);
+    }
 }

@@ -149,6 +149,32 @@
                 </div>
             </div>
 
+
+            <!-- Payment Settings -->
+            <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
+                <h3 class="text-lg font-bold text-slate-900 mb-4">Payment Settings</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Payment Status</label>
+                        <select v-model="form.payment_status"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                            <option value="unpaid">Unpaid</option>
+                            <option value="processing">Processing</option>
+                            <option value="paid">Paid</option>
+                            <option value="partial">Partial</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Minimum Payment Amount</label>
+                        <input v-model.number="form.min_payment_amount" type="number" step="0.01" min="0"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                            placeholder="0.00">
+                        <p class="text-xs text-slate-500 mt-1">Leave 0 for full payment required</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Admin Information -->
             <div class="bg-surface rounded-xl shadow-md border border-white/10 p-6">
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Admin Information</h3>
@@ -215,7 +241,10 @@ const form = ref({
     payment_processing_fee: 0,
     status_id: null,
     admin_image_url: '',
-    admin_note: ''
+    admin_image_url: '',
+    admin_note: '',
+    payment_status: 'unpaid',
+    min_payment_amount: 0
 });
 
 const calculatedTotal = computed(() => {
@@ -261,7 +290,11 @@ const fetchRequest = async () => {
             payment_processing_fee: parseFloat(request.value.payment_processing_fee || 0),
             status_id: request.value.status_id || request.value.order_status?.id || null,
             admin_image_url: request.value.admin_image_url || '',
-            admin_note: request.value.admin_note || ''
+            status_id: request.value.status_id || request.value.order_status?.id || null,
+            admin_image_url: request.value.admin_image_url || '',
+            admin_note: request.value.admin_note || '',
+            payment_status: request.value.payment_status || 'unpaid',
+            min_payment_amount: parseFloat(request.value.min_payment_amount || 0)
         };
     } catch (err) {
         console.error('Error fetching request:', err);

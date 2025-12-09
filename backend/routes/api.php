@@ -4,6 +4,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductRequestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,8 +51,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
 
-    Route::apiResource('requests', \App\Http\Controllers\ProductRequestController::class);
-    Route::post('/requests/{id}/confirm', [\App\Http\Controllers\ProductRequestController::class, 'confirm']);
+    // Product Requests
+    Route::post('/product-requests/bkash/initiate', [ProductRequestController::class, 'initiateBkashPayment']);
+    Route::apiResource('product-requests', ProductRequestController::class);
+    Route::post('/product-requests/{id}/payment', [ProductRequestController::class, 'submitPaymentDetails']);
     
     // Orders (for customers)
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index']);
@@ -74,7 +77,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/wishlist', [\App\Http\Controllers\WishlistController::class, 'store']);
     Route::post('/wishlist/toggle', [\App\Http\Controllers\WishlistController::class, 'toggle']);
     Route::delete('/wishlist/{wishlistItem}', [\App\Http\Controllers\WishlistController::class, 'destroy']);
-    
+
+    // Customer Dashboard Data
+    Route::get('/coupons/available', [\App\Http\Controllers\CouponController::class, 'available']);
+
+    Route::post('/addresses/shipping', [\App\Http\Controllers\AddressController::class, 'saveShipping']);
+    Route::post('/addresses/billing', [\App\Http\Controllers\AddressController::class, 'saveBilling']);
+
+    Route::get('/notifications/preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
+    Route::put('/notifications/preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
+
+    Route::delete('/account', [\App\Http\Controllers\AccountController::class, 'destroy']);
+
     // Coupon apply (for customers during checkout)
     Route::post('/coupons/apply', [\App\Http\Controllers\CouponController::class, 'apply']);
     

@@ -2,136 +2,57 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\ProductRequest;
-use App\Models\Setting;
-use App\Models\Currency;
-use App\Models\Charge;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Ihasan\Bkash\Facades\Bkash;
 
 class ProductRequestController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $user = Auth::user();
-        $query = $user->hasRole('Admin') 
-            ? ProductRequest::with(['user', 'orderStatus'])
-            : $user->productRequests()->with('orderStatus');
-        
-        // Filter by search
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('url', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($userQuery) use ($search) {
-                      $userQuery->where('name', 'like', "%{$search}%")
-                                ->orWhere('email', 'like', "%{$search}%");
-                  });
-            });
+        if ($user->hasRole('Admin')) {
+            $requests = ProductRequest::with(['user', 'orderStatus'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
+        } else {
+            $requests = ProductRequest::with(['orderStatus'])
+                ->where('user_id', $user->id)
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
         }
-        
-        // Filter by status_id (status parameter can be status_id)
-        if ($request->has('status') && $request->status) {
-            $query->where('status_id', $request->status);
-        }
-        
-        // Filter by date range
-        if ($request->has('date_from') && $request->date_from) {
-            $query->whereDate('created_at', '>=', $request->date_from);
-        }
-        if ($request->has('date_to') && $request->date_to) {
-            $query->whereDate('created_at', '<=', $request->date_to);
-        }
-        
-        return response()->json($query->latest()->get());
+        return response()->json($requests);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'url' => 'required|url',
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
-            'currency' => 'required|string|exists:currencies,code',
+            'currency' => 'required|string|max:3',
             'declared_shipping_cost' => 'nullable|numeric|min:0',
-            'is_inside_city' => 'boolean',
+            'is_inside_city' => 'nullable|boolean',
             'weight' => 'nullable|numeric|min:0',
-            'payment_method' => 'nullable|string',
         ]);
 
-        // Get currency
-        $currency = Currency::where('code', $request->currency)->first();
-        if (!$currency) {
-            return response()->json(['message' => 'Invalid currency'], 422);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Calculate product total in base currency (BDT)
-        $productTotal = ($request->price * $request->quantity);
-        if (!$currency->is_base) {
-            $productTotal = $productTotal * $currency->rate_to_base;
+        $shippingCost = 0;
+        if ($request->has('declared_shipping_cost') && $request->declared_shipping_cost !== null) {
+            $shippingCost = $request->declared_shipping_cost;
+        } else {
+            // Basic estimation logic if not provided (server-side fallback)
+            // Ideally should match frontend logic or be calculated by Admin
+            $shippingCost = 0; // Default to 0 if not declared, let Admin set it.
         }
-
-        // Calculate charges - only charges in the selected currency or base currency
-        $charges = Charge::where('is_active', true)
-            ->whereHas('currency', function($q) use ($currency) {
-                // Get charges in the selected currency OR base currency (which applies to all)
-                $q->where('id', $currency->id)
-                  ->orWhere('is_base', true);
-            })
-            ->with('currency')
-            ->orderBy('sort_order')
-            ->get();
-        $totalCharges = 0;
-        $chargeBreakdown = [];
-
-        foreach ($charges as $charge) {
-            // Convert product total to charge currency if needed
-            $chargeBaseAmount = $productTotal;
-            if (!$charge->currency->is_base && $currency->is_base) {
-                $chargeBaseAmount = $productTotal / $charge->currency->rate_to_base;
-            } elseif ($charge->currency->is_base && !$currency->is_base) {
-                $chargeBaseAmount = $productTotal * $currency->rate_to_base;
-            }
-
-            $chargeAmount = $charge->calculate($chargeBaseAmount, [
-                'weight' => $request->weight ?? 0,
-                'is_inside_city' => $request->is_inside_city ?? false,
-            ]);
-
-            $totalCharges += $chargeAmount;
-            $chargeBreakdown[] = [
-                'name' => $charge->name,
-                'type' => $charge->type,
-                'amount' => $chargeAmount,
-            ];
-        }
-
-        // Calculate delivery charges from settings (in BDT, no conversion needed)
-        $isInsideCity = $request->is_inside_city ?? false;
-        $weight = $request->weight ?? 0;
-        $paymentMethod = $request->payment_method ?? null;
-        $deliveryCharge = $this->calculateDeliveryCharge($productTotal, $isInsideCity, $weight, $paymentMethod);
-        $totalCharges += $deliveryCharge;
-
-        // Add declared shipping cost if provided (convert to base currency)
-        $declaredShipping = $request->declared_shipping_cost ?? 0;
-        if ($declaredShipping > 0 && !$currency->is_base) {
-            $declaredShipping = $declaredShipping * $currency->rate_to_base;
-        }
-
-        // Calculate subtotal before payment processing fee
-        $subtotalBeforePaymentFee = $productTotal + $totalCharges + $declaredShipping;
-
-        // Calculate payment processing fee (based on grand total: product + all charges + delivery + declared shipping)
-        $paymentProcessingFee = $this->calculatePaymentProcessingFee($subtotalBeforePaymentFee, $paymentMethod);
-        $totalCharges += $paymentProcessingFee;
-
-        $totalBDT = $productTotal + $totalCharges + $declaredShipping;
-
-        // Calculate minimum payment amount for request orders
-        $minPaymentPercentage = Setting::get('min_payment_percentage_request', 0);
-        $minPaymentAmount = ($totalBDT * $minPaymentPercentage) / 100;
 
         $productRequest = ProductRequest::create([
             'user_id' => Auth::id(),
@@ -139,31 +60,124 @@ class ProductRequestController extends Controller
             'price' => $request->price,
             'quantity' => $request->quantity,
             'currency' => $request->currency,
-            'declared_shipping_cost' => $request->declared_shipping_cost ?? 0,
+            'declared_shipping_cost' => $shippingCost,
             'is_inside_city' => $request->is_inside_city ?? false,
-            'total_amount_bdt' => $totalBDT,
-            'min_payment_amount' => $minPaymentAmount,
-            'status' => 'pending',
+            'weight' => $request->weight,
+            'status' => 'pending', // Initial status
+            'payment_status' => 'pending',
         ]);
 
+        // Notify User
+        $user = Auth::user();
+        try {
+            $user->notify(new \App\Notifications\ProductRequestSubmittedNotification($productRequest));
+        } catch (\Exception $e) {
+            Log::error('Failed to notify user: ' . $e->getMessage());
+        }
+
+        // Notify Admins
+        try {
+            // Adjust depending on how roles are implemented. Assuming Spatie or similar:
+            $admins = \App\Models\User::role('Admin')->get();
+            if ($admins->count() > 0) {
+                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewProductRequestNotification($productRequest));
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to notify admins: ' . $e->getMessage());
+        }
+
         return response()->json([
+            'message' => 'Product request submitted successfully',
             'product_request' => $productRequest,
-            'calculation' => [
-                'product_total' => round($productTotal, 2),
-                'charges' => $chargeBreakdown,
-                'total_charges' => round($totalCharges, 2),
-                'delivery_charge' => round($deliveryCharge, 2),
-                'payment_processing_fee' => round($paymentProcessingFee, 2),
-                'declared_shipping' => round($declaredShipping, 2),
-                'grand_total' => round($totalBDT, 2),
-            ]
         ], 201);
+    }
+
+    public function initiateBkashPayment(Request $request)
+    {
+        $validated = $request->validate([
+            'product_request_id' => 'required|exists:product_requests,id',
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $productRequest = ProductRequest::findOrFail($validated['product_request_id']);
+
+        if ($productRequest->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Configure Bkash
+        $paymentMethod = \App\Models\PaymentMethod::where('type', 'bkash')->where('is_active', true)->first();
+        if (!$paymentMethod || !$paymentMethod->config) {
+            return response()->json(['message' => 'bKash not configured'], 500);
+        }
+        config([
+            'bkash.sandbox' => $paymentMethod->config['is_sandbox'] ?? true,
+            'bkash.credentials.app_key' => $paymentMethod->config['app_key'] ?? '',
+            'bkash.credentials.app_secret' => $paymentMethod->config['app_secret'] ?? '',
+            'bkash.credentials.username' => $paymentMethod->config['username'] ?? '',
+            'bkash.credentials.password' => $paymentMethod->config['password'] ?? '',
+        ]);
+
+        try {
+            $backendUrl = rtrim(config('app.url'), '/');
+            $callbackUrl = $backendUrl . '/api/payments/bkash/callback?request_id=' . $productRequest->id;
+
+            $paymentData = [
+                'amount' => number_format((float) $validated['amount'], 2, '.', ''),
+                'payer_reference' => 'req_' . $productRequest->id,
+                'callback_url' => $callbackUrl,
+                'merchant_invoice_number' => 'REQ-' . $productRequest->id,
+            ];
+
+            $response = \Ihasan\Bkash\Facades\Bkash::createPayment($paymentData);
+
+            return response()->json([
+                'paymentID' => $response['paymentID'] ?? null,
+                'bkashURL' => $response['bkashURL'] ?? null,
+                'successCallback' => $response['successCallback'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function submitPaymentDetails(Request $request, $id)
+    {
+        $productRequest = ProductRequest::findOrFail($id);
+
+        if ($productRequest->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'payment_method' => 'required|string|in:bank_transfer,bkash,cod', // cod unlikely for request but ok
+            'payment_slip' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'payment_reference' => 'nullable|string',
+        ]);
+
+        if ($request->hasFile('payment_slip')) {
+            $path = $request->file('payment_slip')->store('payment_slips', 'public');
+            $productRequest->payment_slip = $path;
+        }
+
+        $productRequest->payment_method = $request->payment_method;
+        if ($request->payment_reference) {
+            $productRequest->payment_reference = $request->payment_reference;
+        }
+
+        // If submitting manual details, status becomes processing
+        $productRequest->payment_status = 'processing';
+        $productRequest->save();
+
+        return response()->json(['message' => 'Payment details submitted successfully']);
     }
 
     public function show($id)
     {
         $productRequest = ProductRequest::with(['user', 'orderStatus'])->findOrFail($id);
-        $this->authorize('view', $productRequest);
+        if ($productRequest->user_id !== Auth::id() && !Auth::user()->hasRole('Admin')) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
         return response()->json($productRequest);
     }
     
@@ -195,28 +209,12 @@ class ProductRequestController extends Controller
             'status_id' => 'nullable|exists:order_statuses,id',
             'admin_note' => 'nullable|string',
             'total_amount_bdt' => 'nullable|numeric|min:0',
+            'min_payment_amount' => 'nullable|numeric|min:0',
+            'payment_status' => 'nullable|string',
         ]);
 
         // Update all provided fields
-        $updateData = $request->only([
-            'url',
-            'price',
-            'quantity',
-            'currency',
-            'declared_shipping_cost',
-            'is_inside_city',
-            'weight',
-            'payment_method',
-            'tax',
-            'additional_charges',
-            'delivery_charge',
-            'payment_processing_fee',
-            'admin_image_url',
-            'status',
-            'status_id',
-            'admin_note',
-            'total_amount_bdt'
-        ]);
+        $updateData = $request->except(['_token', '_method']);
 
         // Convert is_inside_city to boolean if provided
         if ($request->has('is_inside_city')) {
@@ -227,110 +225,27 @@ class ProductRequestController extends Controller
         if (isset($updateData['status_id'])) {
             $orderStatus = OrderStatus::find($updateData['status_id']);
             if ($orderStatus) {
-                $updateData['status'] = $orderStatus->name;
+                $updateData['status'] = $orderStatus->slug; // Or label, but slug is usually better for code
+                // Let's assume we want to update the 'status' column string as well for backward compatibility
+                // if the table has both. Usually redundant but ok.
             }
         }
 
         $productRequest->update($updateData);
 
-        // Reload with relationships
-        $productRequest->load(['user', 'orderStatus']);
-
-        return response()->json($productRequest);
+        return response()->json([
+            'message' => 'Product request updated successfully',
+            'product_request' => $productRequest
+        ]);
     }
 
-    public function confirm(Request $request, $id)
+    public function destroy($id)
     {
         $productRequest = ProductRequest::findOrFail($id);
-        
-        if ($productRequest->user_id !== Auth::id()) {
+        if ($productRequest->user_id !== Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $request->validate([
-            'transactionId' => 'required|string',
-            'method' => 'required|string',
-        ]);
-
-        // Here you would save the transaction details to a Transaction model
-        // For now, we just update the status
-        $productRequest->update(['status' => 'paid']);
-
-        return response()->json($productRequest);
-    }
-
-    /**
-     * Calculate delivery charge from settings
-     */
-    private function calculateDeliveryCharge($totalAmount, $isInsideCity, $weight = 0, $paymentMethod = null)
-    {
-        // Get delivery charge settings
-        $insideCityCharge = Setting::get('delivery_charge_inside_city', 0);
-        $outsideCityCharge = Setting::get('delivery_charge_outside_city', 0);
-        $freeDeliveryThreshold = Setting::get('free_delivery_threshold', 0);
-        $chargePerKg = Setting::get('delivery_charge_per_kg', 0);
-
-        // Check if order qualifies for free delivery
-        if ($freeDeliveryThreshold > 0 && $totalAmount >= $freeDeliveryThreshold) {
-            // Free delivery, but still calculate weight-based charges if applicable
-            $weightCharge = $weight > 0 ? ($weight * $chargePerKg) : 0;
-            return $weightCharge;
-        }
-
-        // Get base delivery charge based on location
-        $baseCharge = $isInsideCity ? $insideCityCharge : $outsideCityCharge;
-
-        // Add weight-based charge if applicable
-        $weightCharge = $weight > 0 ? ($weight * $chargePerKg) : 0;
-
-        // Check if payment method affects delivery charge
-        $totalDeliveryCharge = $baseCharge + $weightCharge;
-
-        // Payment method specific adjustments
-        if ($paymentMethod) {
-            $paymentMethodObj = \App\Models\PaymentMethod::where('type', $paymentMethod)
-                ->orWhere('name', 'like', '%' . $paymentMethod . '%')
-                ->where('is_active', true)
-                ->first();
-            
-            // If payment method has specific delivery charge override in config, use it
-            if ($paymentMethodObj && isset($paymentMethodObj->config['delivery_charge_override'])) {
-                $totalDeliveryCharge = $paymentMethodObj->config['delivery_charge_override'] + $weightCharge;
-            }
-        }
-
-        return $totalDeliveryCharge;
-    }
-
-    /**
-     * Calculate payment processing fee from payment method
-     */
-    private function calculatePaymentProcessingFee($totalAmount, $paymentMethod = null)
-    {
-        if (!$paymentMethod) {
-            return 0;
-        }
-
-        $paymentMethodObj = \App\Models\PaymentMethod::where('type', $paymentMethod)
-            ->orWhere('name', 'like', '%' . $paymentMethod . '%')
-            ->where('is_active', true)
-            ->first();
-
-        if (!$paymentMethodObj) {
-            return 0;
-        }
-
-        $fee = 0;
-
-        // If percentage fee is set, calculate from total amount
-        if ($paymentMethodObj->fee_percentage && $paymentMethodObj->fee_percentage > 0) {
-            $fee = ($totalAmount * $paymentMethodObj->fee_percentage) / 100;
-        }
-        // If fixed fee is set, use it
-        elseif ($paymentMethodObj->fee && $paymentMethodObj->fee > 0) {
-            $fee = $paymentMethodObj->fee;
-        }
-
-        return round($fee, 2);
+        $productRequest->delete();
+        return response()->json(['message' => 'Product request deleted successfully']);
     }
 }

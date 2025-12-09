@@ -12,5 +12,13 @@ const app = createApp(App)
 app.component('QuillEditor', QuillEditor)
 app.use(createPinia())
 app.use(router)
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
+app.use(Toast, {
+    transition: "Vue-Toastification__bounce",
+    maxToasts: 20,
+    newestOnTop: true
+});
 
 app.mount('#app')

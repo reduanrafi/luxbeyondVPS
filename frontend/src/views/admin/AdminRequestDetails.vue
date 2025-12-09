@@ -154,6 +154,50 @@
                 </div>
             </div>
 
+
+            <!-- Payment Details -->
+            <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-gray-50">
+                    <h3 class="text-lg font-bold text-slate-900">Payment Details</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs text-slate-500 mb-1">Payment Status</p>
+                            <span :class="{
+                                'bg-green-100 text-green-700': request.payment_status === 'paid',
+                                'bg-yellow-100 text-yellow-700': request.payment_status === 'processing',
+                                'bg-red-100 text-red-700': request.payment_status === 'failed' || request.payment_status === 'unpaid',
+                                'bg-blue-100 text-blue-700': request.payment_status === 'partial'
+                            }" class="px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                                {{ request.payment_status || 'Unpaid' }}
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 mb-1">Payment Method</p>
+                            <p class="text-sm font-semibold text-slate-900">{{ request.payment_method || 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 mb-1">Min Payment Amount</p>
+                            <p class="text-sm font-semibold text-slate-900">৳{{ formatPrice(request.min_payment_amount)
+                            }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 mb-1">Payment Reference</p>
+                            <p class="text-sm font-semibold text-slate-900">{{ request.payment_reference || 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div v-if="request.payment_slip_url" class="mt-4 border-t border-gray-200 pt-4">
+                        <p class="text-xs text-slate-500 mb-2">Payment Slip</p>
+                        <a :href="request.payment_slip_url" target="_blank" class="block w-full max-w-sm">
+                            <img :src="request.payment_slip_url" alt="Payment Slip"
+                                class="w-full h-auto rounded-lg border border-gray-200 hover:opacity-90 transition-opacity">
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Request Summary -->
             <div class="bg-surface rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 <div class="p-4 border-b border-white/10 bg-gray-50">

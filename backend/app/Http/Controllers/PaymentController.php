@@ -141,17 +141,56 @@ class PaymentController extends Controller
     {
         $paymentID = $request->input('paymentID');
         $status = $request->input('status');
+        $requestId = $request->input('request_id'); // For Product Requests
 
         $frontendUrl = config('app.frontend_url', config('app.url'));
 
         if ($status !== 'success') {
-            return redirect($frontendUrl . '/checkout?payment=failed');
+            return redirect($frontendUrl . ($requestId ? '/dashboard/requests' : '/checkout') . '?payment=failed');
         }
 
         if (!$paymentID) {
-            return redirect($frontendUrl . '/checkout?payment=error');
+            return redirect($frontendUrl . ($requestId ? '/dashboard/requests' : '/checkout') . '?payment=error');
         }
 
+        // Logic for Product Request
+        if ($requestId) {
+            $productRequest = \App\Models\ProductRequest::find($requestId);
+            if (!$productRequest) {
+                Log::warning('bKash Callback: Product Request not found', ['request_id' => $requestId]);
+                return redirect($frontendUrl . '/dashboard/requests?payment=error');
+            }
+
+            try {
+                $this->configureBkashFromPaymentMethod();
+                $response = Bkash::executePayment($paymentID);
+
+                if (isset($response['transactionStatus']) && $response['transactionStatus'] === 'Completed') {
+                    $productRequest->update([
+                        'payment_status' => 'paid',
+                        'bkash_trx_id' => $response['trxID'] ?? null,
+                        'paid_at' => now(),
+                        'payment_method' => 'bkash'
+                    ]);
+
+                    return redirect($frontendUrl . '/dashboard/requests/' . $productRequest->id . '?payment=success');
+                } else {
+                    Log::warning('bKash Payment Not Completed (Product Reqeust)', [
+                        'request_id' => $productRequest->id,
+                        'status' => $response['transactionStatus'] ?? 'unknown',
+                    ]);
+                    return redirect($frontendUrl . '/dashboard/requests/' . $productRequest->id . '?payment=failed');
+                }
+            } catch (\Exception $e) {
+                Log::error('bKash Callback Error (Product Request)', [
+                    'error' => $e->getMessage(),
+                    'request_id' => $requestId
+                ]);
+                return redirect($frontendUrl . '/dashboard/requests/' . $requestId . '?payment=error');
+            }
+        }
+
+        // Existing Logic for Orders
         // Find order by payment reference
         $order = Order::where('payment_reference', $paymentID)->first();
 

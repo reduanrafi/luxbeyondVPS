@@ -81,15 +81,13 @@ const loading = ref(false);
 const fetchCoupons = async () => {
     loading.value = true;
     try {
-        // Note: Since there's no customer-facing coupon endpoint,
-        // we'll show an empty state or you can create a backend endpoint
-        // For now, we'll set empty array and show message
-        coupons.value = [];
-        
-        // TODO: Create a customer-facing endpoint like /api/coupons/available
-        // that returns coupons available to the logged-in user
+        const response = await axios.get('/coupons/available');
+        // Handle both array and paginated response formats just in case
+        const couponsData = response.data.data || response.data;
+        coupons.value = Array.isArray(couponsData) ? couponsData : [];
     } catch (error) {
         console.error('Error fetching coupons:', error);
+        // Fallback to empty
         coupons.value = [];
     } finally {
         loading.value = false;
