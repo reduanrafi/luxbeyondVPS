@@ -181,7 +181,21 @@
 
                                     <!-- Charges -->
                                     <div class="space-y-3 pt-4 border-t border-white/10 text-slate-300">
-                                        <div class="flex justify-between">
+                                        <!-- Breakdown Loop -->
+                                        <template v-if="costBreakdown.breakdown && costBreakdown.breakdown.length > 0">
+                                            <div v-for="(charge, index) in costBreakdown.breakdown" :key="index"
+                                                class="flex justify-between">
+                                                <span>
+                                                    {{ charge.charge }}
+                                                    <span v-if="charge.currency !== 'BDT'"
+                                                        class="text-xs text-slate-500 ml-1">
+                                                        ({{ charge.currency }} {{ charge.amount_in_currency }})
+                                                    </span>
+                                                </span>
+                                                <span>৳{{ charge.amount_in_bdt.toFixed(2) }}</span>
+                                            </div>
+                                        </template>
+                                        <div v-else class="flex justify-between">
                                             <span>Platform Fees & Charges</span>
                                             <span>৳{{ (costBreakdown.total_charges).toFixed(2) }}</span>
                                         </div>
@@ -262,7 +276,7 @@
 
                             <!-- Step 2: Next Button -->
                             <button v-if="currentStep === 2" @click="nextStep" :disabled="!isStepValid(currentStep)"
-                                class="px-8 py-3 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="px-8 py-3 bg-primary text-black font-bold rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                                 Continue to Review
                             </button>
 
@@ -410,6 +424,7 @@ const calculateEstimate = async () => {
         const response = await axios.post('/charges/calculate', {
             base_amount: baseAmount,
             currency_id: selectedCurrency.value?.id,
+            scope: 'request',
             additional_data: {
                 weight: form.value.weight || 0,
                 is_inside_city: form.value.is_inside_city,
@@ -427,8 +442,11 @@ const calculateEstimate = async () => {
         costBreakdown.value = {
             product_total: baseAmount,
             total_charges: response.data.total_charges,
+            delivery_charge: response.data.delivery_charge,
+            payment_processing_fee: response.data.payment_processing_fee,
             declared_shipping: declaredShipping,
             grand_total: baseAmount + response.data.total_charges + declaredShipping,
+            breakdown: response.data.breakdown || [],
         };
         return true;
     } catch (e) {
@@ -499,10 +517,20 @@ const nextStep = () => {
 const submitRequest = async () => {
     submitting.value = true;
     try {
-        await axios.post('/product-requests', { ...form.value, payment_status: 'unpaid' });
+        const payload = {
+            ...form.value,
+            payment_status: 'pending',
+            total_amount_bdt: costBreakdown.value?.grand_total || 0,
+            delivery_charge: costBreakdown.value?.delivery_charge || 0,
+            payment_processing_fee: costBreakdown.value?.payment_processing_fee || 0,
+            charges_breakdown: costBreakdown.value?.breakdown || [],
+            // Extract tax if possible, or leave null for admin to set
+        };
+        await axios.post('/product-requests', payload);
+        toast.success('Product request submitted successfully!');
         router.push('/dashboard/requests');
     } catch (e) {
-        alert(e.response?.data?.message || 'Error submitting request');
+        toast.error(e.response?.data?.message || 'Error submitting request');
     } finally {
         submitting.value = false;
     }

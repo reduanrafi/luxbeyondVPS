@@ -1,56 +1,134 @@
 <template>
-    <div class="bg-surface min-h-screen pt-20 pb-12">
-        <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-black pt-20 pb-12">
+        <!-- Loading State -->
+        <div v-if="loading" class="max-w-4xl mx-auto px-4">
+            <div class="h-8 bg-zinc-900 rounded w-3/4 mb-4 animate-pulse"></div>
+            <div class="h-96 bg-zinc-900 rounded-2xl mb-8 animate-pulse"></div>
+            <div class="space-y-4 animate-pulse">
+                <div class="h-4 bg-zinc-900 rounded w-full"></div>
+                <div class="h-4 bg-zinc-900 rounded w-full"></div>
+                <div class="h-4 bg-zinc-900 rounded w-2/3"></div>
+            </div>
+        </div>
+
+        <div v-else-if="post" class="max-w-4xl mx-auto px-4">
+            <!-- Breadcrumbs -->
+            <div class="flex items-center gap-2 text-sm text-zinc-500 mb-6">
+                <router-link to="/" class="hover:text-amber-500 transition-colors">Home</router-link>
+                <span>/</span>
+                <router-link to="/blogs" class="hover:text-amber-500 transition-colors">Blog</router-link>
+                <span>/</span>
+                <span class="text-zinc-300 line-clamp-1">{{ post.title }}</span>
+            </div>
+
+            <!-- Header -->
             <div class="mb-8">
-                <span class="text-primary font-semibold">{{ blog.category }}</span>
-                <h1 class="text-4xl sm:text-5xl font-bold text-white mt-2 mb-4">{{ blog.title }}</h1>
-                <div class="flex items-center text-gray-500">
-                    <span>By {{ blog.author }}</span>
-                    <span class="mx-2">•</span>
-                    <span>{{ blog.date }}</span>
+                <h1 class="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">{{ post.title }}</h1>
+                <div class="flex flex-wrap items-center gap-6 text-sm text-zinc-400">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
+                            {{ getInitials(post.author?.name) }}
+                        </div>
+                        <span class="text-white">{{ post.author?.name || 'Admin' }}</span>
+                    </div>
+                    <span>{{ formatDate(post.published_at) }}</span>
+                    <span>{{ post.views }} views</span>
                 </div>
             </div>
 
-            <div class="rounded-xl overflow-hidden mb-10 h-[400px]">
-                <img :src="blog.image" :alt="blog.title" class="w-full h-full object-cover">
+            <!-- Featured Image -->
+            <div class="relative w-full aspect-video rounded-2xl overflow-hidden mb-12 border border-white/10 shadow-2xl">
+                <img :src="post.image_url || '/assets/blog-placeholder.jpg'" 
+                    :alt="post.title"
+                    class="w-full h-full object-cover">
             </div>
 
-            <div class="prose prose-lg max-w-none text-slate-300">
-                <p class="lead text-xl mb-6 font-medium">{{ blog.excerpt }}</p>
-                <div v-html="blog.content"></div>
+            <!-- Content -->
+            <div class="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-primary prose-a:text-primary hover:prose-a:text-white mb-12">
+                <div v-html="renderMarkdown(post.content)"></div>
             </div>
-        </article>
+
+            <!-- Tags -->
+            <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2 mb-12">
+                <span v-for="tag in post.tags" :key="tag" 
+                    class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-sm text-zinc-400">
+                    #{{ tag }}
+                </span>
+            </div>
+
+            <!-- Share (Simple implementation) -->
+            <div class="border-t border-white/10 pt-8 mt-8">
+                <h3 class="text-lg font-bold text-white mb-4">Share this article</h3>
+                <div class="flex gap-4">
+                    <button @click="copyLink" class="px-4 py-2 bg-white/5 rounded-lg text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                        <Link class="w-4 h-4" />
+                        Copy Link
+                    </button>
+                    <!-- Add social share buttons here if needed -->
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="text-center py-20">
+            <h2 class="text-2xl font-bold text-white mb-4">Post not found</h2>
+            <router-link to="/blogs" class="text-amber-500 hover:underline">
+                Back to Blog
+            </router-link>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { Link } from 'lucide-vue-next';
+import axios from '../axios';
+import { marked } from 'marked'; 
+// Assuming marked is installed, if not we will use a simple whitespace converter or install it. 
+// For now, I'll use a simple computed for v-html if markdown is complex, 
+// but since the admin saves generic text/html, direct injection works if sanitized.
+// Since this is an internal admin creating content, we trust it slightly more, but let's assume raw HTML for now.
 
 const route = useRoute();
+const post = ref(null);
+const loading = ref(true);
 
-// Mock data fetch based on ID
-const blog = ref({
-    id: 1,
-    title: 'Top 10 Gadgets to Import in 2024',
-    category: 'Technology',
-    author: 'Admin',
-    date: 'Nov 18, 2024',
-    excerpt: 'Discover the hottest tech gadgets that are trending globally and how you can get them easily. From smart home devices to the latest wearables, we cover it all.',
-    image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-    content: `
-        <p class="mb-4">Technology evolves rapidly, and getting your hands on the latest gadgets can be a challenge if they aren't available in your local market. That's where we come in. We've curated a list of the top 10 gadgets that are making waves internationally.</p>
-        <h2 class="text-2xl font-bold mb-4 mt-8">1. Smart Home Hubs</h2>
-        <p class="mb-4">The center of any modern home. The latest hubs from Google and Amazon offer seamless integration with thousands of devices.</p>
-        <h2 class="text-2xl font-bold mb-4 mt-8">2. Next-Gen Wearables</h2>
-        <p class="mb-4">From fitness trackers to smart glasses, wearable tech is becoming more integrated into our daily lives.</p>
-        <p class="mb-4">...</p>
-        <p class="mt-8">Ready to upgrade your tech game? Request these products today through our platform and get them delivered to your doorstep!</p>
-    `
-});
+const fetchPost = async () => {
+    loading.value = true;
+    try {
+        const response = await axios.get(`/blogs/${route.params.slug}`);
+        post.value = response.data;
+    } catch (error) {
+        console.error('Error fetching post:', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+};
+
+const getInitials = (name) => {
+    if (!name) return 'A';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+};
+
+const renderMarkdown = (text) => {
+    if (!text) return '';
+    return marked.parse(text);
+};
+
+const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert('Link copied to clipboard!');
+};
 
 onMounted(() => {
-    // In real app, fetch blog by route.params.id
-    console.log('Blog ID:', route.params.id);
+    fetchPost();
 });
 </script>

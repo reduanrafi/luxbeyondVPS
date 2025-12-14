@@ -29,6 +29,10 @@
                         <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110"
                             :class="isActive(item.href) ? 'text-slate-900' : 'text-current'" />
                         <span>{{ item.name }}</span>
+                        <span v-if="item.name === 'Notifications' && unreadCount > 0"
+                            class="ml-auto bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ unreadCount }}
+                        </span>
                     </router-link>
                     <button v-for="item in navigation.filter(i => i.action)" :key="item.name"
                         @click="handleAction(item.action); isSidebarOpen = false"
@@ -91,10 +95,24 @@
                         <p class="text-sm text-slate-500 mt-0.5">Welcome back, {{ user?.name?.split(' ')[0] }}!</p>
                     </div>
                     <div class="flex items-center gap-4">
-                        <button class="relative p-2 text-slate-400 hover:text-primary transition-colors">
+                        <router-link to="/shop"
+                            class="p-2 flex gap-2 text-slate-400  border border-primary/10 items-center rounded hover:bg-primary/10 hover:text-white transition-colors">
+                            <Store class="w-5 h-5" />
+                            <span class="">Shop</span>
+                        </router-link>
+                        <router-link to="/request-product"
+                            class="flex gap-2 ites-center p-2 text-slate-400 hover:text-primary transition-colors border border-primary/10 items-center rounded">
+                            <PlaneTakeoff class="w-5 h-5" />
+                            <span class="">Request</span>
+                        </router-link>
+                        <router-link to="/dashboard/notifications"
+                            class="relative p-2 text-slate-400 hover:text-primary transition-colors group">
                             <Bell class="w-6 h-6" />
-                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                            <span v-if="unreadCount > 0"
+                                class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                                {{ unreadCount }}
+                            </span>
+                        </router-link>
                     </div>
                 </div>
             </header>
@@ -107,10 +125,10 @@
                         class="p-2 -ml-2 text-gray-600 hover:text-primary transition-colors">
                         <Menu class="w-6 h-6" />
                     </button>
-                    <span class="font-bold text-lg text-slate-900">{{ currentPageTitle }}</span>
+                    <span class="font-bold text-lg text-primary">{{ currentPageTitle }}</span>
                     <button class="relative p-2 text-slate-400 hover:text-primary transition-colors">
                         <Bell class="w-5 h-5" />
-                        <span class="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                        <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">{{ unreadCount }}</span>
                     </button>
                 </div>
             </header>
@@ -130,10 +148,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '../../stores/auth';
 import { useCartStore } from '../../stores/cart';
 import { useWishlistStore } from '../../stores/wishlist';
+import { useNotificationStore } from '../../stores/notification';
 import { useRouter, useRoute } from 'vue-router';
 import {
     LayoutDashboard,
@@ -146,7 +165,9 @@ import {
     Menu,
     Earth,
     ShoppingCart,
-    Heart
+    Heart,
+    Store,
+    PlaneTakeoff
 } from 'lucide-vue-next';
 import CartDrawer from '../../components/CartDrawer.vue';
 import WishlistDrawer from '../../components/WishlistDrawer.vue';
@@ -154,6 +175,7 @@ import WishlistDrawer from '../../components/WishlistDrawer.vue';
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
+const notificationStore = useNotificationStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -161,6 +183,13 @@ const isSidebarOpen = ref(false);
 const isCartOpen = ref(false);
 const isWishlistOpen = ref(false);
 const user = computed(() => authStore.user);
+const unreadCount = computed(() => notificationStore.unreadCount);
+
+onMounted(() => {
+    if (authStore.isAuthenticated) {
+        notificationStore.fetchNotifications();
+    }
+});
 
 const userInitials = computed(() => {
     if (!user.value?.name) return 'U';
@@ -169,7 +198,7 @@ const userInitials = computed(() => {
 
 const navigation = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'My Requests', href: '/dashboard/requests', icon: Package },
+    { name: 'My Requests', href: '/dashboard/requests', icon: PlaneTakeoff },
     { name: 'My Orders', href: '/dashboard/orders', icon: ShoppingBag },
     { name: 'Cart', href: '#', icon: ShoppingCart, action: 'cart' },
     { name: 'Wishlist', href: '#', icon: Heart, action: 'wishlist' },

@@ -14,6 +14,30 @@ use App\Notifications\OrderPendingNotification;
 
 class OrderController extends Controller
 {
+    public function stats()
+    {
+        $totalOrders = Order::count();
+
+        $stats = OrderStatus::where('is_active', true)
+            ->withCount('orders')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(function ($status) {
+                return [
+                    'id' => $status->id,
+                    'label' => $status->label,
+                    'value' => $status->orders_count,
+                    'color' => $status->color,
+                    'icon' => $status->icon,
+                ];
+            });
+
+        return response()->json([
+            'total' => $totalOrders,
+            'statuses' => $stats
+        ]);
+    }
+
     public function index(Request $request)
     {
         $query = Order::with(['user', 'status', 'event', 'coupon', 'items']);
@@ -239,7 +263,12 @@ class OrderController extends Controller
             $newStatus = OrderStatus::findOrFail($validated['status_id']);
             
             // Check if transition is allowed
-            if ($order->status && $order->status->canTransitionTo($validated['status_id'])) {
+            // Fix: $order->status returns string column, use status_id to find model
+            $currentStatus = OrderStatus::find($order->status_id);
+            if ($currentStatus && $currentStatus->canTransitionTo($validated['status_id'])) {
+                $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
+            } elseif (!$currentStatus) {
+                // If no current status (shouldn't happen), allow update
                 $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
             } else {
                 return response()->json([
@@ -313,9 +342,10 @@ class OrderController extends Controller
         $newStatus = OrderStatus::findOrFail($request->status_id);
         
         // Check if transition is allowed
-        if ($order->status && !$order->status->canTransitionTo($request->status_id)) {
+        $currentStatus = OrderStatus::find($order->status_id);
+        if ($currentStatus && !$currentStatus->canTransitionTo($request->status_id)) {
             return response()->json([
-                'message' => 'Status transition not allowed from ' . $order->status->label . ' to ' . $newStatus->label
+                'message' => 'Status transition not allowed from ' . $currentStatus->label . ' to ' . $newStatus->label
             ], 422);
         }
 

@@ -3,78 +3,85 @@
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900">Categories Management</h2>
-                <p class="text-sm text-slate-600 mt-1">Manage product categories</p>
+                <h2 class="text-2xl font-bold text-white">Categories Management</h2>
+                <p class="text-sm text-zinc-400 mt-1">Manage product categories</p>
             </div>
             <button @click="showAddModal = true"
-                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
+                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Category
             </button>
         </div>
 
         <!-- Filters -->
-        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
+        <div class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search categories..."
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
                 <select v-model="filters.status" @change="fetchCategories(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
-                    <option value="">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    <option value="" class="bg-zinc-900">All Status</option>
+                    <option value="active" class="bg-zinc-900">Active</option>
+                    <option value="inactive" class="bg-zinc-900">Inactive</option>
                 </select>
                 <button @click="resetFilters"
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    class="px-4 py-2 border border-white/10 text-zinc-400 rounded-lg hover:bg-white/5 hover:text-white transition-colors">
                     Reset Filters
                 </button>
             </div>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p class="text-slate-600 mt-2">Loading categories...</p>
+        <div v-if="loading" class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-12 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+            <p class="text-zinc-500 mt-4">Loading categories...</p>
         </div>
 
         <!-- Categories Grid -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-if="categories.length === 0"
-                class="col-span-full bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center text-slate-500">
+                class="col-span-full bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-12 text-center text-zinc-500">
                 No categories found
             </div>
             <div v-for="category in categories" :key="category.id"
-                class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden hover:shadow-lg transition-shadow">
-                <div class="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 overflow-hidden hover:border-amber-500/20 transition-all group">
+                <div
+                    class="h-40 bg-white/5 border-b border-white/5 flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-50"></div>
                     <img v-if="category.image_url" :src="category.image_url" :alt="category.name"
-                        class="h-full w-full object-contain">
-                    <Tag v-else class="w-12 h-12 text-primary/40" />
+                        class="h-24 w-auto max-w-[80%] object-contain relative z-10 filter drop-shadow-2xl">
+                    <Tag v-else class="w-16 h-16 text-zinc-700 relative z-10" />
                 </div>
-                <div class="p-4">
-                    <div class="flex items-start justify-between mb-2">
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-3">
                         <div>
-                            <h3 class="font-bold text-lg text-slate-900">{{ category.name }}</h3>
-                            <p v-if="category.parent" class="text-xs text-slate-500 mt-1">
-                                <span class="text-primary">{{ category.parent.name }}</span> → {{ category.name }}
+                            <h3 class="font-bold text-lg text-white group-hover:text-amber-500 transition-colors">{{
+                                category.name }}</h3>
+                            <p v-if="category.parent" class="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+                                <span class="text-amber-500 font-medium">{{ category.parent.name }}</span>
+                                <span class="text-zinc-600">→</span>
+                                <span class="text-zinc-400">{{ category.name }}</span>
                             </p>
                         </div>
-                        <span class="px-2 py-1 rounded-full text-xs font-semibold"
-                            :class="category.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-slate-300'">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium border"
+                            :class="category.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'">
                             {{ category.is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
-                    <p class="text-sm text-slate-600 mb-3 line-clamp-2">{{ category.description || 'No description' }}
+                    <p class="text-sm text-zinc-400 mb-6 line-clamp-2 h-10">{{ category.description || `No description
+                        provided.` }}
                     </p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-slate-500">{{ category.products_count || 0 }} products</span>
+                    <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                        <span class="text-xs text-zinc-500 font-medium">{{ category.products_count || 0 }}
+                            Products</span>
                         <div class="flex items-center gap-2">
                             <button @click="editCategory(category)"
-                                class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
-                                <Edit class="w-4 h-4 text-blue-600" />
+                                class="p-2 hover:bg-white/10 rounded-lg transition-colors text-blue-400 hover:text-blue-300">
+                                <Edit class="w-4 h-4" />
                             </button>
                             <button @click="deleteCategory(category.id)"
-                                class="p-2 hover:bg-red-50 rounded-lg transition-colors">
-                                <Trash2 class="w-4 h-4 text-red-600" />
+                                class="p-2 hover:bg-white/10 rounded-lg transition-colors text-red-400 hover:text-red-300">
+                                <Trash2 class="w-4 h-4" />
                             </button>
                         </div>
                     </div>
@@ -83,23 +90,25 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination.total > 0" class="flex items-center justify-between">
-            <p class="text-sm text-slate-600">
-                Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} categories
+        <div v-if="pagination.total > 0" class="flex items-center justify-between pt-6 border-t border-white/5">
+            <p class="text-xs text-zinc-500">
+                Showing <span class="font-medium text-white">{{ pagination.from }}</span> to <span
+                    class="font-medium text-white">{{ pagination.to }}</span> of <span class="font-medium text-white">{{
+                        pagination.total }}</span> categories
             </p>
             <div class="flex gap-2">
                 <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page === 1"
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-3 py-1.5 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-xs font-medium text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed">
                     Previous
                 </button>
                 <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                    :class="page === pagination.current_page ? 'bg-primary text-slate-900' : 'border border-gray-300 hover:bg-gray-50'"
-                    class="px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                    :class="page === pagination.current_page ? 'bg-amber-500 text-black border-amber-500 font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
+                    class="px-3 py-1.5 border rounded-lg text-xs transition-colors">
                     {{ page }}
                 </button>
                 <button @click="changePage(pagination.current_page + 1)"
                     :disabled="pagination.current_page === pagination.last_page"
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    class="px-3 py-1.5 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-xs font-medium text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed">
                     Next
                 </button>
             </div>
@@ -107,63 +116,65 @@
 
         <!-- Add/Edit Modal -->
         <div v-if="showAddModal || showEditModal"
-            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div class="bg-surface rounded-xl shadow-2xl max-w-md w-full p-6">
-                <h3 class="text-xl font-bold text-slate-900 mb-4">{{ showEditModal ? 'Edit Category' : 'Add Category' }}
+            class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-white/10 max-w-md w-full p-6">
+                <h3 class="text-xl font-bold text-white mb-6">{{ showEditModal ? 'Edit Category' : 'Add Category' }}
                 </h3>
                 <form @submit.prevent="showEditModal ? updateCategory() : createCategory()" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Name *</label>
                         <input type="text" v-model="form.name" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            :class="{ 'border-red-500': errors.name }">
-                        <p v-if="errors.name" class="text-xs text-red-500 mt-1">{{ errors.name[0] }}</p>
+                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            :class="{ 'border-red-500/50': errors.name }">
+                        <p v-if="errors.name" class="text-xs text-red-400 mt-1">{{ errors.name[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Description</label>
                         <textarea v-model="form.description" rows="3"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                            :class="{ 'border-red-500': errors.description }"></textarea>
-                        <p v-if="errors.description" class="text-xs text-red-500 mt-1">{{ errors.description[0] }}</p>
+                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            :class="{ 'border-red-500/50': errors.description }"></textarea>
+                        <p v-if="errors.description" class="text-xs text-red-400 mt-1">{{ errors.description[0] }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Image</label>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Image</label>
                         <div class="flex gap-4 items-start">
                             <div class="flex-1">
                                 <input type="file" @change="handleImageUpload" accept="image/*"
-                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                    :class="{ 'border-red-500': errors.image }">
-                                <p v-if="errors.image" class="text-xs text-red-500 mt-1">{{ errors.image[0] }}</p>
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-400"
+                                    :class="{ 'border-red-500/50': errors.image }">
+                                <p v-if="errors.image" class="text-xs text-red-400 mt-1">{{ errors.image[0] }}</p>
                             </div>
                             <div v-if="imagePreview"
-                                class="w-16 h-16 bg-gray-100 rounded border border-white/10 overflow-hidden flex-shrink-0">
+                                class="w-16 h-16 bg-white/5 rounded-lg border border-white/10 overflow-hidden flex-shrink-0 p-2">
                                 <img :src="imagePreview" class="w-full h-full object-contain">
                             </div>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Parent Category</label>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Parent Category</label>
                         <select v-model="form.parent_id"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface"
-                            :class="{ 'border-red-500': errors.parent_id }">
-                            <option :value="null">None (Root Category)</option>
-                            <option v-for="cat in availableParentCategories" :key="cat.id" :value="cat.id">
+                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            :class="{ 'border-red-500/50': errors.parent_id }">
+                            <option :value="null" class="bg-zinc-900">None (Root Category)</option>
+                            <option v-for="cat in availableParentCategories" :key="cat.id" :value="cat.id"
+                                class="bg-zinc-900">
                                 {{ cat.name }}
                             </option>
                         </select>
-                        <p v-if="errors.parent_id" class="text-xs text-red-500 mt-1">{{ errors.parent_id[0] }}</p>
+                        <p v-if="errors.parent_id" class="text-xs text-red-400 mt-1">{{ errors.parent_id[0] }}</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input type="checkbox" v-model="form.is_active" id="is_active" class="w-4 h-4 text-primary">
-                        <label for="is_active" class="text-sm font-medium text-slate-700">Active</label>
+                        <input type="checkbox" v-model="form.is_active" id="is_active"
+                            class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                        <label for="is_active" class="text-sm font-medium text-zinc-300">Active</label>
                     </div>
-                    <div class="flex gap-3 pt-4">
+                    <div class="flex gap-3 pt-6 border-t border-white/5">
                         <button type="button" @click="closeModal"
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                            class="flex-1 px-4 py-2 border border-white/10 rounded-lg hover:bg-white/5 transition-colors font-medium text-zinc-400">
                             Cancel
                         </button>
                         <button type="submit"
-                            class="flex-1 px-4 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary-hover transition-colors font-medium">
+                            class="flex-1 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-400 transition-colors font-bold">
                             {{ showEditModal ? 'Update' : 'Create' }}
                         </button>
                     </div>

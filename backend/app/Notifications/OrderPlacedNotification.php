@@ -45,7 +45,11 @@ class OrderPlacedNotification extends Notification implements ShouldQueue
             ->line('Thank you for your order! We have received your order and it is now being processed.')
             ->line('Order Summary:')
             ->line('Order Number: #' . ($this->order->order_number ?? $this->order->id))
-            ->line('Total Amount: ' . $this->order->currency . ' ' . number_format($this->order->total, 2))
+            ->line('Items: ' . $this->order->items->count())
+            ->line('Total Amount: ' . $this->order->currency . ' ' . number_format((float) $this->order->total, 2))
+            ->line('**Items ordered:**')
+            ->line($this->order->items->take(3)->map(fn($item) => "- {$item->product_name} x {$item->quantity}")->implode("\n"))
+            ->line($this->order->items->count() > 3 ? "...and " . ($this->order->items->count() - 3) . " more items." : "")
             ->action('View Order Details', $url)
             ->line('We will notify you once your order has been shipped.')
             ->line('Thank you for shopping with us!');

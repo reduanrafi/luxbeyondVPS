@@ -12,8 +12,8 @@ export const useRequestStore = defineStore('request', {
         async fetchRequests() {
             this.loading = true;
             try {
-                const response = await axios.get('/requests');
-                this.requests = response.data;
+                const response = await axios.get('/product-requests');
+                this.requests = response.data.data || response.data;
             } catch (error) {
                 this.error = error.response?.data?.message || 'Failed to fetch requests';
             } finally {
@@ -24,7 +24,7 @@ export const useRequestStore = defineStore('request', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axios.post('/requests', requestData);
+                const response = await axios.post('/product-requests', requestData);
                 this.requests.unshift(response.data);
                 return response.data;
             } catch (error) {

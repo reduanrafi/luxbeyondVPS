@@ -19,7 +19,7 @@
                         your doorstep with ease, security, and style.
                     </p>
                     <div class="flex gap-4 pt-2">
-                        <a href="#" target="_blank"
+                        <a href="https://www.facebook.com/luxbeyondus" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Facebook class="w-5 h-5" />
                         </a>
@@ -57,6 +57,9 @@
                         <li><router-link to="/blogs"
                                 class="text-slate-400 hover:text-primary hover:translate-x-1 transition-all duration-300 flex items-center gap-2"><span
                                     class="w-1.5 h-1.5 rounded-full bg-accent"></span>Blogs</router-link></li>
+                        <li><router-link to="/track-order"
+                                class="text-slate-400 hover:text-primary hover:translate-x-1 transition-all duration-300 flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 rounded-full bg-accent"></span>Track Order</router-link></li>
                     </ul>
                 </div>
 

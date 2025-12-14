@@ -29,14 +29,14 @@ const props = defineProps({
 });
 
 const computedClasses = computed(() => {
-    const baseClasses = 'inline-flex items-center justify-center rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseClasses = 'inline-flex items-center justify-center rounded-full font-medium transition-all text-sm duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#09090b] disabled:opacity-50 disabled:cursor-not-allowed';
     
     const variants = {
-        primary: 'bg-primary text-slate-900 hover:bg-primary-hover hover:rounded-full focus:ring-primary',
-        secondary: 'bg-secondary text-slate-900 hover:bg-blue-600 hover:rounded-full focus:ring-secondary',
-        outline: 'border border-white/20 bg-transparent text-slate-300 hover:bg-slate-800 hover:rounded-full focus:ring-gray-200',
-        ghost: 'bg-transparent text-slate-300 hover:bg-slate-800 hover:rounded-full focus:ring-gray-200',
-        danger: 'bg-red-600 text-white hover:bg-red-700 hover:rounded-full focus:ring-red-500'
+        primary: 'bg-primary text-black font-semibold hover:bg-primary/100 focus:ring-primary shadow-[0_0_15px_rgba(200,174,125,0.3)] hover:shadow-[0_0_25px_rgba(200,174,125,0.5)]',
+        secondary: 'bg-white/10 text-white hover:bg-white/20 focus:ring-white/50 backdrop-blur-sm border border-white/5',
+        outline: 'border border-primary/30 text-primary hover:bg-primary/10 focus:ring-primary',
+        ghost: 'text-primary hover:bg-primary/10 focus:ring-primary',
+        danger: 'bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white focus:ring-red-500'
     };
 
     const sizes = {

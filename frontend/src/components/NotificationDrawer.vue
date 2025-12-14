@@ -54,12 +54,13 @@
                                 <div class="flex-1 min-w-0">
                                     <p class="font-serif text-sm tracking-wide"
                                         :class="notification.read ? 'text-slate-300' : 'text-white'">
-                                        {{ notification.title }}
+                                        {{ notification.data.title || notification.type }}
                                     </p>
-                                    <p class="text-slate-400 text-xs mt-1 leading-relaxed">{{ notification.message }}
+                                    <p class="text-slate-400 text-xs mt-1 leading-relaxed text-wrap">{{ notification.data.message
+                                        }}
                                     </p>
                                     <p class="text-slate-600 text-[10px] mt-2 uppercase tracking-wider">{{
-                                        notification.time }}</p>
+    formatTime(notification.created_at) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -86,8 +87,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { Bell, X, ShoppingBag, Package, Tag, CheckCircle } from 'lucide-vue-next';
+import { useNotificationStore } from '../stores/notification';
 
 defineProps({
     isOpen: Boolean
@@ -95,72 +97,49 @@ defineProps({
 
 defineEmits(['close']);
 
-// Mock notifications data (should come from a notifications store/API)
-const notifications = ref([
-    {
-        id: 1,
-        title: 'Order Shipped',
-        message: 'Your order #ORD-7828 has been shipped and is on its way!',
-        time: '2 hours ago',
-        type: 'order',
-        read: false
-    },
-    {
-        id: 2,
-        title: 'Request Approved',
-        message: 'Your request for "Sony Headphones" has been approved.',
-        time: '5 hours ago',
-        type: 'request',
-        read: false
-    },
-    {
-        id: 3,
-        title: 'Flash Sale Alert',
-        message: 'Don\'t miss out on our 24-hour flash sale starting tomorrow!',
-        time: '1 day ago',
-        type: 'promo',
-        read: false
-    },
-    {
-        id: 4,
-        title: 'Order Delivered',
-        message: 'Order #ORD-7827 has been delivered. Enjoy your purchase!',
-        time: '3 days ago',
-        type: 'order',
-        read: true
-    }
-]);
+const notificationStore = useNotificationStore();
 
-const unreadCount = computed(() => notifications.value.filter(n => !n.read).length);
+const notifications = computed(() => notificationStore.allNotifications);
+const unreadCount = computed(() => notificationStore.unreadCount);
 
 const getIcon = (type) => {
-    switch (type) {
-        case 'order': return ShoppingBag;
-        case 'request': return Package;
-        case 'promo': return Tag;
-        default: return CheckCircle;
-    }
+    // Basic mapping, can be improved based on backend 'type' or 'data.type' field
+    if (type?.includes('Order')) return ShoppingBag;
+    if (type?.includes('Request')) return Package;
+    if (type?.includes('Promo')) return Tag;
+    return Bell;
 };
 
 const getIconBg = (type) => {
-    switch (type) {
-        case 'order': return 'bg-primary/10 border-primary/20';
-        case 'request': return 'bg-purple-500/10 border-purple-500/20';
-        case 'promo': return 'bg-orange-500/10 border-orange-500/20';
-        default: return 'bg-green-500/10 border-green-500/20';
-    }
+    if (type?.includes('Order')) return 'bg-primary/10 border-primary/20';
+    if (type?.includes('Request')) return 'bg-purple-500/10 border-purple-500/20';
+    if (type?.includes('Promo')) return 'bg-orange-500/10 border-orange-500/20';
+    return 'bg-green-500/10 border-green-500/20';
 };
 
 const getIconColor = (type) => {
-    switch (type) {
-        case 'order': return 'text-primary';
-        case 'request': return 'text-purple-400';
-        case 'promo': return 'text-orange-400';
-        default: return 'text-green-400';
-    }
+    if (type?.includes('Order')) return 'text-primary';
+    if (type?.includes('Request')) return 'text-purple-400';
+    if (type?.includes('Promo')) return 'text-orange-400';
+    return 'text-green-400';
 };
 
-const markAllAsRead = () => {
-    notifications.value.forEach(n => n.read = true);
+const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return 'Just now';
+};
+
+const markAllAsRead = async () => {
+    await notificationStore.markAllAsRead();
 };
 </script>

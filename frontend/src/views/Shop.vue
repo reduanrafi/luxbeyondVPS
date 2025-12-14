@@ -131,7 +131,7 @@
                 <!-- Products Section -->
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 px-4">
 
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 flex-wrap">
                         <!-- Mobile Filter Button -->
                         <button @click="showMobileFilters = true"
                             class="lg:hidden w-full md:w-auto px-4 py-2 bg-surface border border-white/10 text-slate-300 font-medium rounded-none hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 uppercase tracking-wider text-sm">
@@ -140,7 +140,7 @@
                         </button>
 
                         <div v-if="filters.category"
-                            class="p-2 border border-gray-2 text-xs rounded-full flex items-center gap-2 cursor-pointer"
+                            class="px-3 py-1 border border-primary hover:bg-primary/10 text-xs rounded-full flex items-center gap-2 cursor-pointer"
                             @click="clearFilters">
                             {{ filters.category }}
                             <X class="w-4 h-4" />

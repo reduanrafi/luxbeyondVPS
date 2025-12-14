@@ -14,6 +14,7 @@ class ProductVariant extends Model
         'sku',
         'price',
         'stock',
+        'weight',
         'attributes', // JSON: {"Color": "Red", "Size": "XL"}
         'image',
     ];

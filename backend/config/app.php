@@ -126,4 +126,11 @@ return [
 
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
+    /***
+     * 
+     * 
+     */
+
+    'storage_repo'=> env('APP_STORAGE_REPOSITORY', 'storage'),
+
 ];

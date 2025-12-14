@@ -19,6 +19,7 @@ class Product extends Model
         'price',
         'sellable_price',
         'stock',
+        'weight',
         'image',
         'description',
         'short_description',

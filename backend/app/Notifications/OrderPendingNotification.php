@@ -47,7 +47,11 @@ class OrderPendingNotification extends Notification implements ShouldQueue
             ->line('Our team will verify your payment slip and approve your order shortly.')
             ->line('Order Summary:')
             ->line('Order Number: #' . ($this->order->order_number ?? $this->order->id))
-            ->line('Total Amount: ' . $this->order->currency . ' ' . number_format($this->order->total, 2))
+            ->line('Items: ' . $this->order->items->count())
+            ->line('Total Amount: ' . $this->order->currency . ' ' . number_format((float) $this->order->total, 2))
+            ->line('**Items ordered:**')
+            ->line($this->order->items->take(3)->map(fn($item) => "- {$item->product_name} x {$item->quantity}")->implode("\n"))
+            ->line($this->order->items->count() > 3 ? "...and " . ($this->order->items->count() - 3) . " more items." : "")
             ->action('View Order Status', $url)
             ->line('You will receive another notification once your order is approved.')
             ->line('Thank you for shopping with us!');

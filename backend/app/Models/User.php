@@ -57,4 +57,13 @@ class User extends Authenticatable
             'notification_preferences' => 'array',
         ];
     }
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function travellerProfile()
+    {
+        return $this->hasOne(TravellerProfile::class);
+    }
 }

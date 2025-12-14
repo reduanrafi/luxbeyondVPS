@@ -3,113 +3,137 @@
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900">Events Management</h2>
-                <p class="text-sm text-slate-600 mt-1">Manage flash sales, promotions, and special events</p>
+                <h2 class="text-2xl font-bold text-white">Events Management</h2>
+                <p class="text-sm text-zinc-400 mt-1">Manage flash sales, promotions, and special events</p>
             </div>
             <button @click="openAddModal"
-                class="px-4 py-2 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-hover transition-all shadow-md flex items-center gap-2">
+                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Create Event
             </button>
         </div>
 
         <!-- Filters -->
-        <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
+        <div class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search events..."
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
                 <select v-model="filters.status" @change="fetchEvents(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
-                    <option value="">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="live">Live Now</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="expired">Expired</option>
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    <option value="" class="bg-zinc-900">All Status</option>
+                    <option value="active" class="bg-zinc-900">Active</option>
+                    <option value="inactive" class="bg-zinc-900">Inactive</option>
+                    <option value="live" class="bg-zinc-900">Live Now</option>
+                    <option value="upcoming" class="bg-zinc-900">Upcoming</option>
+                    <option value="expired" class="bg-zinc-900">Expired</option>
                 </select>
                 <select v-model="filters.position" @change="fetchEvents(1)"
-                    class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-surface">
-                    <option value="">All Positions</option>
-                    <option value="hero">Hero Banner</option>
-                    <option value="sidebar">Sidebar</option>
-                    <option value="both">Both</option>
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    <option value="" class="bg-zinc-900">All Positions</option>
+                    <option value="hero" class="bg-zinc-900">Hero Banner</option>
+                    <option value="sidebar" class="bg-zinc-900">Sidebar</option>
+                    <option value="both" class="bg-zinc-900">Both</option>
                 </select>
                 <button @click="resetFilters"
-                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    class="px-4 py-2 border border-white/10 text-zinc-400 rounded-lg hover:bg-white/5 hover:text-white transition-colors">
                     Reset Filters
                 </button>
             </div>
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading" class="bg-surface rounded-xl shadow-md border border-white/10 p-8 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p class="text-slate-600 mt-2">Loading events...</p>
+        <div v-if="loading" class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-12 text-center">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+            <p class="text-zinc-500 mt-4">Loading events...</p>
         </div>
 
         <!-- Events Table -->
-        <div v-else class="bg-surface rounded-xl shadow-md border border-white/10 overflow-hidden">
+        <div v-else class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-white/10">
+                    <thead class="bg-white/5 border-b border-white/5">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Range</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actual Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scheduled Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Event</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Position</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Products</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Date Range</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Actual Status</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Scheduled Status</th>
+                            <th
+                                class="px-6 py-4 text-left text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Priority</th>
+                            <th
+                                class="px-6 py-4 text-right text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+                                Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-surface divide-y divide-gray-200">
+                    <tbody class="divide-y divide-white/5">
                         <tr v-if="events.length === 0">
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                            <td colspan="8" class="px-6 py-12 text-center text-zinc-500">
                                 No events found
                             </td>
                         </tr>
-                        <tr v-for="event in events" :key="event.id" class="hover:bg-gray-50">
+                        <tr v-for="event in events" :key="event.id" class="hover:bg-white/5 transition-colors group">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="h-10 w-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 mr-3">
+                                    <div
+                                        class="h-12 w-12 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 mr-4">
                                         <img v-if="event.image_url" :src="event.image_url" :alt="event.name" class="h-full w-full object-cover">
-                                        <Calendar v-else class="h-full w-full p-2 text-gray-400" />
+                                        <div v-else class="h-full w-full flex items-center justify-center">
+                                            <Calendar class="w-5 h-5 text-zinc-600" />
+                                        </div>
                                     </div>
                                     <div>
-                                        <div class="text-sm font-medium text-white">{{ event.name }}</div>
-                                        <div class="text-sm text-gray-500">{{ event.slug }}</div>
+                                        <div
+                                            class="text-sm font-semibold text-white group-hover:text-amber-500 transition-colors">
+                                            {{ event.name }}</div>
+                                        <div class="text-xs text-zinc-500 font-mono">{{ event.slug }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                                <span class="px-2.5 py-1 text-xs font-medium rounded-full border"
                                     :class="{
-                                        'bg-blue-100 text-blue-700': event.position === 'hero',
-                                        'bg-green-100 text-green-700': event.position === 'sidebar',
-                                        'bg-purple-100 text-purple-700': event.position === 'both'
+    'bg-blue-500/10 text-blue-400 border-blue-500/20': event.position === 'hero',
+    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': event.position === 'sidebar',
+    'bg-purple-500/10 text-purple-400 border-purple-500/20': event.position === 'both'
                                     }">
                                     {{ event.position === 'hero' ? 'Hero' : event.position === 'sidebar' ? 'Sidebar' : 'Both' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-zinc-300">
                                 {{ event.products_count || 0 }} products
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-white">{{ formatDate(event.start_date) }}</div>
-                                <div class="text-sm text-gray-500">to {{ formatDate(event.end_date) }}</div>
+                                <div class="text-xs text-zinc-500">to {{ formatDate(event.end_date) }}</div>
                             </td>
                            
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
-                                {{ event.is_active ? 'Active' : 'Inactive' }}
+                                <span class="px-2.5 py-1 text-xs font-medium rounded-full border"
+                                    :class="event.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'">
+                                    {{ event.is_active ? 'Active' : 'Inactive' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full"
+                                <span class="px-2.5 py-1 text-xs font-medium rounded-full border"
                                     :class="{
-                                        'bg-green-100 text-green-700': event.is_live,
-                                        'bg-yellow-100 text-yellow-700': event.is_upcoming,
-                                        'bg-red-100 text-red-700': event.is_expired,
-                                        'bg-gray-100 text-slate-300': !event.is_active
+    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': event.is_live,
+    'bg-amber-500/10 text-amber-500 border-amber-500/20': event.is_upcoming,
+    'bg-red-500/10 text-red-400 border-red-500/20': event.is_expired,
+    'bg-zinc-500/10 text-zinc-400 border-zinc-500/20': !event.is_active
                                     }">
                                     {{ getStatusLabel(event) }}
                                 </span>
@@ -120,12 +144,12 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
                                     <button @click="editEvent(event)"
-                                        class="p-2 hover:bg-blue-50 rounded-lg transition-colors">
-                                        <Edit class="w-4 h-4 text-blue-600" />
+                                        class="p-2 hover:bg-white/10 rounded-lg transition-colors text-blue-400 hover:text-blue-300">
+                                        <Edit class="w-4 h-4" />
                                     </button>
                                     <button @click="deleteEvent(event.id)"
-                                        class="p-2 hover:bg-red-50 rounded-lg transition-colors">
-                                        <Trash2 class="w-4 h-4 text-red-600" />
+                                        class="p-2 hover:bg-white/10 rounded-lg transition-colors text-red-400 hover:text-red-300">
+                                        <Trash2 class="w-4 h-4" />
                                     </button>
                                 </div>
                             </td>
@@ -135,23 +159,26 @@
             </div>
 
             <!-- Pagination -->
-            <div v-if="pagination.total > 0" class="px-6 py-4 border-t border-white/10 flex items-center justify-between">
-                <p class="text-sm text-gray-600">
-                    Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} events
+            <div v-if="pagination.total > 0"
+                class="px-6 py-4 border-t border-white/5 flex items-center justify-between">
+                <p class="text-xs text-zinc-500">
+                    Showing <span class="font-medium text-white">{{ pagination.from }}</span> to <span
+                        class="font-medium text-white">{{ pagination.to }}</span> of <span
+                        class="font-medium text-white">{{ pagination.total }}</span> events
                 </p>
                 <div class="flex gap-2">
                     <button @click="changePage(pagination.current_page - 1)" :disabled="pagination.current_page === 1"
-                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-3 py-1.5 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-xs font-medium text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed">
                         Previous
                     </button>
                     <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                        :class="page === pagination.current_page ? 'bg-primary text-slate-900' : 'border border-gray-300 hover:bg-gray-50'"
-                        class="px-4 py-2 rounded-lg font-medium text-sm transition-colors">
+                        :class="page === pagination.current_page ? 'bg-amber-500 text-black border-amber-500 font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
+                        class="px-3 py-1.5 border rounded-lg text-xs transition-colors">
                         {{ page }}
                     </button>
                     <button @click="changePage(pagination.current_page + 1)"
                         :disabled="pagination.current_page === pagination.last_page"
-                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-3 py-1.5 border border-white/10 rounded-lg hover:bg-white/5 transition-colors text-xs font-medium text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed">
                         Next
                     </button>
                 </div>

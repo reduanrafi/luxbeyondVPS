@@ -40,7 +40,7 @@
                             </td>
                         </tr>
                         <tr v-for="request in requests" :key="request.id" class="hover:bg-white/5 transition-colors group">
-                            <td class="p-4 font-semibold text-primary group-hover:text-white transition-colors text-xs tracking-wide">#{{ request.id }}</td>
+                            <td class="p-4 font-semibold text-primary group-hover:text-white transition-colors text-xs tracking-wide">{{ request.request_number || '#' + request.id }}</td>
                             <td class="p-4 text-slate-400 text-xs max-w-xs truncate">
                                 <a :href="request.url" target="_blank" class="hover:text-primary hover:underline transition-colors" :title="request.url">{{ request.url }}</a>
                             </td>
@@ -87,7 +87,7 @@ const selectedRequest = ref(null);
 const fetchRequests = async () => {
     loading.value = true;
     try {
-        const response = await axios.get('/requests');
+        const response = await axios.get('/product-requests');
         const requestsData = response.data.data || response.data;
         requests.value = Array.isArray(requestsData) ? requestsData : (requestsData.data || []);
     } catch (error) {

@@ -226,28 +226,24 @@
                 <p class="text-xs text-slate-400 leading-relaxed">{{ order.notes }}</p>
             </div>
 
-            <!-- Status History -->
+            <!-- Timeline -->
             <div v-if="order.status_histories && order.status_histories.length > 0"
                 class="bg-surface border border-white/5 overflow-hidden">
                 <div class="p-4 border-b border-white/5 bg-background/50">
-                    <h3 class="text-sm font-serif text-white uppercase tracking-widest">Status History</h3>
+                    <h3 class="text-sm font-serif text-white uppercase tracking-widest">Order Timeline</h3>
                 </div>
                 <div class="p-6">
-                    <div class="space-y-4">
-                        <div v-for="history in order.status_histories" :key="history.id"
-                            class="flex items-start gap-4 pb-4 border-b border-white/5 last:border-0">
-                            <div class="flex-shrink-0">
-                                <div :style="{ backgroundColor: history.status?.color + '20', color: history.status?.color }"
-                                    class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold">
-                                    {{ history.status?.label?.charAt(0) || 'P' }}
-                                </div>
+                    <div class="relative pl-4 border-l-2 border-white/10 space-y-8">
+                        <div v-for="(history, index) in order.status_histories" :key="history.id" class="relative">
+                            <div class="absolute -left-[21px] bg-background border-2 border-primary rounded-full w-4 h-4"></div>
+                            <div class="mb-1">
+                                <span class="font-bold text-white">{{ history.status?.label || 'Status Changed' }}</span>
+                                <span class="text-xs text-slate-400 ml-2">{{ formatDate(history.created_at) }}</span>
                             </div>
-                            <div class="flex-1">
-                                <p class="text-xs font-semibold text-white">{{ history.status?.label || 'Status Changed'
-                                    }}</p>
-                                <p v-if="history.note" class="text-xs text-slate-400 mt-1">{{ history.note }}</p>
-                                <p class="text-xs text-slate-500 mt-1">{{ formatDate(history.created_at) }}</p>
-                            </div>
+                            <p v-if="history.note" class="text-xs text-slate-400 opacity-80 mb-1">{{ history.note }}</p>
+                            <p v-if="history.changed_by" class="text-[10px] text-slate-500 uppercase tracking-wider">
+                                UT: {{ history.changed_by.name }}
+                            </p>
                         </div>
                     </div>
                 </div>

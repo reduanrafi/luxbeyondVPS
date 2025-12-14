@@ -23,6 +23,10 @@ const routes = [
                 component: () => import('../views/dashboard/MyRequests.vue'),
             },
             {
+                path: 'requests/:id',
+                component: () => import('../views/dashboard/RequestDetails.vue'),
+            },
+            {
                 path: 'orders',
                 component: () => import('../views/dashboard/MyOrders.vue'),
             },
@@ -45,6 +49,23 @@ const routes = [
         ]
     },
 
+    {
+      path: '/blogs',
+      name: 'blogs',
+      component: () => import('../views/BlogList.vue'),
+      meta: { title: 'Blog' }
+    },
+    {
+      path: '/blogs/:slug',
+      name: 'blog-details',
+      component: () => import('../views/BlogDetails.vue'),
+      meta: { title: 'Blog Details' }
+    },
+    {
+      path: '/traveller-dashboard',
+      component: () => import('../views/TravellerDashboard.vue'),
+      meta: { requiresAuth: true }
+    },
     // Admin Dashboard
     {
         path: '/admin',
@@ -96,6 +117,10 @@ const routes = [
                 component: () => import('../views/admin/CustomersManagement.vue'),
             },
             {
+                path: 'customers/:id',
+                component: () => import('../views/admin/CustomerDetails.vue'),
+            },
+            {
                 path: 'requests',
                 component: () => import('../views/AdminRequestDashboard.vue'),
             },
@@ -120,8 +145,26 @@ const routes = [
                 component: () => import('../views/admin/AdminSettings.vue'),
             },
             {
+                path: 'blogs',
+                name: 'admin-blogs',
+                component: () => import('../views/admin/BlogsManagement.vue'),
+                meta: { title: 'Blog Management' }
+            },
+            {
                 path: 'events',
                 component: () => import('../views/admin/EventsManagement.vue'),
+            },
+            {
+                path: 'users',
+                component: () => import('../views/admin/UsersManagement.vue'),
+            },
+            {
+                path: 'roles',
+                component: () => import('../views/admin/RolesManagement.vue'),
+            },
+            {
+                path: 'travellers',
+                component: () => import('../views/admin/TravellersManagement.vue'),
             },
         ]
     },
@@ -148,9 +191,8 @@ const routes = [
     },
 
     // Public Pages
-    { path: '/blogs', component: () => import('../views/BlogList.vue') },
-    { path: '/blog/:id', component: () => import('../views/BlogDetails.vue') },
     { path: '/travellers', component: () => import('../views/TravellerLanding.vue') },
+    { path: '/track-order', component: () => import('../views/OrderTracking.vue') },
 ];
 
 const router = createRouter({

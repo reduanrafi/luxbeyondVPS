@@ -74,7 +74,7 @@ return [
     */
 
     'links' => [
-        public_path('media') => storage_path('app/public'),
+        public_path(env('APP_STORAGE_REPOSITORY', 'storage')) => storage_path('app/public'),
     ],
 
 ];

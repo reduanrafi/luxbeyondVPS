@@ -45,8 +45,12 @@ class ProductRequestSubmittedNotification extends Notification
         return (new MailMessage)
             ->subject('Product Request Submitted')
             ->greeting('Hello ' . $notifiable->name . ',')
-            ->line('We have received your product request. Our admin team will review the details and update the cost estimate.')
+            ->line('We have received your product request. Our admin team will review the details.')
+            ->line('**Request Details:**')
             ->line('Product URL: ' . $this->productRequest->url)
+            ->line('Quantity: ' . $this->productRequest->quantity)
+            ->line('Declared Price: ' . $this->productRequest->currency . ' ' . number_format($this->productRequest->price, 2))
+            ->line('Estimated Total: ৳' . number_format($this->productRequest->total_amount_bdt, 2))
             ->action('View Request Status', $url)
             ->line('We will notify you once the request is approved.');
     }
@@ -61,7 +65,7 @@ class ProductRequestSubmittedNotification extends Notification
         return [
             'request_id' => $this->productRequest->id,
             'title' => 'Product Request Submitted',
-            'message' => 'Your request for ' . $this->productRequest->url . ' has been submitted.',
+            'message' => 'Your product request #' . $this->productRequest->id . ' has been submitted successfully.',
             'url' => '/dashboard/requests/' . $this->productRequest->id,
             'type' => 'product_request'
         ];

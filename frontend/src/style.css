@@ -1,6 +1,6 @@
 @import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: 'Inter', sans-serif;
@@ -50,4 +50,10 @@ button:hover {
 
 button:disabled {
   cursor: not-allowed !important;
+}
+
+
+input[type="checkbox"] {
+  @apply w-5 h-5;
+  @apply accent-primary;
 }

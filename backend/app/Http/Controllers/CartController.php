@@ -65,6 +65,7 @@ class CartController extends Controller
                     'price' => $finalPrice,
                     'original_price' => $originalPrice,
                     'total_stock' => $variant ? $variant->stock : $product->stock,
+                    'weight' => $variant ? $variant->weight : $product->weight,
                     'event_price' => $activeEvent ? $finalPrice : null,
                     'quantity' => $item->quantity,
                     'variant' => $variant ? [
@@ -72,6 +73,7 @@ class CartController extends Controller
                         'attributes' => $variant->attributes,
                         'price' => $variant->price,
                         'stock' => $variant->stock,
+                        'weight' => $variant->weight,
                         'sku' => $variant->sku,
                         'image' => $variant->image,
                         'image_url' => $variant->image_url,

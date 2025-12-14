@@ -16,16 +16,22 @@ class ProductRequestController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if ($user->hasRole('Admin')) {
-            $requests = ProductRequest::with(['user', 'orderStatus'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
-        } else {
-            $requests = ProductRequest::with(['orderStatus'])
-                ->where('user_id', $user->id)
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
-        }
+        // Always return only the user's requests for the standard index route
+        $requests = ProductRequest::with(['orderStatus', 'timeline'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return response()->json($requests);
+    }
+
+    public function adminIndex()
+    {
+        // Admin only route to get all requests
+        $requests = ProductRequest::with(['user', 'orderStatus', 'timeline'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
         return response()->json($requests);
     }
 
@@ -39,6 +45,11 @@ class ProductRequestController extends Controller
             'declared_shipping_cost' => 'nullable|numeric|min:0',
             'is_inside_city' => 'nullable|boolean',
             'weight' => 'nullable|numeric|min:0',
+            'total_amount_bdt' => 'nullable|numeric|min:0',
+            'tax' => 'nullable|numeric|min:0',
+            'delivery_charge' => 'nullable|numeric|min:0',
+            'payment_processing_fee' => 'nullable|numeric|min:0',
+            'additional_charges' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -65,6 +76,20 @@ class ProductRequestController extends Controller
             'weight' => $request->weight,
             'status' => 'pending', // Initial status
             'payment_status' => 'pending',
+            'total_amount_bdt' => $request->total_amount_bdt ?? 0,
+            'tax' => $request->tax ?? 0,
+            'delivery_charge' => $request->delivery_charge ?? 0,
+            'payment_processing_fee' => $request->payment_processing_fee ?? 0,
+            'additional_charges' => $request->additional_charges ?? 0,
+            'charges_breakdown' => $request->charges_breakdown ?? null,
+        ]);
+
+        // Create initial timeline entry
+        \App\Models\ProductRequestTimeline::create([
+            'product_request_id' => $productRequest->id,
+            'status' => 'pending',
+            'note' => 'Request created',
+            'created_by' => Auth::id(),
         ]);
 
         // Notify User
@@ -172,9 +197,45 @@ class ProductRequestController extends Controller
         return response()->json(['message' => 'Payment details submitted successfully']);
     }
 
+    public function confirmOrder(Request $request, $id)
+    {
+        $productRequest = ProductRequest::findOrFail($id);
+
+        if ($productRequest->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'shipping_address' => 'required|array',
+            'shipping_address.street' => 'required|string',
+            'shipping_address.city' => 'required|string',
+            'shipping_address.phone' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $productRequest->shipping_address = $request->shipping_address;
+        $productRequest->save();
+
+        // Log confirmation
+        \App\Models\ProductRequestTimeline::create([
+            'product_request_id' => $productRequest->id,
+            'status' => $productRequest->status, // Status might not change, or could change to 'confirmed'
+            'note' => 'User confirmed order and provided shipping address',
+            'created_by' => Auth::id(),
+        ]);
+
+        return response()->json([
+            'message' => 'Order confirmed successfully',
+            'product_request' => $productRequest
+        ]);
+    }
+
     public function show($id)
     {
-        $productRequest = ProductRequest::with(['user', 'orderStatus'])->findOrFail($id);
+        $productRequest = ProductRequest::with(['user', 'orderStatus', 'timeline.creator'])->findOrFail($id);
         if ($productRequest->user_id !== Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -210,8 +271,13 @@ class ProductRequestController extends Controller
             'admin_note' => 'nullable|string',
             'total_amount_bdt' => 'nullable|numeric|min:0',
             'min_payment_amount' => 'nullable|numeric|min:0',
+            'min_payment_amount' => 'nullable|numeric|min:0',
             'payment_status' => 'nullable|string',
+            'charges_breakdown' => 'nullable|array',
         ]);
+
+        $oldStatus = $productRequest->status;
+        $oldStatusId = $productRequest->status_id;
 
         // Update all provided fields
         $updateData = $request->except(['_token', '_method']);
@@ -222,16 +288,36 @@ class ProductRequestController extends Controller
         }
 
         // If status_id is provided, also update status name from order_status
+        $newStatusName = null;
         if (isset($updateData['status_id'])) {
             $orderStatus = OrderStatus::find($updateData['status_id']);
             if ($orderStatus) {
-                $updateData['status'] = $orderStatus->slug; // Or label, but slug is usually better for code
-                // Let's assume we want to update the 'status' column string as well for backward compatibility
-                // if the table has both. Usually redundant but ok.
+                $newStatusName = $orderStatus->name;
+                $updateData['status'] = $orderStatus->name; 
             }
+        } elseif (isset($updateData['status'])) {
+            $newStatusName = $updateData['status'];
         }
 
         $productRequest->update($updateData);
+
+        // Check for status change and log timeline
+        if ($newStatusName && $newStatusName !== $oldStatus) {
+            \App\Models\ProductRequestTimeline::create([
+                'product_request_id' => $productRequest->id,
+                'status' => $newStatusName,
+                'note' => $request->admin_note ? 'Status changed: ' . $newStatusName : 'Status updated',
+                'created_by' => Auth::id(),
+            ]);
+        } elseif (isset($updateData['status_id']) && $updateData['status_id'] != $oldStatusId) {
+             // Fallback if name was same but ID changed (unlikely but safe)
+             \App\Models\ProductRequestTimeline::create([
+                'product_request_id' => $productRequest->id,
+                'status' => $newStatusName ?? 'updated',
+                'note' => 'Status ID updated',
+                'created_by' => Auth::id(),
+            ]);
+        }
 
         return response()->json([
             'message' => 'Product request updated successfully',

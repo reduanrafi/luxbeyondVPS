@@ -43,8 +43,16 @@ Route::get('/payment-methods', function () {
     return response()->json($methods);
 });
 
+// Public checkout settings
+Route::get('/settings/checkout', [\App\Http\Controllers\Public\SettingsController::class, 'getCheckoutSettings']);
+
+
 // Public payment callback (bKash redirects here)
 Route::get('/payments/bkash/callback', [\App\Http\Controllers\PaymentController::class, 'bkashCallback']);
+
+
+// Public Tracking
+Route::post('/track-order', [\App\Http\Controllers\Public\TrackingController::class, 'track']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -55,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/product-requests/bkash/initiate', [ProductRequestController::class, 'initiateBkashPayment']);
     Route::apiResource('product-requests', ProductRequestController::class);
     Route::post('/product-requests/{id}/payment', [ProductRequestController::class, 'submitPaymentDetails']);
+    Route::post('/product-requests/{id}/confirm-order', [ProductRequestController::class, 'confirmOrder']);
     
     // Orders (for customers)
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index']);
@@ -87,6 +96,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications/preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'index']);
     Route::put('/notifications/preferences', [\App\Http\Controllers\NotificationPreferenceController::class, 'update']);
 
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
+    Route::get('/notifications/unread', [\App\Http\Controllers\NotificationController::class, 'unread']);
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
+
     Route::delete('/account', [\App\Http\Controllers\AccountController::class, 'destroy']);
 
     // Coupon apply (for customers during checkout)
@@ -96,10 +110,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:Admin')->prefix('admin')->group(function () {
         // Customers
         Route::get('/customers', [\App\Http\Controllers\CustomerController::class, 'index']);
+        Route::post('/customers', [\App\Http\Controllers\CustomerController::class, 'store']);
+        Route::get('/customers-stats', [\App\Http\Controllers\CustomerController::class, 'stats']);
         Route::get('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'show']);
+        Route::put('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'update']);
         Route::post('/customers/{id}/toggle-status', [\App\Http\Controllers\CustomerController::class, 'toggleStatus']);
         
-        // Products
+        
+    
+
+    // User & Role Management
+    Route::apiResource('users', \App\Http\Controllers\Admin\UsersController::class);
+    Route::apiResource('roles', \App\Http\Controllers\Admin\RolesController::class);
+    Route::get('/permissions', [\App\Http\Controllers\Admin\RolesController::class, 'permissions']);
+
+    // Dashboard
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/stats', [App\Http\Controllers\Admin\DashboardController::class, 'stats']);
+        Route::get('/charts', [App\Http\Controllers\Admin\DashboardController::class, 'charts']);
+        Route::get('/top-products', [App\Http\Controllers\Admin\DashboardController::class, 'topProducts']);
+    });
+
+    // Products
         Route::apiResource('products', \App\Http\Controllers\ProductController::class);
         
         // Categories
@@ -120,6 +152,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/charges/calculate', [\App\Http\Controllers\ChargeController::class, 'calculate']);
 
         // Orders
+        Route::get('/orders/stats', [\App\Http\Controllers\OrderController::class, 'stats']);
         Route::apiResource('orders', \App\Http\Controllers\OrderController::class);
         Route::post('/orders/{id}/update-status', [\App\Http\Controllers\OrderController::class, 'updateStatus']);
         
@@ -140,7 +173,10 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/payment-methods', [\App\Http\Controllers\SettingsController::class, 'storePaymentMethod']);
             Route::put('/payment-methods/{id}', [\App\Http\Controllers\SettingsController::class, 'updatePaymentMethod']);
             Route::delete('/payment-methods/{id}', [\App\Http\Controllers\SettingsController::class, 'deletePaymentMethod']);
-            
+
+            // Product Requests (Admin)
+            Route::get('/product-requests', [\App\Http\Controllers\ProductRequestController::class, 'adminIndex']);
+
             // Notification Settings
             Route::get('/notifications', [\App\Http\Controllers\SettingsController::class, 'getNotificationSettings']);
             Route::post('/notifications', [\App\Http\Controllers\SettingsController::class, 'storeNotificationSetting']);
@@ -148,12 +184,42 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/notifications/{id}', [\App\Http\Controllers\SettingsController::class, 'deleteNotificationSetting']);
         });
 
+        // Product Requests
+        Route::get('/requests', [\App\Http\Controllers\ProductRequestController::class, 'adminIndex']);
+        Route::get('/requests/{id}', [\App\Http\Controllers\ProductRequestController::class, 'show']);
+        Route::put('/requests/{id}', [\App\Http\Controllers\ProductRequestController::class, 'update']);
+
         // Events Management
         Route::apiResource('events', \App\Http\Controllers\Admin\EventController::class);
         Route::get('/events/products/search', [\App\Http\Controllers\Admin\EventController::class, 'getProducts']);
+
+        // Blog Management
+        Route::apiResource('blogs', \App\Http\Controllers\Admin\BlogController::class);
+        
+        // Traveller Management
+        Route::get('travellers', [\App\Http\Controllers\Admin\TravellerController::class, 'index']);
+        Route::get('travellers/{id}', [\App\Http\Controllers\Admin\TravellerController::class, 'show']);
+        Route::post('travellers/{id}/status', [\App\Http\Controllers\Admin\TravellerController::class, 'updateStatus']);
     });
 });
 
 // Public Events API
 Route::get('/events', [\App\Http\Controllers\Public\EventController::class, 'index']);
 Route::get('/events/{slug}', [\App\Http\Controllers\Public\EventController::class, 'show']);
+
+// Public Blog API
+Route::get('/blogs', [\App\Http\Controllers\Public\BlogController::class, 'index']);
+Route::get('/blogs/recent', [\App\Http\Controllers\Public\BlogController::class, 'getRecent']);
+Route::get('/blogs/{slug}', [\App\Http\Controllers\Public\BlogController::class, 'show']);
+
+// Authenticated Routes
+Route::middleware('auth:sanctum')->group(function () {
+    // User Context
+    Route::get('/user', function (Request $request) {
+        return $request->user()->load(['roles', 'permissions']);
+    });
+    
+    // Traveller Dashboard
+    Route::get('/traveller/profile', [\App\Http\Controllers\Traveller\DashboardController::class, 'getProfile']);
+    Route::post('/traveller/profile', [\App\Http\Controllers\Traveller\DashboardController::class, 'updateProfile']);
+});

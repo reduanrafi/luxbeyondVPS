@@ -10,6 +10,7 @@ class ProductRequest extends Model
     use HasFactory;
 
     protected $fillable = [
+        'request_number',
         'user_id',
         'url',
         'price',
@@ -34,13 +35,29 @@ class ProductRequest extends Model
         'payment_slip',
         'paid_at',
         'min_payment_amount',
+        'charges_breakdown',
+        'shipping_address',
+    ];
+
+    protected $casts = [
+        'charges_breakdown' => 'array',
+        'shipping_address' => 'array',
+        'is_inside_city' => 'boolean',
+        'payment_method_config' => 'array',
     ];
 
     protected $appends = ['payment_slip_url'];
 
+    protected static function booted()
+    {
+        static::creating(function ($request) {
+            $request->request_number = 'REQ-' . strtoupper(uniqid());
+        });
+    }
+
     public function getPaymentSlipUrlAttribute()
     {
-        return $this->payment_slip ? asset('storage/' . $this->payment_slip) : null;
+        return $this->payment_slip ? asset(config('app.storage_repo').'/' . $this->payment_slip) : null;
     }
 
     public function user()
@@ -51,5 +68,10 @@ class ProductRequest extends Model
     public function orderStatus()
     {
         return $this->belongsTo(OrderStatus::class, 'status_id');
+    }
+
+    public function timeline()
+    {
+        return $this->hasMany(ProductRequestTimeline::class)->orderBy('created_at', 'desc');
     }
 }

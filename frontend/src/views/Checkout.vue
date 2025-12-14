@@ -154,16 +154,20 @@
                         <div class="space-y-3">
                             <label
                                 class="flex items-center justify-between gap-4 p-5 border rounded-none cursor-pointer hover:border-primary/30 transition-all relative"
-                                :class="paymentAmount === 60 ? 'border-primary/50 bg-primary/5 shadow-[0_0_20px_rgba(200,174,125,0.1)]' : 'border-white/10 hover:bg-white/5'">
+                                :class="paymentAmount === 'partial' ? 'border-primary/50 bg-primary/5 shadow-[0_0_20px_rgba(200,174,125,0.1)]' : 'border-white/10 hover:bg-white/5'">
                                 <div class="flex items-center gap-4">
-                                    <input type="radio" v-model="paymentAmount" :value="60"
+                                    <input type="radio" v-model="paymentAmount" value="partial"
                                         class="w-5 h-5 text-primary border-white/20 focus:ring-2 focus:ring-primary/50 focus:ring-offset-0 bg-background transition-all accent-primary" />
                                     <div>
-                                        <div class="font-serif text-white tracking-wide">Partial Payment (60%)</div>
-                                        <div class="text-xs text-slate-500 mt-1">Pay 60% now, 40% on delivery</div>
+                                        <div class="font-serif text-white tracking-wide">
+                                            Partial Payment ({{ checkoutSettings.min_payment_percentage_shop }}%)
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-1">
+                                            Pay {{ checkoutSettings.min_payment_percentage_shop }}% now, {{ 100 - checkoutSettings.min_payment_percentage_shop }}% on delivery
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="text-primary font-bold text-lg">৳{{ formatPrice(orderSummary.total * 0.6) }}
+                                <div class="text-primary font-bold text-lg">৳{{ formatPrice(bkashPaymentAmount) }}
                                 </div>
                             </label>
                             <label
@@ -298,6 +302,23 @@
                                 <span class="font-semibold text-white">৳{{ formatPrice(orderSummary.subtotal) }}</span>
                             </div>
                             <div class="flex justify-between text-sm">
+                                <span class="text-slate-500">Total Weight</span>
+                                <span class="font-semibold text-white">{{ cartWeight.toFixed(2) }} kg</span>
+                            </div>
+                            <!-- Hub Charges -->
+                            <template v-for="(charge, index) in chargesBreakdown" :key="index">
+                                <div v-if="charge.type === 'hub'" class="flex justify-between text-sm">
+                                    <span class="text-slate-500">
+                                        {{ charge.charge }}
+                                        <span v-if="charge.currency !== 'BDT'" class="text-xs ml-1">
+                                            ({{ charge.currency }} {{ charge.amount_in_currency }})
+                                        </span>
+                                    </span>
+                                    <span class="font-semibold text-white">৳{{ formatPrice(charge.amount_in_bdt)
+                                    }}</span>
+                                </div>
+                            </template>
+                            <div class="flex justify-between text-sm">
                                 <span class="text-slate-500">Delivery Charge</span>
                                 <span class="font-semibold text-white">
                                     <span v-if="orderSummary.delivery_charge > 0">৳{{
@@ -319,15 +340,15 @@
                                 <span class="font-semibold">-৳{{ formatPrice(orderSummary.discount) }}</span>
                             </div>
                             <!-- bKash Payment Breakdown -->
-                            <div v-if="selectedPaymentMethod === 'bkash' && paymentAmount === 60"
+                            <div v-if="selectedPaymentMethod === 'bkash' && paymentAmount === 'partial'"
                                 class="space-y-2 py-3 border-t border-white/10">
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-primary font-semibold">Payment Now (60%)</span>
+                                    <span class="text-primary font-semibold">Payment Now ({{ checkoutSettings.min_payment_percentage_shop }}%)</span>
                                     <span class="font-bold text-primary">৳{{ formatPrice(bkashPaymentAmount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">On Delivery (40%)</span>
-                                    <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total * 0.4)
+                                    <span class="text-slate-500">On Delivery ({{ 100 - checkoutSettings.min_payment_percentage_shop }}%)</span>
+                                    <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total - bkashPaymentAmount)
                                         }}</span>
                                 </div>
                             </div>
@@ -414,10 +435,47 @@ const applyingCoupon = ref(false);
 const couponError = ref('');
 const paymentAmount = ref(100); // 60 or 100
 
+const checkoutSettings = ref({
+    min_payment_percentage_shop: 60, // Default fallback
+    delivery_charge_inside_city: 90,
+    delivery_charge_outside_city: 150,
+    delivery_charge_per_kg: 0,
+    free_delivery_threshold: 0,
+});
+
 const bkashPaymentAmount = computed(() => {
     if (selectedPaymentMethod.value !== 'bkash') return 0;
-    return orderSummary.value.total * (paymentAmount.value / 100);
+    
+    // Use dynamic percentage if partial payment selected
+    if (paymentAmount.value === 'partial') {
+        const percentage = parseFloat(checkoutSettings.value.min_payment_percentage_shop) || 60;
+        return orderSummary.value.total * (percentage / 100);
+    }
+    return orderSummary.value.total; // Full payment
 });
+
+// Calculate total weight of cart
+const cartWeight = computed(() => {
+    return cartStore.items.reduce((total, item) => {
+        // Assume default weight 1 if not set, or 0? 
+        // Ideally should come from product.weight. 
+        // If product has no weight, maybe 0.
+        const weight = parseFloat(item.weight || 0);
+        return total + (weight * item.quantity);
+    }, 0);
+});
+
+const fetchCheckoutSettings = async () => {
+    try {
+        const response = await axios.get('/settings/checkout');
+        checkoutSettings.value = { ...checkoutSettings.value, ...response.data };
+        // Update default payment amount radio value if needed
+        // Actually we use 'partial' string value instead of hardcoded 60 now
+    } catch (error) {
+        console.error('Error fetching checkout settings:', error);
+    }
+};
+
 
 const isFormValid = computed(() => {
     const baseValid = (
@@ -457,6 +515,8 @@ const formatPrice = (price) => {
     });
 };
 
+const chargesBreakdown = ref([]);
+
 const calculateCharges = async () => {
     // Calculate subtotal
     const subtotal = cartStore.items.reduce((total, item) => {
@@ -465,34 +525,42 @@ const calculateCharges = async () => {
 
     orderSummary.value.subtotal = subtotal;
 
-    // Calculate delivery charge and payment fee
+    // Calculate charges (hub scope)
     try {
         const response = await axios.post('/charges/calculate', {
             base_amount: subtotal,
             currency_id: bdtCurrencyId.value,
+            scope: 'hub',
             additional_data: {
                 is_inside_city: shippingForm.value.is_inside_city,
                 payment_method: selectedPaymentMethod.value,
-                weight: 0, // Could calculate from products if needed
+                weight: cartWeight.value,
             },
         });
 
         orderSummary.value.delivery_charge = response.data.delivery_charge || 0;
         orderSummary.value.payment_processing_fee = response.data.payment_processing_fee || 0;
+        chargesBreakdown.value = response.data.breakdown || [];
 
         // Calculate total (subtract coupon discount if applied)
+        // Note: backend total_charges includes delivery and payment fee.
+        // We need to match frontend total with backend grand_total logic.
+        // Backend: grand_total = base_amount + total_charges (which has delivery + fee + hub charges)
+        // Frontend total should match this minus discount.
+
         const totalCharges = response.data.total_charges || 0;
         const discountAmount = orderSummary.value.discount || 0;
         orderSummary.value.total = subtotal + totalCharges - discountAmount;
 
         // Calculate minimum payment
-        const minPaymentPercentage = 0; // Get from settings if needed
-        orderSummary.value.min_payment = (orderSummary.value.total * minPaymentPercentage) / 100;
+        const minPercentage = parseFloat(checkoutSettings.value.min_payment_percentage_shop) || 0;
+        orderSummary.value.min_payment = (orderSummary.value.total * minPercentage) / 100;
     } catch (error) {
         console.error('Error calculating charges:', error);
         orderSummary.value.delivery_charge = 0;
         orderSummary.value.payment_processing_fee = 0;
         orderSummary.value.total = subtotal;
+        chargesBreakdown.value = [];
     }
 };
 
@@ -620,7 +688,7 @@ const placeOrder = async () => {
                 const paymentResponse = await axios.post('/payments/bkash/initiate', {
                     order_id: order.id,
                     amount: bkashPaymentAmount.value,
-                    payment_type: paymentAmount.value === 60 ? 'partial' : 'full',
+                    payment_type: paymentAmount.value === 'partial' ? 'partial' : 'full',
                 });
 
                 if (paymentResponse.data.bkashURL) {
@@ -762,10 +830,10 @@ onMounted(() => {
         shippingForm.value.email = authStore.user.email || '';
         shippingForm.value.name = authStore.user.name || '';
     }
-    fetchBDTCurrency().then(() => {
-        calculateCharges();
-    });
+    fetchBDTCurrency(); // Just fetch it, don't wait
+    calculateCharges(); // Calculate immediately (currency_id might be null, that's fine now)
     fetchPaymentMethods();
+    fetchCheckoutSettings();
     handlePaymentCallback();
 });
 </script>

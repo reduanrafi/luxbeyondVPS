@@ -19,7 +19,7 @@
                     <!-- Image Logo with Gold Hover -->
                     <div v-if="brand.image_url" class="relative group/brand transition-all duration-300">
                         <!-- Ghost Image (Preserves Aspect Ratio) -->
-                        <img :src="getImageUrl(brand.image_url)" :alt="brand.name" class="h-16 w-auto opacity-0"
+                        <img :src="brand.image_url" :alt="brand.name" class="h-16 w-auto"
                             aria-hidden="true" />
 
                         <!-- Color Layer (Masked by Logo) -->
@@ -57,16 +57,12 @@ const brands = ref([]);
 
 const getImageUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('http')) {
-        return url.replace('http://127.0.0.1:8000', '').replace('http://localhost:8000', '');
-    }
     return url;
 };
 
 const fetchBrands = async () => {
     try {
         const response = await axios.get('/brands', { params: { all: true } });
-        console.log(response.data);
         brands.value = response.data;
     } catch (error) {
         console.error('Error fetching brands:', error);

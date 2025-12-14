@@ -1,6 +1,6 @@
 <template>
-    <section id="products" class="py-20 bg-background">
-        <div class="px-4 sm:px-6 lg:px-8 mx-10">
+    <section id="products" class="py-24 bg-surface">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Section Header -->
             <div class="text-center mb-16">
                 <div
@@ -26,7 +26,8 @@
             </div>
 
             <!-- Products Grid -->
-            <div v-else-if="products.length > 0" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div v-else-if="products.length > 0"
+                class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  2xl:grid-cols-6 gap-6">
                 <ProductCard v-for="product in products" :key="product.id" :product="product" view-mode="grid"
                     :show-stock="true" :show-category="true" :show-brand="true" :show-quick-view="true"
                     :show-wishlist="true" />

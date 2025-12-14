@@ -61,9 +61,12 @@
                         <div v-else-if="searchQuery && !isSearching" class="p-6 text-center">
                             <Search class="h-12 w-12 text-gray-300 mx-auto mb-3" />
                             <p class="text-sm font-medium text-white">No products found</p>
-                            <p class="text-xs text-gray-500 mt-1">
+                            <p class="text-xs text-gray-500 mt-1 mb-5">
                                 We are working on it.
                             </p>
+                            <router-link to="request-product" class="bg-primary rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
+                                Request Product
+                            </router-link>
                         </div>
 
                         <!-- Recent Searches / Suggestions (when no query) -->
@@ -84,10 +87,6 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
-                    <router-link to="/"
-                        class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
-                        Home
-                    </router-link>
                     <router-link to="/shop"
                         class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
                         Shop
@@ -96,6 +95,14 @@
                         class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
                         Travellers
                     </router-link>
+                    <router-link to="/track-order"
+                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
+                        Track Order
+                    </router-link>
+                    <!-- <router-link to="/blogs"
+                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
+                        Blog
+                    </router-link> -->
                     <router-link to="/request-product"
                         class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-primary hover:bg-primary/90 rounded-full transition-colors shadow-sm">
                         Request Order
@@ -239,6 +246,9 @@
                     </div>
                     <div v-else-if="searchQuery && !isSearching" class="p-6 text-center">
                         <p class="text-sm text-gray-500">No products found</p>
+                        <router-link to="/request-product">
+                            Request Order
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -258,6 +268,14 @@
                 <router-link to="/travellers" @click="isOpen = false"
                     class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
                     Travellers
+                </router-link>
+                <router-link to="/track-order" @click="isOpen = false"
+                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    Track Order
+                </router-link>
+                <router-link to="/blogs" @click="isOpen = false"
+                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    Blog
                 </router-link>
                 <router-link to="/request-product" @click="isOpen = false"
                     class="block px-3 py-2 rounded-lg text-base font-medium text-slate-900 bg-primary hover:bg-primary/90 transition-colors">
@@ -293,16 +311,17 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
+import { useNotificationStore } from '../stores/notification';
+import { useModalStore } from '../stores/modal';
 import CartDrawer from './CartDrawer.vue';
 import WishlistDrawer from './WishlistDrawer.vue';
 import NotificationDrawer from './NotificationDrawer.vue';
 import { ShoppingCart, Heart, Menu, X, Bell, Search, User } from 'lucide-vue-next';
-import { useModalStore } from '../stores/modal';
 import axios from '../axios';
 
 const router = useRouter();
@@ -314,6 +333,7 @@ const isMobileSearchOpen = ref(false);
 const authStore = useAuthStore();
 const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
+const notificationStore = useNotificationStore();
 const modalStore = useModalStore();
 
 // Watch for cart drawer trigger from cart store
@@ -343,8 +363,15 @@ const searchTimeout = ref(null);
 
 const popularSearches = ['Electronics', 'Fashion', 'Home & Garden', 'Accessories', 'Beauty'];
 
-// Mock unread notifications count
-const unreadCount = computed(() => authStore.isAuthenticated ? 3 : 0);
+// Real unread notifications count from store
+const unreadCount = computed(() => notificationStore.unreadCount);
+
+// Fetch notifications when auth state changes or on mount
+watch(() => authStore.isAuthenticated, (isAuthenticated) => {
+    if (isAuthenticated) {
+        notificationStore.fetchNotifications();
+    }
+}, { immediate: true });
 
 const handleSearch = () => {
     if (searchTimeout.value) {

@@ -10,12 +10,12 @@
                     class="group h-full flex flex-col cursor-pointer hover:-translate-y-1 transition-transform duration-300">
                     <template #header>
                         <div class="overflow-hidden h-48 relative">
-                            <img :src="blog.image" :alt="blog.title"
+                            <img :src="blog.image_url || '/assets/blog-placeholder.jpg'" :alt="blog.title"
                                 class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
                             <div class="absolute top-0 right-0">
                                 <span
                                     class="bg-primary text-slate-900 text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
-                                    {{ blog.category }}
+                                    {{ blog.category || 'News' }}
                                 </span>
                             </div>
                         </div>
@@ -23,11 +23,10 @@
                     <div class="p-6 flex-1 flex flex-col text-left">
                         <h3
                             class="text-xl font-serif text-white uppercase tracking-wider mb-3 group-hover:text-primary transition-colors">
-                            {{
-                                blog.title }}</h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-6 flex-1">{{ blog.excerpt }}</p>
+                            {{ blog.title }}</h3>
+                        <p class="text-slate-400 text-sm line-clamp-3 mb-6 flex-1" v-html="blog.excerpt || blog.content?.substring(0, 100) + '...'"></p>
                         <div class="mt-auto">
-                            <router-link :to="`/blog/${blog.id}`"
+                            <router-link :to="`/blogs/${blog.slug}`"
                                 class="flex items-center gap-2 text-sm text-white font-bold uppercase tracking-widest hover:text-primary transition-colors group/btn">
                                 Read More
                                 <svg class="ml-1 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none"
@@ -45,11 +44,18 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import Card from './ui/Card.vue';
+import axios from '../axios';
 
-const blogs = [
-    { id: 1, title: 'Top 10 Gadgets to Import in 2024', category: 'Technology', excerpt: 'Discover the hottest tech gadgets that are trending globally and how you can get them easily.', image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 2, title: 'Understanding Customs & Shipping Duties', category: 'Guide', excerpt: 'A comprehensive guide to understanding how shipping charges and customs duties are calculated.', image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-    { id: 3, title: 'Why Authenticity Matters', category: 'Lifestyle', excerpt: 'We ensure every product you request is 100% authentic and sourced directly from official stores.', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60' },
-];
+const blogs = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('/blogs/recent');
+        blogs.value = response.data;
+    } catch (error) {
+        console.error('Error fetching recent blogs:', error);
+    }
+});
 </script>

@@ -117,74 +117,96 @@ class ChargeController extends Controller
     {
         $request->validate([
             'base_amount' => 'required|numeric|min:0',
-            'currency_id' => 'required|exists:currencies,id',
+            'currency_id' => 'nullable|exists:currencies,id', // Made nullable
+            'scope' => 'nullable|in:hub,request',
             'charge_types' => 'nullable|array',
-            'additional_data' => 'nullable|array', // weight, distance, payment_method, etc.
+            'additional_data' => 'nullable|array',
         ]);
 
-        $currency = \App\Models\Currency::findOrFail($request->currency_id);
-        $additionalData = $request->additional_data ?? [];
-        $isInsideCity = $additionalData['is_inside_city'] ?? false;
-        $weight = $additionalData['weight'] ?? 0;
-        $paymentMethod = $additionalData['payment_method'] ?? null;
+        $currency = null;
+        if ($request->currency_id) {
+            $currency = \App\Models\Currency::find($request->currency_id);
+        }
         
-        // For shop orders, only calculate delivery charge from settings
-        // Skip charges table - delivery charge is handled separately below
-        // Get active charges that match the selected currency (for product requests, not shop orders)
-        $query = Charge::where('is_active', true)
-            ->whereHas('currency', function($q) use ($currency) {
-                // Get charges in the selected currency OR base currency (which applies to all currencies)
+        $scope = $request->scope ?? 'request';
+
+        // Build Query
+        $query = Charge::where('is_active', true);
+        
+        if ($currency) {
+            $query->whereHas('currency', function($q) use ($currency) {
+                // Get charges in the selected currency OR base currency
                 $q->where('id', $currency->id)
                   ->orWhere('is_base', true);
             });
-        
-        if ($request->has('charge_types') && !empty($request->charge_types)) {
-            $query->whereIn('type', $request->charge_types);
+        }
+        // If no currency, maybe return no database charges or just base ones?
+        // For 'hub', we mostly use settings, so it's fine.
+
+        // Scope Filter
+        if ($scope === 'hub') {
+             $query->where('type', 'hub');
+        } else {
+            // For Product Requests:
+            // Fetch 'request' type charges AND any specific charges for the selected currency
+            $query->where(function ($q) use ($request, $currency) {
+                // ALWAYS include 'request' type charges (global BDT fees etc)
+                $q->where('type', 'request');
+
+                // If specific charge types requested
+                if ($request->has('charge_types') && !empty($request->charge_types)) {
+                    $q->orWhereIn('type', $request->charge_types);
+                }
+                
+                // CRITICAL: Include ALL charges that belong to the selected currency
+                // (User requirement: "all charges from the charge table should be added for the selected currency")
+                if ($currency) {
+                    $q->orWhere('currency_id', $currency->id);
+                }
+            });
+            
+            // Safety: Never include 'hub' charges in requests
+            $query->where('type', '!=', 'hub');
         }
 
-        // Only get charges if charge_types is specified (for product requests)
-        // For shop orders (checkout), skip charges table - only use delivery charge from settings
-        $charges = $request->has('charge_types') && !empty($request->charge_types) 
-            ? $query->with('currency')->orderBy('sort_order')->get()
-            : collect([]);
+        $charges = $query->with('currency')->orderBy('sort_order')->get();
+
         $totalCharges = 0;
         $chargeBreakdown = [];
 
-        // Note: base_amount from frontend is already in BDT
-        // We need to convert it back to the selected currency for percentage calculations
+        // Note: base_amount from frontend is already in BDT for requests, usually.
+        // We need to convert it back to the selected currency for percentage calculations if needed.
         $baseAmountInSelectedCurrency = $request->base_amount;
-        if (!$currency->is_base) {
-            // Convert BDT back to selected currency (e.g., 5118.72 BDT / 128 = 39.99 USD)
+        if ($currency && !$currency->is_base && $currency->rate_to_base > 0) {
             $baseAmountInSelectedCurrency = $request->base_amount / $currency->rate_to_base;
         }
 
         foreach ($charges as $charge) {
             // Determine the base amount to use for calculation in the charge's currency
-            $chargeBaseAmount = 0;
+            $chargeBaseAmount = $request->base_amount; 
             
-            if ($charge->currency->id === $currency->id) {
-                // Charge is in same currency as selected product - use selected currency amount
-                // Example: Product in USD, Charge in USD -> use USD amount (39.99)
-                $chargeBaseAmount = $baseAmountInSelectedCurrency;
-            } elseif ($charge->currency->is_base) {
-                // Charge is in base currency (BDT) - use BDT amount directly
-                // Example: Product in USD, Charge in BDT -> use BDT amount (5118.72)
-                $chargeBaseAmount = $request->base_amount;
-            } else {
-                // Charge is in a different currency than selected
-                // Convert from selected currency to charge currency
-                if (!$currency->is_base) {
-                    // Selected currency to charge currency via BDT
-                    // Example: Product in USD, Charge in EUR
-                    // USD amount -> BDT -> EUR amount
-                    $chargeBaseAmount = ($baseAmountInSelectedCurrency * $currency->rate_to_base) / $charge->currency->rate_to_base;
+            if ($currency) {
+                if ($charge->currency->id === $currency->id) {
+                    $chargeBaseAmount = $baseAmountInSelectedCurrency;
+                } elseif ($charge->currency->is_base) {
+                    $chargeBaseAmount = $request->base_amount;
                 } else {
-                    // Selected is base (BDT), convert to charge currency
-                    $chargeBaseAmount = $request->base_amount / $charge->currency->rate_to_base;
+                    if (!$currency->is_base) {
+                        $chargeBaseAmount = ($baseAmountInSelectedCurrency * $currency->rate_to_base) / $charge->currency->rate_to_base;
+                    } else {
+                        $chargeBaseAmount = $request->base_amount / $charge->currency->rate_to_base;
+                    }
                 }
+            } else {
+               // No target currency, just use base amount assume BDT/Base
+               if (!$charge->currency->is_base) {
+                   // naive conversion if charge is foreign but request is base?
+                   // Assuming request is base currency if currency_id is null
+                   $chargeBaseAmount = $request->base_amount / $charge->currency->rate_to_base;
+               }
             }
 
-            // Calculate charge in its own currency first
+            // Calculate charge
             $chargeAmountInCurrency = 0;
             if ($charge->calculation_type === 'fixed') {
                 $chargeAmountInCurrency = $charge->value;
@@ -192,13 +214,13 @@ class ChargeController extends Controller
                 $chargeAmountInCurrency = ($chargeBaseAmount * $charge->value) / 100;
             }
 
-            // Apply min/max constraints
+            // Min/Max constraints
             if ($charge->min_value !== null && $chargeAmountInCurrency < $charge->min_value) {
                 $chargeAmountInCurrency = $charge->min_value;
             }
             if ($charge->max_value !== null && $chargeAmountInCurrency > $charge->max_value) {
                 $chargeAmountInCurrency = $charge->max_value;
-    }
+            }
 
             // Convert to base currency (BDT) for total
             $chargeAmountBDT = $chargeAmountInCurrency;
@@ -221,14 +243,23 @@ class ChargeController extends Controller
             ];
         }
 
-        // Calculate delivery charges from settings (in BDT, no conversion needed)
+        // --- Additional Logic for Delivery & Payment Fees ---
+        $deliveryCharge = 0;
+        $paymentProcessingFee = 0;
+
+        // Delivery Charge Logic (Usually for both, but definitely for 'hub' or if requested)
+        // For 'hub' (Shop), we always calculate delivery if it's not a purely digital/service order (assuming physical)
+        // For 'request', we usually rely on declared shipping, BUT user might want system delivery charge too.
+        // Let's keep it: Calculate if additional_data provided.
+
         $additionalData = $request->additional_data ?? [];
         $isInsideCity = $additionalData['is_inside_city'] ?? false;
         $weight = $additionalData['weight'] ?? 0;
         $paymentMethod = $additionalData['payment_method'] ?? null;
         
         $deliveryCharge = $this->calculateDeliveryCharge($request->base_amount, $isInsideCity, $weight, $paymentMethod);
-        // Always add delivery charge to total (even if 0 for free delivery)
+
+        // Add delivery to total
         $totalCharges += $deliveryCharge;
         $chargeBreakdown[] = [
             'charge' => 'Delivery Charge',
@@ -242,9 +273,10 @@ class ChargeController extends Controller
             'rate_to_base' => 1,
         ];
 
-        // Calculate payment processing fee (based on grand total: product + all charges + delivery)
+        // Payment Processing Fee
         $subtotalBeforePaymentFee = $request->base_amount + $totalCharges;
         $paymentProcessingFee = $this->calculatePaymentProcessingFee($subtotalBeforePaymentFee, $paymentMethod);
+        
         if ($paymentProcessingFee > 0) {
             $totalCharges += $paymentProcessingFee;
             $chargeBreakdown[] = [
@@ -275,19 +307,38 @@ class ChargeController extends Controller
      */
     private function calculateDeliveryCharge($totalAmount, $isInsideCity, $weight = 0, $paymentMethod = null)
     {
-        // Get delivery charge settings (for shop orders - simple calculation)
-        $insideCityCharge = \App\Models\Setting::get('delivery_charge_inside_city', 0);
-        $outsideCityCharge = \App\Models\Setting::get('delivery_charge_outside_city', 0);
-        $freeDeliveryThreshold = \App\Models\Setting::get('free_delivery_threshold', 0);
+        // Get delivery charge settings
+        $insideCityCharge = (float) \App\Models\Setting::get('delivery_charge_inside_city', 0);
+        $outsideCityCharge = (float) \App\Models\Setting::get('delivery_charge_outside_city', 0);
+        $freeDeliveryThreshold = (float) \App\Models\Setting::get('free_delivery_threshold', 0);
+        $deliveryChargePerKg = (float) \App\Models\Setting::get('delivery_charge_per_kg', 0);
+
+        \Illuminate\Support\Facades\Log::info('Calculating Delivery Charge', [
+            'totalAmount' => $totalAmount,
+            'isInsideCity' => $isInsideCity,
+            'weight' => $weight,
+            'insideCityCharge' => $insideCityCharge,
+            'outsideCityCharge' => $outsideCityCharge,
+            'freeDeliveryThreshold' => $freeDeliveryThreshold,
+            'deliveryChargePerKg' => $deliveryChargePerKg,
+        ]);
 
         // Check if order qualifies for free delivery
         if ($freeDeliveryThreshold > 0 && $totalAmount >= $freeDeliveryThreshold) {
             return 0; // Free delivery
         }
 
-        // Simple calculation: just use the setting value based on location
-        // Inside Dhaka or Outside Dhaka - no conversion, no weight calculation for shop orders
+        // Base delivery charge based on location
         $deliveryCharge = $isInsideCity ? $insideCityCharge : $outsideCityCharge;
+
+        // Add weight-based charge (if applicable)
+        if ($weight > 1 && $deliveryChargePerKg > 0) {
+            // First 1kg is covered by base charge, charge for extra weight
+            $extraWeight = ceil($weight - 1);
+            if ($extraWeight > 0) {
+                $deliveryCharge += ($extraWeight * $deliveryChargePerKg);
+            }
+        }
 
         return $deliveryCharge;
     }
