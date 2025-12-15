@@ -12,11 +12,15 @@ class DashboardController extends Controller
     public function getProfile()
     {
         $user = auth()->user();
-        $profile = $user->travellerProfile;
         
-        if (!$profile) {
-            return response()->json(['status' => 'not_registered']);
-        }
+        // Auto-create profile if not exists, syncing data from User table
+        $profile = $user->travellerProfile()->firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'passport_number' => $user->passport_no,
+                'phone_number' => $user->phone
+            ]
+        );
         
         return response()->json(['profile' => $profile, 'user' => $user]);
     }
@@ -45,6 +49,10 @@ class DashboardController extends Controller
             
             // Set status to pending whenever new docs are uploaded
             $data['verification_status'] = 'pending';
+
+            // Notify Admins
+            $admins = \App\Models\User::role('Admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewTravellerApplication($user));
         }
 
         $profile->update($data);

@@ -167,7 +167,8 @@ import {
     ShoppingCart,
     Heart,
     Store,
-    PlaneTakeoff
+    PlaneTakeoff,
+    Plane
 } from 'lucide-vue-next';
 import CartDrawer from '../../components/CartDrawer.vue';
 import WishlistDrawer from '../../components/WishlistDrawer.vue';
@@ -196,19 +197,28 @@ const userInitials = computed(() => {
     return user.value.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 });
 
-const navigation = [
-    { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'My Requests', href: '/dashboard/requests', icon: PlaneTakeoff },
-    { name: 'My Orders', href: '/dashboard/orders', icon: ShoppingBag },
-    { name: 'Cart', href: '#', icon: ShoppingCart, action: 'cart' },
-    { name: 'Wishlist', href: '#', icon: Heart, action: 'wishlist' },
-    { name: 'Notifications', href: '/dashboard/notifications', icon: Bell },
-    { name: 'Coupons', href: '/dashboard/coupons', icon: Ticket },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
-];
+const navigation = computed(() => {
+    const items = [
+        { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'My Requests', href: '/dashboard/requests', icon: PlaneTakeoff },
+        { name: 'My Orders', href: '/dashboard/orders', icon: ShoppingBag },
+        { name: 'Cart', href: '#', icon: ShoppingCart, action: 'cart' },
+        { name: 'Wishlist', href: '#', icon: Heart, action: 'wishlist' },
+        { name: 'Notifications', href: '/dashboard/notifications', icon: Bell },
+        { name: 'Coupons', href: '/dashboard/coupons', icon: Ticket },
+        { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+    ];
+
+    // Check for Traveller role
+    if (user.value?.roles?.some(role => role.name === 'Traveller')) {
+        items.splice(1, 0, { name: 'My Trip', href: '/traveller-dashboard', icon: Plane });
+    }
+
+    return items;
+});
 
 const currentPageTitle = computed(() => {
-    const item = navigation.find(nav => isActive(nav.href));
+    const item = navigation.value.find(nav => isActive(nav.href));
     return item ? item.name : 'Dashboard';
 });
 

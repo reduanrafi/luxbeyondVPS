@@ -14,7 +14,7 @@
                 <nav class="flex -mb-px">
                     <button
                         @click="activeTab = 'currencies'"
-                        :class="activeTab === 'currencies' ? 'border-amber-500 text-amber-500' : 'border-transparent text-zinc-400 hover:text-white hover:border-white/10'"
+                        :class="activeTab === 'currencies' ? 'bg-primary text-primary-500' : 'border-transparent text-zinc-400 hover:text-white hover:border-white/10'"
                         class="px-6 py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
                     >
                         <DollarSign class="w-4 h-4" />
@@ -22,7 +22,7 @@
                     </button>
                     <button
                         @click="activeTab = 'charges'"
-                        :class="activeTab === 'charges' ? 'border-amber-500 text-amber-500' : 'border-transparent text-zinc-400 hover:text-white hover:border-white/10'"
+                        :class="activeTab === 'charges' ? 'bg-primary text-primary-500' : 'border-transparent text-zinc-400 hover:text-white hover:border-white/10'"
                         class="px-6 py-4 text-sm font-bold border-b-2 transition-colors flex items-center gap-2"
                     >
                         <Receipt class="w-4 h-4" />
@@ -36,7 +36,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-white">Currency Management</h3>
                     <button @click="showCurrencyModal = true; editingCurrency = null"
-                        class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                        class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                         <Plus class="w-5 h-5" />
                         Add Currency
                     </button>
@@ -61,8 +61,8 @@
                             </tr>
                             <tr v-for="currency in currencies" :key="currency.id" class="hover:bg-white/5 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="font-bold text-amber-500">{{ currency.code }}</span>
-                                    <span v-if="currency.is_base" class="ml-2 px-2 py-0.5 bg-amber-500/10 text-amber-500 text-xs rounded border border-amber-500/20">Base</span>
+                                    <span class="font-bold text-primary-500">{{ currency.code }}</span>
+                                    <span v-if="currency.is_base" class="ml-2 px-2 py-0.5 bg-primary/10 text-primary-500 text-xs rounded border bg-primary/20">Base</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ currency.name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ currency.symbol }}</td>
@@ -94,7 +94,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-white">Charges Management</h3>
                     <button @click="showChargeModal = true; editingCharge = null"
-                        class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                        class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                         <Plus class="w-5 h-5" />
                         Add Charge
                     </button>
@@ -103,9 +103,9 @@
                 <!-- Filters -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                     <input type="text" v-model="chargeFilters.search" @input="handleChargeSearch" placeholder="Search charges..."
-                        class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                        class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <select v-model="chargeFilters.type" @change="fetchCharges(1)"
-                        class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                        class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                         <option value="" class="bg-zinc-900">All Types</option>
                         <option value="shipping" class="bg-zinc-900">Shipping</option>
                         <option value="weight" class="bg-zinc-900">Weight</option>
@@ -115,7 +115,7 @@
                         <option value="custom" class="bg-zinc-900">Custom</option>
                     </select>
                     <select v-model="chargeFilters.currency_id" @change="fetchCharges(1)"
-                        class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                        class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                         <option value="" class="bg-zinc-900">All Currencies</option>
                         <option v-for="currency in allCurrencies" :key="currency.id" :value="currency.id" class="bg-zinc-900">
                             {{ currency.code }}
@@ -204,36 +204,36 @@
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Currency Code *</label>
                                 <input v-model="currencyForm.code" type="text" maxlength="3" required
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                     placeholder="USD">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Currency Name *</label>
                                 <input v-model="currencyForm.name" type="text" required
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                     placeholder="United States Dollar">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Symbol *</label>
                                 <input v-model="currencyForm.symbol" type="text" maxlength="10" required
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                     placeholder="$">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Rate to Base Currency *</label>
                                 <input v-model.number="currencyForm.rate_to_base" type="number" step="0.0001" min="0" required
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                     placeholder="1.0000">
                             </div>
                             <div class="flex items-center gap-6 pt-2">
                                 <label class="flex items-center cursor-pointer">
                                     <input v-model="currencyForm.is_base" type="checkbox"
-                                        class="rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500">
+                                        class="rounded border-white/20 bg-white/5 text-primary-500 focus:ring-primary-500">
                                     <span class="ml-2 text-sm text-zinc-300">Set as Base Currency</span>
                                 </label>
                                 <label class="flex items-center cursor-pointer">
                                     <input v-model="currencyForm.is_active" type="checkbox"
-                                        class="rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500">
+                                        class="rounded border-white/20 bg-white/5 text-primary-500 focus:ring-primary-500">
                                     <span class="ml-2 text-sm text-zinc-300">Active</span>
                                 </label>
                             </div>
@@ -244,7 +244,7 @@
                                 Cancel
                             </button>
                             <button type="submit"
-                                class="px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
+                                class="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-colors">
                                 {{ editingCurrency ? 'Update' : 'Create' }}
                             </button>
                         </div>
@@ -267,13 +267,13 @@
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-1">Charge Name *</label>
                                     <input v-model="chargeForm.name" type="text" required
-                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                         placeholder="Shipping Charge">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-1">Type *</label>
                                     <select v-model="chargeForm.type" required
-                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                                         <option value="" class="bg-zinc-900">Select Type</option>
                                         <option value="hub" class="bg-zinc-900">Shop Order (Hub Invoice)</option>
                                         <option value="request" class="bg-zinc-900">Product Request (General)</option>
@@ -288,7 +288,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Currency *</label>
                                 <select v-model="chargeForm.currency_id" required
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                                     <option value="" class="bg-zinc-900">Select Currency</option>
                                     <option v-for="currency in allCurrencies" :key="currency.id" :value="currency.id" class="bg-zinc-900">
                                         {{ currency.code }} - {{ currency.name }} ({{ currency.symbol }})
@@ -299,7 +299,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-1">Calculation Type *</label>
                                     <select v-model="chargeForm.calculation_type" required
-                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                                         <option value="fixed" class="bg-zinc-900">Fixed Amount</option>
                                         <option value="percentage" class="bg-zinc-900">Percentage</option>
                                     </select>
@@ -307,7 +307,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-1">Value *</label>
                                     <input v-model.number="chargeForm.value" type="number" step="0.01" min="0" required
-                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                         placeholder="0.00">
                                 </div>
                             </div>
@@ -315,26 +315,26 @@
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-1">Min Value (Optional)</label>
                                     <input v-model.number="chargeForm.min_value" type="number" step="0.01" min="0"
-                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                         placeholder="0.00">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-1">Max Value (Optional)</label>
                                     <input v-model.number="chargeForm.max_value" type="number" step="0.01" min="0"
-                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                        class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                         placeholder="0.00">
                                 </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Description (Optional)</label>
                                 <textarea v-model="chargeForm.description" rows="3"
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                     placeholder="Charge description..."></textarea>
                             </div>
                             <div class="flex items-center pt-2">
                                 <label class="flex items-center cursor-pointer">
                                     <input v-model="chargeForm.is_active" type="checkbox"
-                                        class="rounded border-white/20 bg-white/5 text-amber-500 focus:ring-amber-500">
+                                        class="rounded border-white/20 bg-white/5 text-primary-500 focus:ring-primary-500">
                                     <span class="ml-2 text-sm text-zinc-300">Active</span>
                                 </label>
                             </div>
@@ -345,7 +345,7 @@
                                 Cancel
                             </button>
                             <button type="submit"
-                                class="px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors">
+                                class="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-colors">
                                 {{ editingCharge ? 'Update' : 'Create' }}
                             </button>
                         </div>

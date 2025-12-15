@@ -4,7 +4,7 @@
         <!-- Categories List -->
         <div class="px-4 pb-4">
             <div v-if="loading" class="space-y-0">
-                <div v-for="n in 8" :key="n" class="h-16 bg-gray-200 rounded-lg animate-pulse mb-1"></div>
+                <div v-for="n in 8" :key="n" class="h-16 bg-black/90 rounded-lg animate-pulse mb-1"></div>
             </div>
             
             <div v-else-if="categories.length > 0" class="space-y-0">

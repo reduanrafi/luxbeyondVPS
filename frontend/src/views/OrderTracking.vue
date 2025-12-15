@@ -118,7 +118,7 @@
                     <div class="space-y-4">
                         <div v-for="(item, index) in result.items" :key="index" class="flex items-center gap-4">
                             <div class="w-16 h-16 bg-[#111111] rounded-lg border border-white/10 overflow-hidden flex-shrink-0">
-                                <img v-if="item.image" :src="item.image" :alt="item.name" class="w-full h-full object-cover">
+                                <img v-if="item.image" :src="item.image" :alt="item.name" class="w-full h-full object-contain">
                                 <div v-else class="w-full h-full flex items-center justify-center text-zinc-600">
                                     <Package class="w-6 h-6" />
                                 </div>

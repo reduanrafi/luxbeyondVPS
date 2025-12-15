@@ -58,7 +58,7 @@
                             class="flex items-center justify-between group py-2 border-b border-white/5 last:border-0 hover:bg-white/5 px-2 rounded">
                             <div class="flex items-center gap-3">
                                 <img :src="product.image || 'https://via.placeholder.com/50'" :alt="product.name"
-                                    class="w-10 h-10 rounded-lg object-cover ring-1 ring-white/10">
+                                    class="w-10 h-10 rounded-lg object-contain ring-1 ring-white/10">
                                 <div>
                                     <p class="font-semibold text-white text-sm group-hover:text-primary transition-colors">
                                         {{ product.name }}</p>

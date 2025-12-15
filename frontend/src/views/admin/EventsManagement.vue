@@ -7,7 +7,7 @@
                 <p class="text-sm text-zinc-400 mt-1">Manage flash sales, promotions, and special events</p>
             </div>
             <button @click="openAddModal"
-                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Create Event
             </button>
@@ -17,9 +17,9 @@
         <div class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search events..."
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                 <select v-model="filters.status" @change="fetchEvents(1)"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <option value="" class="bg-zinc-900">All Status</option>
                     <option value="active" class="bg-zinc-900">Active</option>
                     <option value="inactive" class="bg-zinc-900">Inactive</option>
@@ -28,7 +28,7 @@
                     <option value="expired" class="bg-zinc-900">Expired</option>
                 </select>
                 <select v-model="filters.position" @change="fetchEvents(1)"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <option value="" class="bg-zinc-900">All Positions</option>
                     <option value="hero" class="bg-zinc-900">Hero Banner</option>
                     <option value="sidebar" class="bg-zinc-900">Sidebar</option>
@@ -43,7 +43,7 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-12 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 bg-primary"></div>
             <p class="text-zinc-500 mt-4">Loading events...</p>
         </div>
 
@@ -90,14 +90,14 @@
                                 <div class="flex items-center">
                                     <div
                                         class="h-12 w-12 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 mr-4">
-                                        <img v-if="event.image_url" :src="event.image_url" :alt="event.name" class="h-full w-full object-cover">
+                                        <img v-if="event.image_url" :src="event.image_url" :alt="event.name" class="h-full w-full object-contain">
                                         <div v-else class="h-full w-full flex items-center justify-center">
                                             <Calendar class="w-5 h-5 text-zinc-600" />
                                         </div>
                                     </div>
                                     <div>
                                         <div
-                                            class="text-sm font-semibold text-white group-hover:text-amber-500 transition-colors">
+                                            class="text-sm font-semibold text-white group-hover:text-primary-500 transition-colors">
                                             {{ event.name }}</div>
                                         <div class="text-xs text-zinc-500 font-mono">{{ event.slug }}</div>
                                     </div>
@@ -131,7 +131,7 @@
                                 <span class="px-2.5 py-1 text-xs font-medium rounded-full border"
                                     :class="{
     'bg-emerald-500/10 text-emerald-400 border-emerald-500/20': event.is_live,
-    'bg-amber-500/10 text-amber-500 border-amber-500/20': event.is_upcoming,
+    'bg-primary/10 text-primary-500 bg-primary/20': event.is_upcoming,
     'bg-red-500/10 text-red-400 border-red-500/20': event.is_expired,
     'bg-zinc-500/10 text-zinc-400 border-zinc-500/20': !event.is_active
                                     }">
@@ -172,7 +172,7 @@
                         Previous
                     </button>
                     <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                        :class="page === pagination.current_page ? 'bg-amber-500 text-black border-amber-500 font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
+                        :class="page === pagination.current_page ? 'bg-primary text-black bg-primary font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
                         class="px-3 py-1.5 border rounded-lg text-xs transition-colors">
                         {{ page }}
                     </button>

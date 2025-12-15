@@ -60,7 +60,7 @@
                                         <div class="shrink-0 w-20 h-24 border bg-white/5 rounded-sm overflow-hidden relative"
                                             :class="isOutOfStock(item) ? 'border-red-500/50' : 'border-white/10'">
                                             <img :src="getItemImage(item)" :alt="item.name"
-                                                class="w-full h-full object-center object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                                class="w-full h-full object-center object-contain opacity-90 group-hover:opacity-100 transition-opacity"
                                                 :class="{ 'opacity-50 grayscale': isOutOfStock(item) }">
 
                                             <!-- Out of Stock Overlay -->

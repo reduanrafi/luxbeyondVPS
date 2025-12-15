@@ -49,22 +49,22 @@
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Store Name</label>
                                 <input v-model="generalSettings.site_name" type="text"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all">
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Store Email</label>
                                 <input v-model="generalSettings.site_email" type="email"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all">
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Store Phone</label>
                                 <input v-model="generalSettings.site_phone" type="tel"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all">
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Default Currency</label>
                                 <select v-model="generalSettings.default_currency"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50">
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50">
                                     <option value="BDT" class="bg-zinc-900">BDT (৳)</option>
                                     <option value="USD" class="bg-zinc-900">USD ($)</option>
                                     <option value="CNY" class="bg-zinc-900">CNY (¥)</option>
@@ -85,7 +85,7 @@
                                 </label>
                                 <div class="relative">
                                     <input v-model.number="generalSettings.min_payment_percentage_request" type="number" min="0" max="100" step="0.01"
-                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all pr-12">
+                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all pr-12">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">%</span>
                                 </div>
                                 <p class="text-xs text-zinc-500 mt-2">Minimum percentage of total amount required for request orders (0-100%)</p>
@@ -96,7 +96,7 @@
                                 </label>
                                 <div class="relative">
                                     <input v-model.number="generalSettings.min_payment_percentage_shop" type="number" min="0" max="100" step="0.01"
-                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all pr-12">
+                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all pr-12">
                                     <span class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">%</span>
                                 </div>
                                 <p class="text-xs text-zinc-500 mt-2">Minimum percentage of total amount required for shop orders (0-100%)</p>
@@ -115,7 +115,7 @@
                                     Inside City Delivery Charge (৳)
                                 </label>
                                 <input v-model.number="generalSettings.delivery_charge_inside_city" type="number" min="0" step="0.01"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all"
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all"
                                     placeholder="0.00">
                                 <p class="text-xs text-zinc-500 mt-2">Fixed delivery charge for orders within the city</p>
                             </div>
@@ -124,7 +124,7 @@
                                     Outside City Delivery Charge (৳)
                                 </label>
                                 <input v-model.number="generalSettings.delivery_charge_outside_city" type="number" min="0" step="0.01"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all"
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all"
                                     placeholder="0.00">
                                 <p class="text-xs text-zinc-500 mt-2">Fixed delivery charge for orders outside the city</p>
                             </div>
@@ -133,7 +133,7 @@
                                     Free Delivery Threshold (৳)
                                 </label>
                                 <input v-model.number="generalSettings.free_delivery_threshold" type="number" min="0" step="0.01"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all"
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all"
                                     placeholder="0.00">
                                 <p class="text-xs text-zinc-500 mt-2">Order amount above which delivery is free</p>
                             </div>
@@ -142,7 +142,7 @@
                                     Delivery Charge Per Kg (৳)
                                 </label>
                                 <input v-model.number="generalSettings.delivery_charge_per_kg" type="number" min="0" step="0.01"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-primary/50 transition-all"
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary/50 transition-all"
                                     placeholder="0.00">
                                 <p class="text-xs text-zinc-500 mt-2">Additional charge per kilogram (if weight-based)</p>
                             </div>
@@ -151,7 +151,7 @@
 
                     <div class="pt-4">
                         <button @click="saveGeneralSettings" :disabled="saving"
-                            class="px-8 py-3 bg-primary text-black font-bold rounded-xl hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                            class="px-8 py-3 bg-primary text-black font-bold rounded-xl hover:bg-primary transition-all shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                             <Settings class="w-5 h-5" />
                             {{ saving ? 'Saving Changes...' : 'Save All Changes' }}
                         </button>
@@ -167,7 +167,7 @@
                         <p class="text-sm text-zinc-400 mt-1">Manage accepted payment gateways and bank accounts</p>
                     </div>
                     <button @click="openPaymentModal()"
-                        class="px-5 py-2.5 bg-primary text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                        class="px-5 py-2.5 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                         <Plus class="w-5 h-5" />
                         Add Payment Method
                     </button>
@@ -231,7 +231,7 @@
                         <CreditCard class="w-12 h-12 text-zinc-600 mx-auto mb-4" />
                         <h3 class="text-lg font-bold text-white mb-2">No Payment Methods</h3>
                         <p class="text-zinc-500 mb-4">You haven't added any payment methods yet.</p>
-                        <button @click="openPaymentModal()" class="text-primary hover:text-amber-400 font-bold text-sm">Add your first method</button>
+                        <button @click="openPaymentModal()" class="text-primary hover:text-primary-400 font-bold text-sm">Add your first method</button>
                     </div>
                 </div>
             </div>
@@ -244,7 +244,7 @@
                         <p class="text-sm text-zinc-400 mt-1">Configure automated alerts and messaging rules</p>
                     </div>
                     <button @click="openNotificationModal()"
-                        class="px-5 py-2.5 bg-primary text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                        class="px-5 py-2.5 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                         <Plus class="w-5 h-5" />
                         Add Notification Rule
                     </button>
@@ -295,7 +295,7 @@
                         <Bell class="w-12 h-12 text-zinc-600 mx-auto mb-4" />
                         <h3 class="text-lg font-bold text-white mb-2">No Notification Rules</h3>
                         <p class="text-zinc-500 mb-4">You haven't configured any notification rules yet.</p>
-                        <button @click="openNotificationModal()" class="text-primary hover:text-amber-400 font-bold text-sm">Create your first rule</button>
+                        <button @click="openNotificationModal()" class="text-primary hover:text-primary-400 font-bold text-sm">Create your first rule</button>
                     </div>
                 </div>
             </div>

@@ -148,7 +148,7 @@
                                                 <div
                                                     class="w-12 h-12 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex-shrink-0">
                                                     <img v-if="item.product?.image_url" :src="item.product.image_url"
-                                                        :alt="item.product.name" class="w-full h-full object-cover">
+                                                        :alt="item.product.name" class="w-full h-full object-contain">
                                                     <div v-else
                                                         class="w-full h-full flex items-center justify-center text-zinc-600">
                                                         <ImageIcon class="w-5 h-5" />

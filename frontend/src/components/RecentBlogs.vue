@@ -11,7 +11,7 @@
                     <template #header>
                         <div class="overflow-hidden h-48 relative">
                             <img :src="blog.image_url || '/assets/blog-placeholder.jpg'" :alt="blog.title"
-                                class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                                class="w-full h-full object-contain transform group-hover:scale-105 transition duration-500">
                             <div class="absolute top-0 right-0">
                                 <span
                                     class="bg-primary text-slate-900 text-[10px] font-bold px-3 py-1 uppercase tracking-wider">

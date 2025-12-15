@@ -32,7 +32,7 @@
                         class="h-full bg-surface border border-white/10 hover:border-primary/30 transition-colors p-8">
                         <div class="flex items-center mb-6">
                             <img :src="review.avatar" :alt="review.name"
-                                class="w-14 h-14 rounded-full mr-4 border-2 border-primary/20 shadow-sm object-cover">
+                                class="w-14 h-14 rounded-full mr-4 border-2 border-primary/20 shadow-sm object-contain">
                             <div>
                                 <h4 class="text-lg font-serif text-white uppercase tracking-wide">{{ review.name }}</h4>
                                 <div class="flex text-primary text-sm gap-0.5">

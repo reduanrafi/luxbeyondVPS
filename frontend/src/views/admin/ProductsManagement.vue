@@ -7,7 +7,7 @@
                 <p class="text-sm text-zinc-400 mt-1">Manage your product inventory</p>
             </div>
             <router-link to="/admin/products/create"
-                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Product
             </router-link>
@@ -17,9 +17,9 @@
         <div class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search products..."
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                 <select v-model="filters.category" @change="fetchProducts(1)"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <option value="all" class="bg-zinc-900">All Categories</option>
                     <option value="Electronics" class="bg-zinc-900">Electronics</option>
                     <option value="Clothing" class="bg-zinc-900">Clothing</option>
@@ -27,7 +27,7 @@
                     <option value="Accessories" class="bg-zinc-900">Accessories</option>
                 </select>
                 <select v-model="filters.status" @change="fetchProducts(1)"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <option value="" class="bg-zinc-900">All Status</option>
                     <option value="in_stock" class="bg-zinc-900 text-nowrap">In Stock</option>
                     <option value="low_stock" class="bg-zinc-900 text-nowrap">Low Stock</option>
@@ -42,7 +42,7 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-12 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 bg-primary"></div>
             <p class="text-zinc-500 mt-4">Loading products...</p>
         </div>
 
@@ -70,7 +70,7 @@
                             <td class="py-4 px-6">
                                 <div class="flex items-center gap-3">
                                     <img :src="product.image_url || 'https://via.placeholder.com/100'"
-                                        :alt="product.name" class="w-12 h-12 rounded-lg object-cover bg-white/5">
+                                        :alt="product.name" class="w-12 h-12 rounded-lg object-contain bg-white/5">
                                     <div>
                                         <p class="font-semibold text-white text-sm">{{ product.name }}</p>
                                         <p class="text-xs text-zinc-500">{{ product.brand || 'N/A' }}</p>
@@ -79,7 +79,7 @@
                             </td>
                             <td class="py-4 px-6 text-sm text-zinc-400">{{ product.sku }}</td>
                             <td class="py-4 px-6 text-sm text-zinc-400">{{ product.category }}</td>
-                            <td class="py-4 px-6 text-sm font-mono text-amber-500">৳{{
+                            <td class="py-4 px-6 text-sm font-mono text-primary-500">৳{{
                                 Number(product.price).toLocaleString()
                                 }}</td>
                             <td class="py-4 px-6 text-sm text-zinc-400">{{ product.total_stock || 0 }}</td>
@@ -120,7 +120,7 @@
                     Previous
                 </button>
                 <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                    :class="page === pagination.current_page ? 'bg-amber-500 text-black border-amber-500 font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
+                    :class="page === pagination.current_page ? 'bg-primary text-black bg-primary font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
                     class="px-3 py-1.5 border rounded-lg text-xs transition-colors">
                     {{ page }}
                 </button>
@@ -227,7 +227,7 @@ const deleteProduct = async (id) => {
 
 const getStockClass = (stock) => {
     if (stock > 10) return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-    if (stock > 0) return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
+    if (stock > 0) return 'bg-primary/10 text-primary-500 bg-primary/20';
     return 'bg-red-500/10 text-red-400 border-red-500/20';
 };
 

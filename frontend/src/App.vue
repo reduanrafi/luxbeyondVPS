@@ -13,5 +13,5 @@ import Footer from './components/Footer.vue';
 import AuthModal from './components/AuthModal.vue';
 
 const route = useRoute();
-const isDashboardRoute = computed(() => route.path.startsWith('/dashboard') || route.path.startsWith('/admin'));
+const isDashboardRoute = computed(() => route.path.startsWith('/dashboard') || route.path.startsWith('/admin') || route.path.startsWith('/traveller-dashboard'));
 </script>

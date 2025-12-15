@@ -18,7 +18,7 @@
                         Cancel
                     </button>
                     <button @click="saveProduct" :disabled="loading"
-                        class="px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                         <Save class="w-5 h-5" />
                         {{ loading ? 'Saving...' : 'Save Product' }}
                     </button>
@@ -32,9 +32,9 @@
                 <div class="flex border-b border-white/5 overflow-x-auto">
                     <button v-for="tab in tabs" :key="tab.id" @click="currentTab = tab.id"
                         class="px-6 py-4 text-sm font-bold transition-colors relative whitespace-nowrap"
-                        :class="currentTab === tab.id ? 'text-amber-500 bg-amber-500/5' : 'text-zinc-500 hover:text-white hover:bg-white/5'">
+                        :class="currentTab === tab.id ? 'text-primary-500 bg-primary/5' : 'text-zinc-500 hover:text-white hover:bg-white/5'">
                         {{ tab.label }}
-                        <div v-if="currentTab === tab.id" class="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-500">
+                        <div v-if="currentTab === tab.id" class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary">
                         </div>
                     </button>
                 </div>
@@ -51,7 +51,7 @@
                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Product Name *</label>
                                 <input type="text" v-model="form.name" required
                                     placeholder="e.g. Premium Leather Jacket"
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all">
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 transition-all">
                             </div>
 
                             <div>
@@ -63,7 +63,7 @@
                                 <div class="flex items-center gap-2">
                                     <input type="text" v-model="form.slug" 
                                         placeholder="premium-leather-jacket"
-                                        class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all font-mono text-sm">
+                                        class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 transition-all font-mono text-sm">
                                     <button 
                                         type="button"
                                         @click="generateSlug"
@@ -80,7 +80,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-2">Brand</label>
                                     <select v-model="form.brand"
-                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                                         <option value="" class="bg-zinc-900">Select Brand (Optional)</option>
                                         <option v-for="brand in brands" :key="brand.id" :value="brand.name"
                                             class="bg-zinc-900">
@@ -91,7 +91,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-zinc-400 mb-2">SKU *</label>
                                     <input type="text" v-model="form.sku" required placeholder="e.g. PRD-001"
-                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all font-mono">
+                                        class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 transition-all font-mono">
                                 </div>
                             </div>
 
@@ -99,7 +99,7 @@
                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Short Description</label>
                                 <textarea v-model="form.short_description" rows="5"
                                     placeholder="Brief summary for product cards..."
-                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all"></textarea>
+                                    class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 transition-all"></textarea>
                             </div>
 
                             <div>
@@ -122,7 +122,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-zinc-400 mb-2">Category *</label>
                                         <select v-model="form.category" required
-                                            class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                            class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                                             <option value="" class="bg-zinc-900">Select Category</option>
                                             <option v-for="cat in categories" :key="cat.id" :value="cat.name"
                                                 class="bg-zinc-900">
@@ -133,7 +133,7 @@
                                     <div>
                                         <label class="block text-sm font-medium text-zinc-400 mb-2">Status</label>
                                         <select v-model="form.status"
-                                            class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                            class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                                             <option value="published" class="bg-zinc-900">Published</option>
                                             <option value="draft" class="bg-zinc-900">Draft</option>
                                             <option value="archived" class="bg-zinc-900">Archived</option>
@@ -141,7 +141,7 @@
                                     </div>
                                     <div class="flex items-center gap-2 pt-2">
                                         <input type="checkbox" v-model="form.is_featured" id="is_featured"
-                                            class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                                            class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
                                         <label for="is_featured" class="text-sm font-medium text-zinc-300">
                                             Featured Product
                                         </label>
@@ -160,7 +160,7 @@
                                                 (৳)
                                                 *</label>
                                             <input type="number" v-model="form.price" required min="0" step="0.01"
-                                                class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 font-mono text-lg">
+                                                class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 font-mono text-lg">
                                             <p class="text-xs text-zinc-500 mt-1">Base price before any discounts</p>
                                         </div>
                                         <div>
@@ -168,7 +168,7 @@
                                                 (৳)</label>
                                             <input type="number" v-model="form.sellable_price" min="0" step="0.01"
                                                 placeholder="Leave empty if no discount"
-                                                class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 font-mono text-lg">
+                                                class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 font-mono text-lg">
                                             <p class="text-xs text-zinc-500 mt-1">Discounted/sale price (optional)</p>
                                         </div>
                                     </div>
@@ -177,13 +177,13 @@
                                             <div>
                                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Stock Quantity *</label>
                                                 <input type="number" v-model="form.stock" required min="0"
-                                                    class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 font-mono">
+                                                    class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 font-mono">
                                                 <p class="text-xs text-zinc-500 mt-1">Available quantity</p>
                                             </div>
                                             <div>
                                                 <label class="block text-sm font-medium text-zinc-400 mb-2">Weight (kg)</label>
                                                 <input type="number" v-model="form.weight" min="0" step="0.01"
-                                                    class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 font-mono">
+                                                    class="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 font-mono">
                                                 <p class="text-xs text-zinc-500 mt-1">Shipping weight</p>
                                             </div>
                                         </div>
@@ -212,7 +212,7 @@
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" v-model="form.has_variants" class="sr-only peer">
                                 <div
-                                    class="w-11 h-6 bg-zinc-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500">
+                                    class="w-11 h-6 bg-zinc-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
                                 </div>
                                 <span class="ml-3 text-sm font-medium text-zinc-300">Enable Variants</span>
                             </label>
@@ -223,14 +223,14 @@
                         <!-- Variant Generator -->
                         <div class="bg-white/5 p-6 rounded-xl border border-white/10">
                             <h4 class="font-bold text-white mb-4 flex items-center gap-2">
-                                <Wand2 class="w-4 h-4 text-amber-500" /> Variant Generator (Attribute Based Pricing)
+                                <Wand2 class="w-4 h-4 text-primary-500" /> Variant Generator (Attribute Based Pricing)
                             </h4>
                             <div class="space-y-6">
                                 <div v-for="(attr, attrIndex) in variantAttributes" :key="attrIndex"
                                     class="bg-zinc-900 p-4 rounded-lg border border-white/10 shadow-sm">
                                     <div class="flex justify-between items-center mb-4">
                                         <input type="text" v-model="attr.name" placeholder="Attribute Name (e.g. Size)"
-                                            class="font-bold bg-transparent text-white border-b border-transparent hover:border-white/20 focus:border-amber-500 focus:outline-none px-2 py-1 transition-colors w-1/3 placeholder:text-zinc-600">
+                                            class="font-bold bg-transparent text-white border-b border-transparent hover:border-white/20 focus:bg-primary focus:outline-none px-2 py-1 transition-colors w-1/3 placeholder:text-zinc-600">
                                         <button type="button" @click="removeAttribute(attrIndex)"
                                             class="text-red-400 hover:text-red-300 text-sm font-medium">
                                             Remove Attribute
@@ -243,25 +243,25 @@
                                             <div class="flex-1">
                                                 <input type="text" v-model="value.name"
                                                     placeholder="Value (e.g. Red, XL)"
-                                                    class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm">
+                                                    class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-sm">
                                             </div>
                                             <div class="w-32">
                                                 <div class="relative">
                                                     <span class="absolute left-3 top-2 text-zinc-500 text-sm">+৳</span>
                                                     <input type="number" v-model="value.price_adjustment"
                                                         placeholder="0"
-                                                        class="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm">
+                                                        class="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-sm">
                                                 </div>
                                             </div>
                                             <div class="w-12">
                                                 <div
-                                                    class="relative w-10 h-10 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:border-amber-500 transition-colors">
+                                                    class="relative w-10 h-10 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-primary transition-colors">
                                                     <input type="file"
                                                         @change="e => handleAttributeImageUpload(e, attrIndex, valIndex)"
                                                         accept="image/*"
                                                         class="absolute inset-0 opacity-0 cursor-pointer z-10">
                                                     <img v-if="value.image_preview" :src="value.image_preview"
-                                                        class="w-full h-full object-cover">
+                                                        class="w-full h-full object-contain">
                                                     <ImageIcon v-else class="w-4 h-4 text-zinc-600" />
                                                 </div>
                                             </div>
@@ -271,7 +271,7 @@
                                             </button>
                                         </div>
                                         <button type="button" @click="addAttributeValue(attrIndex)"
-                                            class="text-sm text-amber-500 font-medium hover:text-amber-400 flex items-center gap-1 mt-2">
+                                            class="text-sm text-primary-500 font-medium hover:text-primary-400 flex items-center gap-1 mt-2">
                                             <Plus class="w-3 h-3" /> Add Value
                                         </button>
                                     </div>
@@ -283,7 +283,7 @@
                                         <Plus class="w-4 h-4" /> Add Attribute
                                     </button>
                                     <button type="button" @click="generateVariants"
-                                        class="ml-auto px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                                        class="ml-auto px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-colors shadow-lg shadow-primary-500/20 flex items-center gap-2">
                                         <Wand2 class="w-4 h-4" /> Generate Variants
                                     </button>
                                 </div>
@@ -337,30 +337,30 @@
                                                     accept="image/*"
                                                     class="absolute inset-0 opacity-0 cursor-pointer z-10">
                                                 <img v-if="variant.image_preview" :src="variant.image_preview"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-contain">
                                                 <img v-else-if="variant.image_url" :src="variant.image_url"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-contain">
                                                 <img v-else-if="variant.image" 
                                                     :src="variant.image.startsWith('http') || variant.image.startsWith('/') ? variant.image : `/storage/${variant.image}`"
-                                                    class="w-full h-full object-cover">
+                                                    class="w-full h-full object-contain">
                                                 <ImageIcon v-else class="w-5 h-5 text-zinc-600" />
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <input type="text" v-model="variant.sku"
-                                                class="w-full px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-amber-500">
+                                                class="w-full px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:bg-primary">
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <input type="number" v-model="variant.price"
-                                                class="w-32 px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-amber-500">
+                                                class="w-32 px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:bg-primary">
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <input type="number" v-model="variant.stock"
-                                                class="w-24 px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-amber-500">
+                                                class="w-24 px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:bg-primary">
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <input type="number" v-model="variant.weight" step="0.01"
-                                                class="w-24 px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:border-amber-500">
+                                                class="w-24 px-2 py-1 bg-white/5 border border-white/10 rounded text-sm text-white focus:outline-none focus:bg-primary">
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right">
                                             <button type="button" @click="removeVariant(index)"
@@ -386,15 +386,15 @@
                         <label class="block text-sm font-medium text-zinc-400 mb-4">Main Product Image</label>
                         <div class="flex items-start gap-6">
                             <div
-                                class="w-48 h-48 bg-white/5 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center relative overflow-hidden group hover:border-amber-500 transition-colors cursor-pointer">
+                                class="w-48 h-48 bg-white/5 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center relative overflow-hidden group hover:bg-primary transition-colors cursor-pointer">
                                 <input type="file" @change="handleMainImageUpload" accept="image/*"
                                     class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                                <img v-if="mainImagePreview" :src="mainImagePreview" class="w-full h-full object-cover">
+                                <img v-if="mainImagePreview" :src="mainImagePreview" class="w-full h-full object-contain">
                                 <img v-else-if="form.image_url" :src="form.image_url"
-                                    class="w-full h-full object-cover">
+                                    class="w-full h-full object-contain">
                                 <div v-else class="text-center p-4">
                                     <ImageIcon
-                                        class="w-8 h-8 text-zinc-600 mx-auto mb-2 group-hover:text-amber-500 transition-colors" />
+                                        class="w-8 h-8 text-zinc-600 mx-auto mb-2 group-hover:text-primary-500 transition-colors" />
                                     <span class="text-xs text-zinc-500 font-medium">Upload Main Image</span>
                                 </div>
                             </div>
@@ -429,8 +429,8 @@
                                 <!-- Existing Item -->
                                 <template v-if="item.id">
                                     <img v-if="item.type === 'image'" :src="item.url"
-                                        class="w-full h-full object-cover">
-                                    <video v-else :src="item.url" class="w-full h-full object-cover"></video>
+                                        class="w-full h-full object-contain">
+                                    <video v-else :src="item.url" class="w-full h-full object-contain"></video>
                                     <div
                                         class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                         <span class="text-white text-xs font-bold uppercase">{{ item.type }}</span>
@@ -440,8 +440,8 @@
                                 <template v-else>
                                     <div v-if="item.preview" class="w-full h-full">
                                         <img v-if="item.type === 'image'" :src="item.preview"
-                                            class="w-full h-full object-cover">
-                                        <video v-else :src="item.preview" class="w-full h-full object-cover"></video>
+                                            class="w-full h-full object-contain">
+                                        <video v-else :src="item.preview" class="w-full h-full object-contain"></video>
                                     </div>
                                     <div v-else
                                         class="w-full h-full flex flex-col items-center justify-center p-4 text-center">
@@ -474,7 +474,7 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-2">Meta Title</label>
                             <input type="text" v-model="form.meta_title" placeholder="Product Name | Brand"
-                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all">
+                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 transition-all">
                             <p class="text-xs text-zinc-500 mt-2 flex justify-between">
                                 <span>Recommended length: 50-60 characters.</span>
                                 <span :class="form.meta_title.length > 60 ? 'text-red-400' : 'text-emerald-400'">{{
@@ -485,7 +485,7 @@
                             <label class="block text-sm font-medium text-zinc-400 mb-2">Meta Description</label>
                             <textarea v-model="form.meta_description" rows="4"
                                 placeholder="A brief summary of the product..."
-                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all"></textarea>
+                                class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 transition-all"></textarea>
                             <p class="text-xs text-zinc-500 mt-2 flex justify-between">
                                 <span>Recommended length: 150-160 characters.</span>
                                 <span

@@ -12,9 +12,9 @@
             }" class="w-full h-auto">
             <swiper-slide v-for="(slide, index) in slides" :key="index">
                 <!-- Desktop Banner -->
-                <img :src="slide.desktop" :alt="slide.alt" class="hidden lg:block w-full h-auto object-cover">
+                <img :src="slide.desktop" :alt="slide.alt" class="hidden lg:block w-full h-auto object-contain">
                 <!-- Mobile Banner -->
-                <img :src="slide.mobile" :alt="slide.alt" class="block lg:hidden w-full h-auto object-cover">
+                <img :src="slide.mobile" :alt="slide.alt" class="block lg:hidden w-full h-auto object-contain">
             </swiper-slide>
 
             <!-- Custom Navigation Arrows -->

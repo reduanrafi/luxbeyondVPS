@@ -1,5 +1,5 @@
 <template>
-    <div v-if="brands.length > 0" class="py-12 bg-surface border-y border-white/5 overflow-hidden">
+    <div v-if="loading || brands.length > 0" class="py-12 bg-surface border-y border-white/5 overflow-hidden">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-serif text-primary uppercase tracking-[0.2em] mb-4 drop-shadow-sm">World Class
@@ -13,7 +13,12 @@
                     from the world's finest houses</p>
             </div>
 
-            <Vue3Marquee :clone="true" :duration="40" :pause-on-hover="true" class="py-4 overflow-hidden">
+            <!-- Skeleton Loader -->
+            <div v-if="loading" class="flex justify-center items-center gap-12 overflow-hidden py-4 animate-pulse opacity-50">
+                <div v-for="i in 5" :key="i" class="h-16 w-32 bg-zinc-800/50 rounded-lg"></div>
+            </div>
+
+            <Vue3Marquee v-else :clone="true" :duration="40" :pause-on-hover="true" class="py-4 overflow-hidden">
                 <div v-for="brand in brands" :key="brand.id"
                     class="mx-12 flex items-center justify-center min-w-[150px]">
                     <!-- Image Logo with Gold Hover -->
@@ -54,6 +59,7 @@ import { Vue3Marquee } from 'vue3-marquee';
 import axios from '../axios';
 
 const brands = ref([]);
+const loading = ref(true);
 
 const getImageUrl = (url) => {
     if (!url) return '';
@@ -61,11 +67,14 @@ const getImageUrl = (url) => {
 };
 
 const fetchBrands = async () => {
+    loading.value = true;
     try {
         const response = await axios.get('/brands', { params: { all: true } });
         brands.value = response.data;
     } catch (error) {
         console.error('Error fetching brands:', error);
+    } finally {
+        loading.value = false;
     }
 };
 

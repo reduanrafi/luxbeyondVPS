@@ -43,7 +43,7 @@
                                 class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors group">
                                 <img :src="product.image_url ? product.image_url : '/assets/placeholder.png'"
                                     :alt="product.name"
-                                    class="w-16 h-16 object-cover rounded-lg border border-white/10" />
+                                    class="w-16 h-16 object-contain rounded-lg border border-white/10" />
                                 <div class="flex-1 min-w-0">
                                     <h4
                                         class="text-sm font-medium text-white group-hover:text-primary transition-colors truncate">
@@ -234,7 +234,7 @@
                             :to="`/shop/${product.slug || product.id}`" @click="closeSearchDropdown"
                             class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
                             <img :src="product.image_url" :alt="product.name"
-                                class="w-16 h-16 object-cover rounded-lg border border-white/10" />
+                                class="w-16 h-16 object-contain rounded-lg border border-white/10" />
                             <div class="flex-1 min-w-0">
                                 <h4 class="text-sm font-medium text-white truncate">{{ product.name }}</h4>
                                 <p class="text-xs text-gray-500 mt-1">{{ product.category }}</p>

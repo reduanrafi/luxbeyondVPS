@@ -92,8 +92,8 @@
                     </div>
 
                     <div v-if="request.payment_status === 'processing'"
-                        class="bg-amber-500/10 text-amber-500 p-4 rounded-lg flex items-center gap-3 border border-amber-500/20">
-                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-amber-500"></div>
+                        class="bg-primary/10 text-primary-500 p-4 rounded-lg flex items-center gap-3 border bg-primary/20">
+                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 bg-primary"></div>
                          <div>
                             <p class="font-semibold">Payment Verification Pending</p>
                             <p class="text-sm">We are verifying your payment details. This may take a while.</p>
@@ -200,7 +200,7 @@
                 <div class="p-6">
                     <div class="relative pl-4 border-l-2 border-gray-200 space-y-8">
                         <div v-for="(log, index) in request.timeline" :key="index" class="relative">
-                            <div class="absolute -left-[21px] bg-amber-500 border-2 border-primary rounded-full w-4 h-4"></div>
+                            <div class="absolute -left-[21px] bg-primary border-2 border-primary rounded-full w-4 h-4"></div>
                             <div class="mb-1">
                                 <span class="font-bold text-slate-800">{{ log.status }}</span>
                                 <span class="text-xs text-slate-500 ml-2">{{ formatDate(log.created_at) }}</span>
@@ -229,7 +229,7 @@
                     </div>
                     <div v-if="request.admin_image_url" class="mt-4">
                         <p class="text-xs text-slate-500 mb-2">Product Image</p>
-                        <img :src="request.admin_image_url" alt="Product Image" class="w-32 h-32 object-cover rounded-lg border border-white/10">
+                        <img :src="request.admin_image_url" alt="Product Image" class="w-32 h-32 object-contain rounded-lg border border-white/10">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>

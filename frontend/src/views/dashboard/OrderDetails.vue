@@ -81,7 +81,7 @@
                                             <img v-if="item.image || (item.product && item.product.image)"
                                                 :src="item.image || (item.product ? item.product.image_url : null)"
                                                 :alt="item.product_name"
-                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
                                             <div v-else
                                                 class="w-full h-full flex items-center justify-center text-slate-500 text-xs">
                                                 No Image

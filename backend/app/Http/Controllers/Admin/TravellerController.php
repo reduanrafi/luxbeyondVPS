@@ -14,17 +14,20 @@ class TravellerController extends Controller
      */
     public function index(Request $request)
     {
-        // Get all users who have a traveller profile (applicants)
-        $query = User::whereHas('travellerProfile')->with('travellerProfile');
+        // Get users who are Travellers (role) OR have applied (have profile)
+        $query = User::where(function($q) {
+            $q->role('Traveller')
+              ->orWhereHas('travellerProfile');
+        })->with('travellerProfile');
 
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $status = $request->status; // pending, approved, rejected
             $query->whereHas('travellerProfile', function($q) use ($status) {
                 $q->where('verification_status', $status);
             });
         }
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -60,7 +63,28 @@ class TravellerController extends Controller
             $user->removeRole('Traveller');
         }
 
+        $user->notify(new \App\Notifications\TravellerStatusUpdated($validated['status']));
+
         return response()->json(['message' => 'Status updated successfully', 'user' => $user->load('travellerProfile')]);
+    }
+
+    /**
+     * Update traveller profile details.
+     */
+    public function updateProfile(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'passport_number' => 'required|string',
+            'phone_number' => 'required|string',
+            // Add other fields if necessary
+        ]);
+
+        $user = User::findOrFail($id);
+        $profile = $user->travellerProfile()->firstOrCreate(['user_id' => $user->id]);
+        
+        $profile->update($validated);
+
+        return response()->json(['message' => 'Profile updated successfully', 'user' => $user->load('travellerProfile')]);
     }
     
     /**
@@ -68,7 +92,7 @@ class TravellerController extends Controller
      */
     public function show($id)
     {
-        $user = User::with('travellerProfile')->findOrFail($id);
+        $user = User::with(['travellerProfile', 'trips', 'payouts'])->findOrFail($id);
         return response()->json($user);
     }
 }

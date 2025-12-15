@@ -23,8 +23,21 @@ class TravellerProfile extends Model
         'travel_history' => 'array',
     ];
 
+    protected $appends = ['document_urls'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getDocumentUrlsAttribute()
+    {
+        if (empty($this->documents)) {
+            return [];
+        }
+
+        return collect($this->documents)->map(function ($doc) {
+            return url(config('app.storage_repo').'/'. $doc);
+        })->toArray();
     }
 }

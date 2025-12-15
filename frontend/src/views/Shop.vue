@@ -19,7 +19,7 @@
     : { backgroundColor: event.bg_color || '#7c3aed' }">
                                         <img v-if="event.image_url || event.banner_image_url"
                                             :src="event.image_url || event.banner_image_url" :alt="event.name"
-                                            class="w-full h-20 object-cover" />
+                                            class="w-full h-20 object-contain" />
                                         <div v-else class="w-full h-32 flex items-center justify-center p-4"
                                             :style="{ backgroundColor: event.bg_color || '#7c3aed' }">
                                             <div class="text-center text-white">
@@ -83,7 +83,7 @@
                                             : { backgroundColor: event.bg_color || '#7c3aed' }">
                                         <img v-if="event.banner_image_url || event.image_url"
                                             :src="event.banner_image_url || event.image_url" :alt="event.name"
-                                            class="w-full h-full object-cover object-center" />
+                                            class="w-full h-full object-contain object-center" />
                                         <!-- Only show text/button if no banner/image -->
                                         <div v-else class="w-full h-64 flex items-center justify-center p-8"
                                             :style="{ backgroundColor: event.bg_color || '#7c3aed' }">

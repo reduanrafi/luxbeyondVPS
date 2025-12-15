@@ -11,12 +11,12 @@
             <div class="flex items-center gap-4">
                 <label class="text-sm font-bold text-zinc-300">Date Range:</label>
                 <input type="date"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 dark-calendar">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 dark-calendar">
                 <span class="text-zinc-500">to</span>
                 <input type="date"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 dark-calendar">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50 dark-calendar">
                 <button
-                    class="px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20">
+                    class="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20">
                     Apply
                 </button>
             </div>
@@ -27,7 +27,7 @@
             <h3 class="text-lg font-bold text-white mb-6">Revenue Trend</h3>
             <div class="h-80 flex items-end justify-between gap-2 border-b border-white/5 pb-2">
                 <div v-for="(value, index) in revenueData" :key="index"
-                    class="flex-1 bg-gradient-to-t from-amber-500/50 to-amber-500 rounded-t-lg relative group cursor-pointer hover:from-amber-400/60 hover:to-amber-400 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                    class="flex-1 bg-gradient-to-t from-primary/50 to-primary rounded-t-lg relative group cursor-pointer hover:from-primary/60 hover:to-primary transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]"
                     :style="{ height: value + '%' }">
                     <div
                         class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black font-bold text-xs px-2 py-1.5 rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 before:content-[''] before:absolute before:top-full before:left-1/2 before:-translate-x-1/2 before:border-4 before:border-transparent before:border-t-white">
@@ -49,10 +49,10 @@
                     <div v-for="category in topCategories" :key="category.name">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-zinc-300">{{ category.name }}</span>
-                            <span class="text-sm font-bold text-amber-500">{{ category.percentage }}%</span>
+                            <span class="text-sm font-bold text-primary-500">{{ category.percentage }}%</span>
                         </div>
                         <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/5">
-                            <div class="bg-amber-500 h-2 rounded-full transition-all shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+                            <div class="bg-primary h-2 rounded-full transition-all shadow-[0_0_10px_rgba(245,158,11,0.5)]"
                                 :style="{ width: category.percentage + '%' }"></div>
                         </div>
                     </div>

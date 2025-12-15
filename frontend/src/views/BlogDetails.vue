@@ -14,9 +14,9 @@
         <div v-else-if="post" class="max-w-4xl mx-auto px-4">
             <!-- Breadcrumbs -->
             <div class="flex items-center gap-2 text-sm text-zinc-500 mb-6">
-                <router-link to="/" class="hover:text-amber-500 transition-colors">Home</router-link>
+                <router-link to="/" class="hover:text-primary-500 transition-colors">Home</router-link>
                 <span>/</span>
-                <router-link to="/blogs" class="hover:text-amber-500 transition-colors">Blog</router-link>
+                <router-link to="/blogs" class="hover:text-primary-500 transition-colors">Blog</router-link>
                 <span>/</span>
                 <span class="text-zinc-300 line-clamp-1">{{ post.title }}</span>
             </div>
@@ -26,7 +26,7 @@
                 <h1 class="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">{{ post.title }}</h1>
                 <div class="flex flex-wrap items-center gap-6 text-sm text-zinc-400">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold">
+                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-500 font-bold">
                             {{ getInitials(post.author?.name) }}
                         </div>
                         <span class="text-white">{{ post.author?.name || 'Admin' }}</span>
@@ -40,7 +40,7 @@
             <div class="relative w-full aspect-video rounded-2xl overflow-hidden mb-12 border border-white/10 shadow-2xl">
                 <img :src="post.image_url || '/assets/blog-placeholder.jpg'" 
                     :alt="post.title"
-                    class="w-full h-full object-cover">
+                    class="w-full h-full object-contain">
             </div>
 
             <!-- Content -->
@@ -71,7 +71,7 @@
 
         <div v-else class="text-center py-20">
             <h2 class="text-2xl font-bold text-white mb-4">Post not found</h2>
-            <router-link to="/blogs" class="text-amber-500 hover:underline">
+            <router-link to="/blogs" class="text-primary-500 hover:underline">
                 Back to Blog
             </router-link>
         </div>

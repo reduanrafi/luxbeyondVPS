@@ -7,7 +7,7 @@
                 <p class="text-sm text-zinc-400 mt-1">Create and manage blog posts/articles</p>
             </div>
             <button @click="openModal()"
-                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Create Post
             </button>
@@ -17,9 +17,9 @@
         <div class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-4">
             <div class="flex gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search posts..."
-                    class="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                 <select v-model="filters.status" @change="fetchPosts(1)"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <option value="">All Status</option>
                     <option value="published">Published</option>
                     <option value="draft">Draft</option>
@@ -52,7 +52,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <div class="h-10 w-10 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 mr-3">
-                                        <img v-if="post.image_url" :src="post.image_url" class="h-full w-full object-cover">
+                                        <img v-if="post.image_url" :src="post.image_url" class="h-full w-full object-contain">
                                         <div v-else class="h-full w-full flex items-center justify-center">
                                             <FileText class="w-5 h-5 text-zinc-600" />
                                         </div>
@@ -129,20 +129,20 @@
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Title</label>
                                 <input v-model="form.title" type="text" required
-                                    class="w-full px-4 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20">
+                                    class="w-full px-4 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Content</label>
                                 <textarea v-model="form.content" rows="12" required
-                                    class="w-full px-4 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 font-mono text-sm"
+                                    class="w-full px-4 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 font-mono text-sm"
                                     placeholder="Use Markdown or HTML..."></textarea>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Excerpt (Optional)</label>
                                 <textarea v-model="form.excerpt" rows="3"
-                                    class="w-full px-4 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-sm"></textarea>
+                                    class="w-full px-4 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-sm"></textarea>
                             </div>
                         </div>
 
@@ -153,7 +153,7 @@
                                     @click="$refs.fileInput.click()">
                                     <input ref="fileInput" type="file" @change="handleImage" class="hidden" accept="image/*">
                                     <div v-if="imagePreview" class="relative">
-                                        <img :src="imagePreview" class="w-full h-40 object-cover rounded-lg">
+                                        <img :src="imagePreview" class="w-full h-40 object-contain rounded-lg">
                                         <div class="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity rounded-lg">
                                             <span class="text-white text-xs">Change Image</span>
                                         </div>
@@ -170,14 +170,14 @@
                             <div class="p-4 bg-white/5 rounded-lg border border-white/10 space-y-4">
                                 <div class="flex items-center gap-2">
                                     <input type="checkbox" id="is_published" v-model="form.is_published"
-                                        class="w-4 h-4 rounded border-white/20 bg-zinc-800 text-amber-500 focus:ring-amber-500/50">
+                                        class="w-4 h-4 rounded border-white/20 bg-zinc-800 text-primary-500 focus:ring-primary-500/50">
                                     <label for="is_published" class="text-sm font-medium text-white cursor-pointer select-none">Publish Immediately</label>
                                 </div>
                                 
                                 <div>
                                     <label class="block text-xs font-medium text-zinc-500 mb-1">Tags (Comma separated)</label>
                                     <input v-model="tagsInput" type="text" placeholder="news, update, featured"
-                                        class="w-full px-3 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20">
+                                        class="w-full px-3 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                                 </div>
                             </div>
                         </div>
@@ -189,7 +189,7 @@
                             Cancel
                         </button>
                         <button type="submit" :disabled="saving"
-                            class="px-6 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors disabled:opacity-50">
+                            class="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-colors disabled:opacity-50">
                             {{ saving ? 'Saving...' : (isEditing ? 'Update Post' : 'Create Post') }}
                         </button>
                     </div>

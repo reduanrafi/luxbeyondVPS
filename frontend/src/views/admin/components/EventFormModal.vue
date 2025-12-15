@@ -17,27 +17,27 @@
                 <div class="border-b border-white/10">
                     <div class="flex gap-4">
                         <button type="button" @click="activeTab = 'general'"
-                            :class="activeTab === 'general' ? 'border-b-2 border-amber-500 text-amber-500' : 'text-zinc-400 hover:text-white'"
+                            :class="activeTab === 'general' ? 'border-b-2 bg-primary text-primary-500' : 'text-zinc-400 hover:text-white'"
                             class="pb-3 px-2 font-medium text-sm transition-colors">
                             General
                         </button>
                         <button type="button" @click="activeTab = 'display'"
-                            :class="activeTab === 'display' ? 'border-b-2 border-amber-500 text-amber-500' : 'text-zinc-400 hover:text-white'"
+                            :class="activeTab === 'display' ? 'border-b-2 bg-primary text-primary-500' : 'text-zinc-400 hover:text-white'"
                             class="pb-3 px-2 font-medium text-sm transition-colors">
                             Display Settings
                         </button>
                         <button type="button" @click="activeTab = 'products'"
-                            :class="activeTab === 'products' ? 'border-b-2 border-amber-500 text-amber-500' : 'text-zinc-400 hover:text-white'"
+                            :class="activeTab === 'products' ? 'border-b-2 bg-primary text-primary-500' : 'text-zinc-400 hover:text-white'"
                             class="pb-3 px-2 font-medium text-sm transition-colors">
                             Products ({{ selectedProducts.length }})
                         </button>
                         <button type="button" @click="activeTab = 'schedule'"
-                            :class="activeTab === 'schedule' ? 'border-b-2 border-amber-500 text-amber-500' : 'text-zinc-400 hover:text-white'"
+                            :class="activeTab === 'schedule' ? 'border-b-2 bg-primary text-primary-500' : 'text-zinc-400 hover:text-white'"
                             class="pb-3 px-2 font-medium text-sm transition-colors">
                             Schedule
                         </button>
                         <button type="button" @click="activeTab = 'notifications'"
-                            :class="activeTab === 'notifications' ? 'border-b-2 border-amber-500 text-amber-500' : 'text-zinc-400 hover:text-white'"
+                            :class="activeTab === 'notifications' ? 'border-b-2 bg-primary text-primary-500' : 'text-zinc-400 hover:text-white'"
                             class="pb-3 px-2 font-medium text-sm transition-colors">
                             Notifications
                         </button>
@@ -50,7 +50,7 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Event Name *</label>
                             <input v-model="form.name" type="text" required
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.name ? 'border-red-500/50' : ''"
                                 placeholder="Flash Sale, Black Friday, etc.">
                             <p v-if="errors.name" class="text-xs text-red-400 mt-1">{{ errors.name[0] }}</p>
@@ -58,7 +58,7 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Slug</label>
                             <input v-model="form.slug" type="text"
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.slug ? 'border-red-500/50' : ''"
                                 placeholder="auto-generated">
                             <p v-if="errors.slug" class="text-xs text-red-400 mt-1">{{ errors.slug[0] }}</p>
@@ -69,7 +69,7 @@
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Short Description</label>
                         <input v-model="form.short_description" type="text"
-                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.short_description ? 'border-red-500/50' : ''"
                             placeholder="Brief description for banners">
                         <p v-if="errors.short_description" class="text-xs text-red-400 mt-1">{{ errors.short_description[0] }}</p>
@@ -78,7 +78,7 @@
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Description</label>
                         <textarea v-model="form.description" rows="4"
-                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.description ? 'border-red-500/50' : ''"
                             placeholder="Full event description..."></textarea>
                         <p v-if="errors.description" class="text-xs text-red-400 mt-1">{{ errors.description[0] }}</p>
@@ -87,7 +87,7 @@
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Custom URL</label>
                         <input v-model="form.url" type="text"
-                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.url ? 'border-red-500/50' : ''"
                             placeholder="/shop?events=event-slug">
                         <p v-if="errors.url" class="text-xs text-red-400 mt-1">{{ errors.url[0] }}</p>
@@ -101,7 +101,7 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Position *</label>
                             <select v-model="form.position" required
-                                class="w-full px-3 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.position ? 'border-red-500/50' : ''">
                                 <option value="hero" class="bg-zinc-900">Hero Banner</option>
                                 <option value="sidebar" class="bg-zinc-900">Sidebar</option>
@@ -112,7 +112,7 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Priority</label>
                             <input v-model.number="form.priority" type="number" min="0"
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.priority ? 'border-red-500/50' : ''">
                             <p v-if="errors.priority" class="text-xs text-red-400 mt-1">{{ errors.priority[0] }}</p>
                             <p v-else class="text-xs text-zinc-500 mt-1">Higher priority shows first</p>
@@ -121,7 +121,7 @@
 
                     <div class="flex items-center gap-2 mb-4">
                         <input v-model="form.show_button" type="checkbox" id="show_button"
-                            class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                            class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
                         <label for="show_button" class="text-sm font-medium text-zinc-300">Show Button</label>
                         <span class="text-xs text-zinc-500">If unchecked, only image will be displayed</span>
                     </div>
@@ -130,7 +130,7 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Button Text</label>
                             <input v-model="form.button_text" type="text"
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 placeholder="Shop Now">
                         </div>
                         <div>
@@ -139,7 +139,7 @@
                                 <input v-model="form.button_color" type="color"
                                     class="h-10 w-20 border border-white/10 rounded-lg cursor-pointer bg-transparent">
                                 <input v-model="form.button_color" type="text"
-                                    class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                    class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                     placeholder="#f59e0b">
                             </div>
                         </div>
@@ -149,12 +149,12 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Event Image</label>
                             <input type="file" @change="handleImageUpload" accept="image/*"
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-400">
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-black hover:file:bg-primary">
                             <div v-if="imagePreview" class="mt-2">
-                                <img :src="imagePreview" class="h-32 w-full object-cover rounded-lg border border-white/10">
+                                <img :src="imagePreview" class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                             <div v-else-if="form.image_url" class="mt-2">
-                                <img :src="form.image_url" class="h-32 w-full object-cover rounded-lg border border-white/10">
+                                <img :src="form.image_url" class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                         </div>
                         <div>
@@ -162,13 +162,13 @@
                                 Banner Image <span class="text-red-400">*</span>
                             </label>
                             <input type="file" @change="handleBannerUpload" accept="image/*"
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-400"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-black hover:file:bg-primary"
                                 :class="errors.banner_image ? 'border-red-500/50' : ''">
                             <div v-if="bannerPreview" class="mt-2">
-                                <img :src="bannerPreview" class="h-32 w-full object-cover rounded-lg border border-white/10">
+                                <img :src="bannerPreview" class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                             <div v-else-if="form.banner_image_url" class="mt-2">
-                                <img :src="form.banner_image_url" class="h-32 w-full object-cover rounded-lg border border-white/10">
+                                <img :src="form.banner_image_url" class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                             <p v-if="errors.banner_image" class="text-xs text-red-400 mt-1">{{ errors.banner_image[0] }}</p>
                             <p v-else class="text-xs text-zinc-500 mt-1">Required for hero/sidebar display</p>
@@ -178,7 +178,7 @@
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Price Type</label>
                         <select v-model="form.price_type"
-                            class="w-full px-3 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-3 py-2 bg-zinc-800 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.price_type ? 'border-red-500/50' : ''">
                             <option value="fixed" class="bg-zinc-900">Fixed Price</option>
                             <option value="percentage" class="bg-zinc-900">Percentage Discount</option>
@@ -190,7 +190,7 @@
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Fixed Price (for all products)</label>
                         <input v-model.number="form.price" type="number" step="0.01" min="0"
                             placeholder="0.00"
-                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.price ? 'border-red-500/50' : ''">
                         <p v-if="errors.price" class="text-xs text-red-400 mt-1">{{ errors.price[0] }}</p>
                         <p v-else class="text-xs text-zinc-500 mt-1">All products in this event will be sold at this fixed price. Leave empty to use product's original price.</p>
@@ -201,7 +201,7 @@
                         <div class="flex items-center gap-2">
                             <input v-model.number="form.discount_percentage" type="number" step="0.01" min="0" max="100"
                                 placeholder="0.00"
-                                class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.discount_percentage ? 'border-red-500/50' : ''">
                             <span class="text-zinc-500">%</span>
                         </div>
@@ -215,7 +215,7 @@
                             <input v-model="form.bg_color" type="color"
                                 class="h-10 w-20 border border-white/10 rounded-lg cursor-pointer bg-transparent">
                             <input v-model="form.bg_color" type="text"
-                                class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.bg_color ? 'border-red-500/50' : ''"
                                 placeholder="#f59e0b">
                         </div>
@@ -226,13 +226,13 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="flex items-center gap-2">
                             <input v-model="form.is_active" type="checkbox" id="is_active"
-                                class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                                class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
                             <label for="is_active" class="text-sm font-medium text-zinc-300">Active</label>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Sort Order</label>
                             <input v-model.number="form.sort_order" type="number" min="0"
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                         </div>
                     </div>
                 </div>
@@ -243,10 +243,10 @@
                         <h4 class="text-lg font-semibold text-white">Assign Products</h4>
                         <div class="flex gap-2">
                             <input v-model="productSearch" type="text" placeholder="Search products..."
-                                class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 @input="searchProducts">
                             <button type="button" @click="showProductModal = true"
-                                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-colors text-sm">
+                                class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-colors text-sm">
                                 Add Products
                             </button>
                         </div>
@@ -260,7 +260,7 @@
                         <div v-for="(product, index) in selectedProducts" :key="product.id"
                             class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">
                             <img :src="product.image_url || '/assets/placeholder.png'" :alt="product.name"
-                                class="w-12 h-12 object-cover rounded">
+                                class="w-12 h-12 object-contain rounded">
                             <div class="flex-1">
                                 <div class="font-medium text-white">{{ product.name }}</div>
                                 <div class="text-sm text-zinc-400">৳{{ formatPrice(product.sellable_price || product.price) }}</div>
@@ -279,14 +279,14 @@
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Start Date & Time *</label>
                             <input v-model="form.start_date" type="datetime-local" required
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.start_date ? 'border-red-500/50' : ''">
                             <p v-if="errors.start_date" class="text-xs text-red-400 mt-1">{{ errors.start_date[0] }}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">End Date & Time *</label>
                             <input v-model="form.end_date" type="datetime-local" required
-                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                                class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                                 :class="errors.end_date ? 'border-red-500/50' : ''">
                             <p v-if="errors.end_date" class="text-xs text-red-400 mt-1">{{ errors.end_date[0] }}</p>
                         </div>
@@ -299,7 +299,7 @@
                                 <div class="font-medium text-blue-100">Event Status</div>
                                 <div class="text-sm text-blue-300 mt-1">
                                     <div v-if="eventStatus === 'live'" class="text-emerald-400 font-semibold">● Live Now</div>
-                                    <div v-else-if="eventStatus === 'upcoming'" class="text-amber-400 font-semibold">● Upcoming</div>
+                                    <div v-else-if="eventStatus === 'upcoming'" class="text-primary-400 font-semibold">● Upcoming</div>
                                     <div v-else-if="eventStatus === 'expired'" class="text-red-400 font-semibold">● Expired</div>
                                     <div v-else class="text-zinc-400">● Not scheduled</div>
                                 </div>
@@ -310,11 +310,11 @@
 
                 <!-- Notifications Tab -->
                 <div v-show="activeTab === 'notifications'" class="space-y-4">
-                    <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+                    <div class="bg-primary/10 border bg-primary/20 rounded-lg p-4">
                         <div class="flex items-start gap-2">
                             <div>
-                                <div class="font-medium text-amber-500 mb-2">Email Notifications</div>
-                                <p class="text-sm text-amber-200/80">
+                                <div class="font-medium text-primary-500 mb-2">Email Notifications</div>
+                                <p class="text-sm text-primary-200/80">
                                     When enabled, all registered users will receive email notifications about this event.
                                 </p>
                             </div>
@@ -324,7 +324,7 @@
                     <div class="space-y-4">
                         <div class="flex items-center gap-2">
                             <input v-model="form.send_notification" type="checkbox" id="send_notification"
-                                class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                                class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
                             <label for="send_notification" class="text-sm font-medium text-zinc-300">
                                 Send Email Notifications
                             </label>
@@ -352,7 +352,7 @@
                         Cancel
                     </button>
                     <button type="submit" :disabled="saving"
-                        class="flex-1 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-400 transition-colors font-bold disabled:opacity-50">
+                        class="flex-1 px-4 py-2 bg-primary text-black rounded-lg hover:bg-primary transition-colors font-bold disabled:opacity-50">
                         {{ saving ? 'Saving...' : (event ? 'Update Event' : 'Create Event') }}
                     </button>
                 </div>
@@ -376,9 +376,9 @@
                                 class="flex items-center gap-3 p-3 border border-white/10 rounded-lg hover:bg-white/5 cursor-pointer"
                                 @click="toggleProduct(product)">
                                 <input type="checkbox" :checked="isProductSelected(product.id)"
-                                    class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                                    class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
                                 <img :src="product.image_url || '/assets/placeholder.png'" :alt="product.name"
-                                    class="w-12 h-12 object-cover rounded">
+                                    class="w-12 h-12 object-contain rounded">
                                 <div class="flex-1">
                                     <div class="font-medium text-white">{{ product.name }}</div>
                                     <div class="text-sm text-zinc-400">৳{{ formatPrice(product.sellable_price || product.price) }}</div>
@@ -392,7 +392,7 @@
                             Cancel
                         </button>
                         <button @click="confirmProductSelection"
-                            class="flex-1 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-400 transition-colors font-bold">
+                            class="flex-1 px-4 py-2 bg-primary text-black rounded-lg hover:bg-primary transition-colors font-bold">
                             Add Selected ({{ tempSelectedProducts.length }})
                         </button>
                     </div>

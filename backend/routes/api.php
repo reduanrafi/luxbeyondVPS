@@ -200,6 +200,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('travellers', [\App\Http\Controllers\Admin\TravellerController::class, 'index']);
         Route::get('travellers/{id}', [\App\Http\Controllers\Admin\TravellerController::class, 'show']);
         Route::post('travellers/{id}/status', [\App\Http\Controllers\Admin\TravellerController::class, 'updateStatus']);
+        
+        // Payout Management
+        Route::apiResource('payouts', \App\Http\Controllers\Admin\PayoutController::class)->only(['index', 'update']);
+
+        // Extended Traveller Management
+        Route::put('travellers/{id}/profile', [\App\Http\Controllers\Admin\TravellerController::class, 'updateProfile']);
+        
+        // Admin Trip Management
+        Route::put('trips/{id}/status', [\App\Http\Controllers\Admin\TripController::class, 'updateStatus']);
+        Route::delete('trips/{id}', [\App\Http\Controllers\Admin\TripController::class, 'destroy']);
     });
 });
 
@@ -222,4 +232,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Traveller Dashboard
     Route::get('/traveller/profile', [\App\Http\Controllers\Traveller\DashboardController::class, 'getProfile']);
     Route::post('/traveller/profile', [\App\Http\Controllers\Traveller\DashboardController::class, 'updateProfile']);
+    
+    // Traveller Trips
+    Route::apiResource('/traveller/trips', \App\Http\Controllers\Traveller\TripController::class);
 });

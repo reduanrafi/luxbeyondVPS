@@ -7,7 +7,7 @@
                 <p class="text-sm text-zinc-400 mt-1">Manage product brands</p>
             </div>
             <button @click="showAddModal = true"
-                class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/20 flex items-center gap-2">
+                class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2">
                 <Plus class="w-5 h-5" />
                 Add Brand
             </button>
@@ -17,9 +17,9 @@
         <div class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="text" v-model="filters.search" @input="handleSearch" placeholder="Search brands..."
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                 <select v-model="filters.status" @change="fetchBrands(1)"
-                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50">
+                    class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50">
                     <option value="" class="bg-zinc-900">All Status</option>
                     <option value="active" class="bg-zinc-900">Active</option>
                     <option value="inactive" class="bg-zinc-900">Inactive</option>
@@ -33,7 +33,7 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 p-12 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 bg-primary"></div>
             <p class="text-zinc-500 mt-4">Loading brands...</p>
         </div>
 
@@ -44,17 +44,17 @@
                 No brands found
             </div>
             <div v-for="brand in brands" :key="brand.id"
-                class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 overflow-hidden hover:border-amber-500/20 transition-all group">
+                class="bg-zinc-900 rounded-2xl shadow-lg border border-white/5 overflow-hidden hover:bg-primary/20 transition-all group">
                 <div
                     class="h-40 bg-white/5 border-b border-white/5 flex items-center justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-50"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50"></div>
                     <img v-if="brand.image_url" :src="brand.image_url" :alt="brand.name"
                         class="h-24 w-auto max-w-[80%] object-contain relative z-10 filter drop-shadow-2xl">
                     <Crown v-else class="w-16 h-16 text-zinc-700 relative z-10" />
                 </div>
                 <div class="p-6">
                     <div class="flex items-start justify-between mb-3">
-                        <h3 class="font-bold text-lg text-white group-hover:text-amber-500 transition-colors">{{
+                        <h3 class="font-bold text-lg text-white group-hover:text-primary-500 transition-colors">{{
                             brand.name }}</h3>
                         <span class="px-2.5 py-1 rounded-full text-xs font-medium border"
                             :class="brand.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'">
@@ -94,7 +94,7 @@
                     Previous
                 </button>
                 <button v-for="page in visiblePages" :key="page" @click="changePage(page)"
-                    :class="page === pagination.current_page ? 'bg-amber-500 text-black border-amber-500 font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
+                    :class="page === pagination.current_page ? 'bg-primary text-black bg-primary font-bold' : 'border-white/10 text-zinc-400 hover:bg-white/5'"
                     class="px-3 py-1.5 border rounded-lg text-xs transition-colors">
                     {{ page }}
                 </button>
@@ -116,21 +116,21 @@
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Name *</label>
                         <input type="text" v-model="form.name" required
-                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="{ 'border-red-500/50': errors.name }">
                         <p v-if="errors.name" class="text-xs text-red-400 mt-1">{{ errors.name[0] }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Description</label>
                         <textarea v-model="form.description" rows="3"
-                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="{ 'border-red-500/50': errors.description }"></textarea>
                         <p v-if="errors.description" class="text-xs text-red-400 mt-1">{{ errors.description[0] }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Brand URL</label>
                         <input type="url" v-model="form.url" placeholder="https://example.com"
-                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50"
+                            class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="{ 'border-red-500/50': errors.url }">
                         <p v-if="errors.url" class="text-xs text-red-400 mt-1">{{ errors.url[0] }}</p>
                     </div>
@@ -139,7 +139,7 @@
                         <div class="flex gap-4 items-start">
                             <div class="flex-1">
                                 <input type="file" @change="handleImageUpload" accept="image/*"
-                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-400"
+                                    class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-black hover:file:bg-primary"
                                     :class="{ 'border-red-500/50': errors.image }">
                                 <p v-if="errors.image" class="text-xs text-red-400 mt-1">{{ errors.image[0] }}</p>
                             </div>
@@ -151,7 +151,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" v-model="form.is_active" id="is_active"
-                            class="w-4 h-4 text-amber-500 rounded border-white/20 bg-white/5 focus:ring-amber-500">
+                            class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
                         <label for="is_active" class="text-sm font-medium text-zinc-300">Active</label>
                     </div>
                     <div class="flex gap-3 pt-6 border-t border-white/5">
@@ -160,7 +160,7 @@
                             Cancel
                         </button>
                         <button type="submit"
-                            class="flex-1 px-4 py-2 bg-amber-500 text-black rounded-lg hover:bg-amber-400 transition-colors font-bold">
+                            class="flex-1 px-4 py-2 bg-primary text-black rounded-lg hover:bg-primary transition-colors font-bold">
                             {{ showEditModal ? 'Update' : 'Create' }}
                         </button>
                     </div>

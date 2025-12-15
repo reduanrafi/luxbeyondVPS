@@ -8,7 +8,7 @@
         <div
           class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 overflow-hidden border border-white/10">
           <img v-if="category.image_url" :src="category.image_url" :alt="category.name"
-            class="w-full h-full object-cover" />
+            class="w-full h-full object-contain" />
           <div v-else
             class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
             <span class="text-primary font-bold text-lg">

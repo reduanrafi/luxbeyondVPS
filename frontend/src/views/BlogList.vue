@@ -24,13 +24,13 @@
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <router-link v-for="post in posts" :key="post.id" 
                     :to="`/blogs/${post.slug}`"
-                    class="group bg-zinc-900 rounded-2xl overflow-hidden border border-white/5 hover:border-amber-500/50 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-500/10">
+                    class="group bg-zinc-900 rounded-2xl overflow-hidden border border-white/5 hover:bg-primary/50 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary-500/10">
                     
                     <!-- Image -->
                     <div class="relative h-56 overflow-hidden">
                         <img :src="post.image_url || '/assets/blog-placeholder.jpg'" 
                             :alt="post.title"
-                            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
+                            class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-700">
                         <div class="absolute top-4 left-4">
                             <span class="px-3 py-1 bg-black/60 backdrop-blur-md text-white text-xs font-semibold rounded-full border border-white/10">
                                 {{ formatDate(post.published_at) }}
@@ -40,7 +40,7 @@
 
                     <!-- Content -->
                     <div class="p-6">
-                        <h2 class="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-amber-500 transition-colors">
+                        <h2 class="text-xl font-bold text-white mb-3 line-clamp-2 group-hover:text-primary-500 transition-colors">
                             {{ post.title }}
                         </h2>
                         <p class="text-zinc-400 text-sm line-clamp-3 mb-4">
@@ -49,12 +49,12 @@
                         
                         <div class="flex items-center justify-between pt-4 border-t border-white/5">
                             <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500 font-bold text-xs">
+                                <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-500 font-bold text-xs">
                                     {{ getInitials(post.author?.name) }}
                                 </div>
                                 <span class="text-sm text-zinc-300">{{ post.author?.name || 'Admin' }}</span>
                             </div>
-                            <span class="text-xs text-amber-500 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            <span class="text-xs text-primary-500 font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                                 Read More <ArrowRight class="w-4 h-4" />
                             </span>
                         </div>
@@ -80,7 +80,7 @@
                 </button>
                 <button @click="fetchPosts(pagination.current_page + 1)"
                     :disabled="pagination.current_page === pagination.last_page"
-                    class="px-4 py-2 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    class="px-4 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                     Next
                 </button>
             </div>

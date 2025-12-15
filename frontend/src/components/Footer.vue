@@ -10,9 +10,9 @@
                 <!-- Brand Section -->
                 <div class="space-y-6">
                     <div class="flex items-center gap-2">
-                        <div class="bg-white/5 p-2 rounded-lg backdrop-blur-sm">
-                            <span class="text-2xl font-bold text-primary tracking-tight">LuxBusiness</span>
-                        </div>
+                        <router-link to="/" class="bg-white/5 p-2 rounded-lg backdrop-blur-sm">
+                            <span class="text-2xl font-bold text-primary tracking-tight">Luxbeyond</span>
+                        </router-link>
                     </div>
                     <p class="text-slate-400 leading-relaxed text-sm">
                         Your premium gateway to global shopping. We connect you with travellers to bring the world to
@@ -109,7 +109,7 @@
                         </div>
                         <div class="flex items-center gap-3 text-slate-400">
                             <Mail class="w-5 h-5 text-accent shrink-0" />
-                            <span class="text-sm">support@luxbusiness.store</span>
+                            <span class="text-sm">support@luxbeyond.store</span>
                         </div>
                     </div>
                 </div>
@@ -118,7 +118,7 @@
             <!-- Bottom Bar -->
             <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p class="text-blue-100/50 text-sm text-center md:text-left">
-                    &copy; {{ new Date().getFullYear() }} LuxBusiness. All rights reserved.
+                    &copy; {{ new Date().getFullYear() }} Luxbeyond. All rights reserved.
                 </p>
 
                 <!-- Payment Methods -->

@@ -66,4 +66,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(TravellerProfile::class);
     }
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
+
+    public function payouts()
+    {
+        return $this->hasMany(Payout::class);
+    }
 }
