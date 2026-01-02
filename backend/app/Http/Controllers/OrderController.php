@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrderPlacedNotification;
 use App\Notifications\OrderPendingNotification;
+use App\Notifications\NewOrderNotification;
+use App\Notifications\OrderStatusUpdated;
 
 class OrderController extends Controller
 {
@@ -219,6 +221,16 @@ class OrderController extends Controller
             $order->user->notify(new OrderPlacedNotification($order));
         }
 
+        // Notify Admins
+        try {
+            $admins = \App\Models\User::role('Admin')->get();
+            if ($admins->count() > 0) {
+                \Illuminate\Support\Facades\Notification::send($admins, new NewOrderNotification($order));
+            }
+        } catch (\Exception $e) {
+            // Log error
+        }
+
         return response()->json($order, 201);
     }
 
@@ -267,9 +279,17 @@ class OrderController extends Controller
             $currentStatus = OrderStatus::find($order->status_id);
             if ($currentStatus && $currentStatus->canTransitionTo($validated['status_id'])) {
                 $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
+                // Notify User
+                try {
+                    $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
+                } catch (\Exception $e) {}
             } elseif (!$currentStatus) {
                 // If no current status (shouldn't happen), allow update
                 $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
+                 // Notify User
+                try {
+                    $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
+                } catch (\Exception $e) {}
             } else {
                 return response()->json([
                     'message' => 'Status transition not allowed'
@@ -350,6 +370,11 @@ class OrderController extends Controller
         }
 
         $order->updateStatus($request->status_id, $request->note, Auth::id());
+        
+        try {
+            $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
+        } catch (\Exception $e) {}
+
         $order->load(['user', 'status', 'items.product', 'statusHistories.changedBy']);
 
         return response()->json([

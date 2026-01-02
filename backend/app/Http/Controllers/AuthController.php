@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Notifications\NewTravellerApplication;
 
 class AuthController extends Controller
 {
@@ -40,6 +41,15 @@ class AuthController extends Controller
         ]);
 
         $user->assignRole($request->role);
+
+        if ($request->role === 'Traveller') {
+            try {
+                $admins = \App\Models\User::role('Admin')->get();
+                if ($admins->count() > 0) {
+                    \Illuminate\Support\Facades\Notification::send($admins, new NewTravellerApplication($user));
+                }
+            } catch (\Exception $e) {}
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

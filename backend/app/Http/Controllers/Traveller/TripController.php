@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Traveller;
 use App\Http\Controllers\Controller;
 use App\Models\Trip;
 use Illuminate\Http\Request;
+use App\Notifications\TripCreatedNotification;
 
 class TripController extends Controller
 {
@@ -31,6 +32,13 @@ class TripController extends Controller
         ]);
 
         $trip = auth()->user()->trips()->create($validated);
+
+        try {
+            $admins = \App\Models\User::role('Admin')->get();
+            if ($admins->count() > 0) {
+                \Illuminate\Support\Facades\Notification::send($admins, new TripCreatedNotification($trip, auth()->user()->name));
+            }
+        } catch (\Exception $e) {}
 
         return response()->json(['message' => 'Trip created successfully', 'trip' => $trip], 201);
     }
