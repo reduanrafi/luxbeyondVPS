@@ -105,7 +105,7 @@
                     </router-link> -->
                     <router-link to="/request-product"
                         class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-primary hover:bg-primary/90 rounded-full transition-colors shadow-sm">
-                        Request Order
+                        Request Product
                     </router-link>
                 </div>
 
