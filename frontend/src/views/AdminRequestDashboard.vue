@@ -151,11 +151,11 @@
                                         title="View Details">
                                         <Eye class="w-4 h-4" />
                                     </router-link>
-                                    <button @click="editRequest(req)"
+                                    <router-link :to="`/admin/requests/${req.id}/edit`"
                                         class="p-2 bg-white/5 hover:bg-white/10 text-blue-400 rounded-lg transition-colors"
                                         title="Edit Request">
                                         <Edit class="w-4 h-4" />
-                                    </button>
+                                    </router-link>
                                 </div>
                             </td>
                         </tr>
@@ -165,168 +165,12 @@
         </div>
 
         <!-- Edit Modal -->
-        <Teleport to="body">
-            <Transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-150 ease-in"
-                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
-                <div v-if="editingRequest" class="fixed inset-0 z-50 overflow-y-auto"
-                    @click.self="editingRequest = null">
-                    <div
-                        class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 transition-opacity bg-black/80 backdrop-blur-sm" aria-hidden="true">
-                        </div>
 
-                        <div
-                            class="inline-block w-full max-w-2xl p-0 my-8 overflow-hidden text-left align-middle transition-all transform bg-[#111111] border border-white/10 shadow-2xl rounded-2xl">
-                            <div class="flex items-center justify-between px-6 py-4 border-b border-white/10">
-                                <div>
-                                    <h2 class="text-xl font-serif font-bold text-white">Edit Request</h2>
-                                    <p class="text-sm text-zinc-400">{{ editingRequest.request_number || 'ID: #' + editingRequest.id }}</p>
-                                </div>
-                                <button @click="editingRequest = null"
-                                    class="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-colors">
-                                    <X class="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            <form @submit.prevent="updateRequest" class="p-6 space-y-6">
-                                <!-- Product URL -->
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Product
-                                        URL *</label>
-                                    <div class="relative group">
-                                        <Link2
-                                            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
-                                        <input v-model="editForm.url" type="url" required
-                                            class="w-full pl-10 pr-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
-                                            placeholder="https://example.com/product">
-                                    </div>
-                                </div>
-
-                                <!-- Price and Currency -->
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Price
-                                            *</label>
-                                        <input v-model.number="editForm.price" type="number" step="0.01" min="0"
-                                            required
-                                            class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
-                                            placeholder="0.00">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Currency
-                                            *</label>
-                                        <input v-model="editForm.currency" type="text" maxlength="3" required
-                                            class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all uppercase placeholder:text-zinc-600"
-                                            placeholder="USD">
-                                    </div>
-                                </div>
-
-                                <!-- Quantity and Shipping -->
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Quantity
-                                            *</label>
-                                        <input v-model.number="editForm.quantity" type="number" min="1" required
-                                            class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
-                                            placeholder="1">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Declared
-                                            Shipping</label>
-                                        <input v-model.number="editForm.declared_shipping_cost" type="number"
-                                            step="0.01" min="0"
-                                            class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
-                                            placeholder="0.00">
-                                    </div>
-                                </div>
-
-                                <!-- Location and Status -->
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Location</label>
-                                        <select v-model="editForm.is_inside_city"
-                                            class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 cursor-pointer">
-                                            <option :value="true" class="bg-[#111111]">Inside City</option>
-                                            <option :value="false" class="bg-[#111111]">Outside City</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Status
-                                            *</label>
-                                        <div class="relative">
-                                            <select v-model="editForm.status_id" required
-                                                class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none">
-                                                <option value="" class="bg-[#111111]">Select Status</option>
-                                                <option v-for="status in orderStatuses" :key="status.id"
-                                                    :value="status.id" class="bg-[#111111]"
-                                                    :style="{ color: status.color }">
-                                                    {{ status.label }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Admin Image URL -->
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Admin
-                                        Image URL</label>
-                                    <input v-model="editForm.admin_image_url" type="url"
-                                        class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
-                                        placeholder="https://example.com/image.jpg">
-                                </div>
-
-                                <!-- Admin Note -->
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Admin
-                                        Note</label>
-                                    <textarea v-model="editForm.admin_note" rows="3"
-                                        class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600 resize-none"
-                                        placeholder="Internal notes..."></textarea>
-                                </div>
-
-                                <!-- Read-only Total -->
-                                <div class="bg-primary/5 p-4 rounded-lg border border-primary/10">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-medium text-white">Estimated Total (BDT)</span>
-                                        <span class="text-xl font-bold text-primary">৳{{
-                                            parseFloat(editingRequest?.total_amount_bdt || 0).toLocaleString() }}</span>
-                                    </div>
-                                    <p class="text-xs text-zinc-500 mt-1">Calculated automatically based on current
-                                        rates.</p>
-                                </div>
-
-                                <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
-                                    <button type="button" @click="editingRequest = null"
-                                        class="px-6 py-2.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
-                                        Cancel
-                                    </button>
-                                    <button type="submit"
-                                        class="px-6 py-2.5 bg-primary text-black font-bold uppercase tracking-wider text-xs rounded-lg hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20">
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </Transition>
-        </Teleport>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Eye, Edit, X, Search, RotateCcw, Ghost, FileText, CheckCircle, Clock } from 'lucide-vue-next'; // Imported icons
 import { Link2 } from 'lucide-vue-next';
 import axios from '../axios';
@@ -335,18 +179,6 @@ const loading = ref(false);
 const updatingStatus = ref(null);
 const requests = ref([]);
 const orderStatuses = ref([]);
-const editingRequest = ref(null);
-const editForm = ref({
-    url: '',
-    price: 0,
-    quantity: 1,
-    currency: '',
-    declared_shipping_cost: 0,
-    is_inside_city: false,
-    status_id: null,
-    admin_image_url: '',
-    admin_note: ''
-});
 
 const filters = ref({
     search: '',
@@ -453,42 +285,7 @@ const fetchOrderStatuses = async () => {
     }
 };
 
-const editRequest = (req) => {
-    editingRequest.value = req;
-};
 
-const updateRequest = async () => {
-    if (!editingRequest.value) return;
-    
-    try {
-        await axios.put(`/admin/requests/${editingRequest.value.id}`, {
-            ...editForm.value,
-            status_id: editForm.value.status_id
-        });
-        await fetchRequests();
-        editingRequest.value = null;
-        // alert('Request updated successfully');
-    } catch (error) {
-        console.error('Error updating request:', error);
-        alert(error.response?.data?.message || 'Error updating request');
-    }
-};
-
-watch(editingRequest, (newVal) => {
-    if (newVal) {
-        editForm.value = {
-            url: newVal.url || '',
-            price: parseFloat(newVal.price || 0),
-            quantity: parseInt(newVal.quantity || 1),
-            currency: newVal.currency || '',
-            declared_shipping_cost: parseFloat(newVal.declared_shipping_cost || 0),
-            is_inside_city: newVal.is_inside_city || false,
-            status_id: newVal.status_id || newVal.order_status?.id || null,
-            admin_image_url: newVal.admin_image_url || '',
-            admin_note: newVal.admin_note || ''
-        };
-    }
-});
 
 onMounted(() => {
     fetchOrderStatuses();
