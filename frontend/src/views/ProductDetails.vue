@@ -70,7 +70,7 @@
                         <!-- Price -->
                         <div class="flex items-baseline gap-4">
                             <span class="text-3xl font-serif text-primary">
-                                ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
+                                ৳{{ formatPrice(currentPrice) }}
                             </span>
                             <span
                                 v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
@@ -98,8 +98,9 @@
                                     <span
                                         class="text-sm font-medium text-white group-hover:text-primary transition-colors">{{
                                             formatVariantAttributes(variant.attributes) }}</span>
-                                    <span class="text-xs text-primary font-bold">৳{{ formatPrice(variant.price)
-                                        }}</span>
+                                    <span v-if="parseFloat(variant.price) > 0" class="text-xs text-primary font-bold ml-2">
+                                        + ৳{{ formatPrice(variant.price) }}
+                                    </span>
                                 </div>
                                 <div class="text-[10px] text-slate-500 uppercase tracking-wide">
                                     {{ variant.stock > 0 ? 'In Stock' : 'Out of Stock' }}
@@ -337,6 +338,15 @@ const fetchRelatedProducts = async () => {
     }
 };
 
+const currentPrice = computed(() => {
+    if (!product.value) return 0;
+    let basePrice = parseFloat(product.value.event_price || product.value.sellable_price || product.value.price);
+    if (selectedVariant.value) {
+        basePrice += parseFloat(selectedVariant.value.price || 0);
+    }
+    return basePrice;
+});
+
 const formatPrice = (price) => {
     if (!price) return '0.00';
     return parseFloat(price).toLocaleString('en-US', {
@@ -389,7 +399,7 @@ const addToCart = () => {
         name: product.value.name,
         slug: product.value.slug || product.value.id || String(product.value.id),
         price: selectedVariant.value 
-            ? (selectedVariant.value.price || product.value.event_price || product.value.sellable_price || product.value.price)
+            ? (parseFloat(product.value.event_price || product.value.sellable_price || product.value.price) + parseFloat(selectedVariant.value.price))
             : (product.value.event_price || product.value.sellable_price || product.value.price),
         image: product.value.image_url || product.value.image,
         category: product.value.category,

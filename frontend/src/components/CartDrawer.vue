@@ -86,10 +86,10 @@
                                                         <p class="font-bold text-sm"
                                                             :class="isOutOfStock(item) ? 'text-slate-500' : 'text-primary'">
                                                             {{ item.price }}</p>
-                                                        <p v-if="item.original_price"
+                                                        <!-- <p v-if="item.original_price"
                                                             class="text-xs text-slate-600 line-through">
                                                             {{ item.original_price }}
-                                                        </p>
+                                                        </p> -->
                                                     </div>
                                                 </div>
                                                 <!-- Variant Information -->

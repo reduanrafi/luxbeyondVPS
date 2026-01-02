@@ -29,8 +29,8 @@ class WishlistController extends Controller
                     'slug' => $product->slug,
                     'name' => $product->name,
                     'image_url' => $variant?->image_url ?? $product->image_url,
-                    'sellable_price' => $variant?->price ?? $product->sellable_price ?? $product->price,
-                    'price' => $variant?->price ?? $product->sellable_price ?? $product->price,
+                    'sellable_price' => ($product->sellable_price ?? $product->price) + ($variant ? $variant->price : 0),
+                    'price' => ($product->sellable_price ?? $product->price) + ($variant ? $variant->price : 0),
                     'total_stock' => $variant ? $variant->stock : $product->stock,
                     'variant' => $variant ? [
                         'id' => $variant->id,
