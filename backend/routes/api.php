@@ -64,6 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product-requests', ProductRequestController::class);
     Route::post('/product-requests/{id}/payment', [ProductRequestController::class, 'submitPaymentDetails']);
     Route::post('/product-requests/{id}/confirm-order', [ProductRequestController::class, 'confirmOrder']);
+    Route::post('/product-requests/{id}/update-quantity', [ProductRequestController::class, 'updateQuantity']);
     
     // Orders (for customers)
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index']);
@@ -188,6 +189,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/requests', [\App\Http\Controllers\ProductRequestController::class, 'adminIndex']);
         Route::get('/requests/{id}', [\App\Http\Controllers\ProductRequestController::class, 'show']);
         Route::put('/requests/{id}', [\App\Http\Controllers\ProductRequestController::class, 'update']);
+        Route::post('/requests/{id}/convert', [\App\Http\Controllers\ProductRequestController::class, 'convertToOrder']);
 
         // Events Management
         Route::apiResource('events', \App\Http\Controllers\Admin\EventController::class);
