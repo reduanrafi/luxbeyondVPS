@@ -209,7 +209,7 @@
                                     <div v-if="method.fee > 0 || method.fee_percentage > 0">
                                         <span class="text-zinc-500 block text-xs uppercase tracking-wider mb-1">Fee</span>
                                         <span class="font-bold text-primary">
-                                            <span v-if="method.fee > 0">৳{{ method.fee }}</span>
+                                            <span v-if="method.fee > 0">৳{{ method.fee }} + </span>
                                             <span v-if="method.fee_percentage > 0">{{ method.fee_percentage }}%</span>
                                         </span>
                                     </div>

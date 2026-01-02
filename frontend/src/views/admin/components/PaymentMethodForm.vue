@@ -42,7 +42,7 @@
 
         <!-- API Configuration Fields -->
         <div v-if="(form.type === 'bkash' || form.type === 'nagad' || form.type === 'rocket') && form.sub_type === 'api'" 
-            class="border border-white/10 rounded-lg p-4 bg-gray-50 space-y-4">
+            class="border border-white/10 rounded-lg p-4 space-y-4">
             <h3 class="text-sm font-semibold text-white mb-3">API Credentials</h3>
             
             <div class="mb-4">
