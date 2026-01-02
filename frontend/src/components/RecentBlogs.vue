@@ -6,7 +6,22 @@
                 <p class="text-xl text-slate-500 max-w-2xl mx-auto">Insights, trends, and updates from our team.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <Card v-for="blog in blogs" :key="blog.id" bodyClass="p-0"
+                <template v-if="loading">
+                    <div v-for="i in 3" :key="i" class="bg-surface rounded-lg overflow-hidden animate-pulse border border-white/5">
+                        <div class="h-48 bg-white/5 w-full"></div>
+                        <div class="p-6">
+                            <div class="h-6 bg-white/5 rounded w-3/4 mb-4"></div>
+                            <div class="space-y-2 mb-6">
+                                <div class="h-4 bg-white/5 rounded w-full"></div>
+                                <div class="h-4 bg-white/5 rounded w-full"></div>
+                                <div class="h-4 bg-white/5 rounded w-2/3"></div>
+                            </div>
+                            <div class="h-4 bg-white/5 rounded w-24"></div>
+                        </div>
+                    </div>
+                </template>
+                
+                <Card v-else v-for="blog in blogs" :key="blog.id" bodyClass="p-0"
                     class="group h-full flex flex-col cursor-pointer hover:-translate-y-1 transition-transform duration-300">
                     <template #header>
                         <div class="overflow-hidden h-48 relative">
@@ -49,13 +64,17 @@ import Card from './ui/Card.vue';
 import axios from '../axios';
 
 const blogs = ref([]);
+const loading = ref(true);
 
 onMounted(async () => {
     try {
+        loading.value = true;
         const response = await axios.get('/blogs/recent');
         blogs.value = response.data;
     } catch (error) {
         console.error('Error fetching recent blogs:', error);
+    } finally {
+        loading.value = false;
     }
 });
 </script>
