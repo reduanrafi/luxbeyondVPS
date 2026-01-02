@@ -13,6 +13,7 @@ class ProductRequest extends Model
         'request_number',
         'user_id',
         'url',
+        'product_name',
         'price',
         'quantity',
         'currency',
