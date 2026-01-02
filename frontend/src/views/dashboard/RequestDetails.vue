@@ -3,7 +3,7 @@
         <!-- Loading State -->
         <div v-if="loading" class="bg-surface rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p class="mt-2 text-sm text-slate-500">Loading request details...</p>
+            <p class="mt-2 text-sm text-slate-300">Loading request details...</p>
         </div>
 
         <!-- Error State -->
@@ -20,13 +20,9 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-2xl font-bold text-slate-900">Product Request Details</h2>
-                    <p class="text-sm text-slate-500 mt-1">Request #{{ request.request_number || request.id }}</p>
+                    <p class="text-sm text-slate-300 mt-1">Request #{{ request.request_number || request.id }}</p>
                 </div>
                 <div class="flex gap-3">
-                    <button @click="printInvoice"
-                        class="px-4 py-2 text-sm font-semibold text-primary border border-gray-300 rounded-lg hover:bg-primary/10 transition-colors">
-                        📄 Print Invoice
-                    </button>
                     <button @click="$router.push('/dashboard/requests')"
                         class="px-4 py-2 text-sm font-semibold text-primary border border-gray-300 rounded-lg hover:bg-primary/10 transition-colors">
                         ← Back to Requests
@@ -36,38 +32,38 @@
 
             <!-- Address Confirmation Section -->
             <div v-if="request.status === 'request_accepted' && !request.shipping_address" 
-                class="bg-surface rounded-2xl shadow-lg border border-primary/20 overflow-hidden">
+                class="bg-[#111111] rounded-2xl shadow-lg border border-white/10 overflow-hidden">
                 <div class="p-6">
-                    <h3 class="text-xl font-bold text-slate-900 mb-4">Confirm Delivery Address</h3>
-                    <p class="text-sm text-slate-500 mb-6">Please confirm your shipping address to proceed with the payment.</p>
+                    <h3 class="text-xl font-bold text-white mb-4">Confirm Delivery Address</h3>
+                    <p class="text-sm text-zinc-400 mb-6">Please confirm your shipping address to proceed with the payment.</p>
                     
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Street Address</label>
-                                <input v-model="shippingAddress.street" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Street Address</label>
+                                <input v-model="shippingAddress.street" type="text" class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-zinc-600">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">City</label>
-                                <input v-model="shippingAddress.city" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">City</label>
+                                <input v-model="shippingAddress.city" type="text" class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-zinc-600">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">State/Division</label>
-                                <input v-model="shippingAddress.state" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">State/Division</label>
+                                <input v-model="shippingAddress.state" type="text" class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-zinc-600">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Postal Code</label>
-                                <input v-model="shippingAddress.postal_code" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Postal Code</label>
+                                <input v-model="shippingAddress.postal_code" type="text" class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-zinc-600">
                             </div>
                              <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
-                                <input v-model="shippingAddress.phone" type="text" class="w-full px-4 py-2 border rounded-lg focus:ring-primary focus:border-primary">
+                                <label class="block text-sm font-medium text-zinc-300 mb-1">Phone Number</label>
+                                <input v-model="shippingAddress.phone" type="text" class="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-zinc-600">
                             </div>
                         </div>
                         
                         <div class="flex justify-end pt-4">
                             <button @click="confirmOrder" :disabled="confirmingOrder" 
-                                class="px-6 py-2 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover disabled:opacity-50">
+                                class="px-6 py-2 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover disabled:opacity-50 transition-colors">
                                 {{ confirmingOrder ? 'Confirming...' : 'Confirm Order' }}
                             </button>
                         </div>
@@ -129,7 +125,7 @@
                         <div v-if="showBankTransfer && bankTransferMethod"
                             class="bg-background p-6 rounded-xl space-y-4 border border-primary/20">
                             <!-- Bank Info -->
-                            <div class="text-sm text-slate-600 mb-4 p-4 bg-background rounded border border-primary/20">
+                            <div class="text-sm text-slate-400 mb-4 p-4 bg-background rounded border border-primary/20">
                                 <p class="font-semibold text-slate-700 mb-2">Bank Details:</p>
                                 <template v-if="bankTransferMethod.bank_name">
                                     <p class="font-medium">Bank: {{ bankTransferMethod.bank_name }}</p>
@@ -154,7 +150,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1">Payment Slip</label>
                                 <input @change="handleFileChange" type="file" accept="image/*,.pdf"
-                                    class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-slate-900 hover:file:bg-primary-hover">
+                                    class="w-full text-sm text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-slate-900 hover:file:bg-primary-hover">
                             </div>
 
                             <div class="flex justify-end">
@@ -171,29 +167,29 @@
             <!-- Request Info Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
-                    <p class="text-xs text-slate-500 mb-1">Request Status</p>
+                    <p class="text-xs text-slate-300 mb-1">Request Status</p>
                     <span
                         :style="{ backgroundColor: request.order_status?.color + '20', color: request.order_status?.color }"
                         class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">
-                        {{ request.order_status?.label || request.status || 'Pending' }}
+                        {{ request.order_status?.label || request.status || 'N/A' }}
                     </span>
                 </div>
                 <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
-                    <p class="text-xs text-slate-500 mb-1">Request Date</p>
+                    <p class="text-xs text-slate-300 mb-1">Request Date</p>
                     <p class="text-sm font-semibold text-primary">{{ formatDate(request.created_at) }}</p>
                 </div>
                 <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
-                    <p class="text-xs text-slate-500 mb-1">Currency</p>
+                    <p class="text-xs text-slate-300 mb-1">Currency</p>
                     <p class="text-sm font-semibold text-primary">{{ request.currency || 'N/A' }}</p>
                 </div>
                 <div class="bg-surface rounded-xl shadow-md border border-white/10 p-4">
-                    <p class="text-xs text-slate-500 mb-1">Total Amount (BDT)</p>
+                    <p class="text-xs text-slate-300 mb-1">Total Amount (BDT)</p>
                     <p class="text-sm font-semibold text-primary">৳{{ formatPrice(request.total_amount_bdt) }}</p>
                 </div>
             </div>
 
             <!-- Timeline -->
-            <div class="bg-background rounded-2xl shadow-lg border border-primary/20 overflow-hidden">
+            <!-- <div class="bg-background rounded-2xl shadow-lg border border-primary/20 overflow-hidden">
                 <div class="p-4 border-b border-primary/20 bg-background">
                     <h3 class="text-lg font-bold text-slate-900">Request Timeline</h3>
                 </div>
@@ -203,17 +199,17 @@
                             <div class="absolute -left-[21px] bg-primary border-2 border-primary rounded-full w-4 h-4"></div>
                             <div class="mb-1">
                                 <span class="font-bold text-slate-800">{{ log.status }}</span>
-                                <span class="text-xs text-slate-500 ml-2">{{ formatDate(log.created_at) }}</span>
+                                <span class="text-xs text-slate-300 ml-2">{{ formatDate(log.created_at) }}</span>
                             </div>
-                            <p class="text-sm text-slate-600">{{ log.note }}</p>
+                            <p class="text-sm text-slate-400">{{ log.note }}</p>
                             <p v-if="log.creator" class="text-xs text-slate-400 mt-1">by {{ log.creator.name }}</p>
                         </div>
-                        <div v-if="!request.timeline || request.timeline.length === 0" class="text-sm text-slate-500 italic">
+                        <div v-if="!request.timeline || request.timeline.length === 0" class="text-sm text-slate-300 italic">
                             No timeline history available.
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Product Information -->
             <div class="bg-background rounded-2xl shadow-lg border border-slate-700 overflow-hidden">
@@ -222,27 +218,47 @@
                 </div>
                 <div class="p-6 space-y-4">
                     <div>
-                        <p class="text-xs text-slate-500 mb-1">Product URL</p>
+                        <p class="text-xs text-slate-300 mb-1">Product URL</p>
                         <a :href="request.url" target="_blank" class="text-sm font-semibold text-primary hover:underline">
                             {{ request.url }}
                         </a>
                     </div>
                     <div v-if="request.admin_image_url" class="mt-4">
-                        <p class="text-xs text-slate-500 mb-2">Product Image</p>
-                        <img :src="request.admin_image_url" alt="Product Image" class="w-32 h-32 object-contain rounded-lg border border-white/10">
+                        <p class="text-xs text-slate-300 mb-2">Product Image</p>
+                        <img :src="request.admin_image_url" 
+                             alt="Product Image" 
+                             referrerpolicy="no-referrer"
+                             class="w-48 h-48 object-contain rounded-lg border border-white/10 bg-white/5"
+                             @error="handleImageError">
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Price</p>
+                            <p class="text-xs text-slate-300 mb-1">Price</p>
                             <p class="text-sm font-semibold text-primary">{{ request.currency }} {{
                                 formatPrice(request.price) }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Quantity</p>
-                            <p class="text-sm font-semibold text-primary">{{ request.quantity }}</p>
+                            <p class="text-xs text-slate-300 mb-1">Quantity</p>
+                            <div class="flex items-center gap-2">
+                                <template v-if="editingQuantity">
+                                    <input v-model.number="tempQuantity" type="number" min="1" class="w-16 px-2 py-1 text-sm bg-black/20 border border-white/10 rounded text-white focus:outline-none focus:border-primary">
+                                    <button @click="saveQuantity" class="p-1 text-green-500 hover:text-green-400">
+                                        <Check class="w-4 h-4" />
+                                    </button>
+                                    <button @click="cancelEditQuantity" class="p-1 text-red-500 hover:text-red-400">
+                                        <X class="w-4 h-4" />
+                                    </button>
+                                </template>
+                                <template v-else>
+                                    <p class="text-sm font-semibold text-primary">{{ request.quantity }}</p>
+                                    <button v-if="canEditQuantity" @click="startEditQuantity" class="p-1 text-slate-400 hover:text-white transition-colors" title="Edit Quantity">
+                                        <Edit2 class="w-3 h-3" />
+                                    </button>
+                                </template>
+                            </div>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Subtotal</p>
+                            <p class="text-xs text-slate-300 mb-1">Subtotal</p>
                             <p class="text-sm font-semibold text-primary">{{ request.currency }} {{
                                 formatPrice(request.price * request.quantity) }}</p>
                         </div>
@@ -258,20 +274,20 @@
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Location</p>
+                            <p class="text-xs text-slate-300 mb-1">Location</p>
                             <p class="text-sm font-semibold text-primary">{{ request.is_inside_city ? 'Inside City' :
                                 'Outside City' }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Weight (kg)</p>
+                            <p class="text-xs text-slate-300 mb-1">Weight (kg)</p>
                             <p class="text-sm font-semibold text-primary">{{ request.weight || 'N/A' }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Payment Method</p>
+                            <p class="text-xs text-slate-300 mb-1">Payment Method</p>
                             <p class="text-sm font-semibold text-primary">{{ request.payment_method || 'N/A' }}</p>
                         </div>
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">Declared Shipping Cost</p>
+                            <p class="text-xs text-slate-300 mb-1">Declared Shipping Cost</p>
                             <p class="text-sm font-semibold text-primary">{{ request.currency }} {{
                                 formatPrice(request.declared_shipping_cost) }}</p>
                         </div>
@@ -284,7 +300,7 @@
                             <div v-for="(charge, index) in request.charges_breakdown" :key="index" class="flex justify-between text-sm">
                                 <span>
                                     {{ charge.charge }} 
-                                    <span v-if="charge.currency !== 'BDT'" class="text-xs text-slate-500">
+                                    <span v-if="charge.currency !== 'BDT'" class="text-xs text-slate-300">
                                         ({{ charge.currency }} {{ formatPrice(charge.amount_in_currency) }})
                                     </span>
                                 </span>
@@ -295,20 +311,20 @@
 
                     <div class="border-t border-white/10 pt-4 space-y-2">
                         <div v-if="request.tax" class="flex justify-between text-sm">
-                            <span class="text-slate-600">Tax:</span>
+                            <span class="text-slate-400">Tax:</span>
                             <span class="font-semibold text-primary">৳{{ formatPrice(request.tax) }}</span>
                         </div>
                         <div v-if="request.additional_charges" class="flex justify-between text-sm">
-                            <span class="text-slate-600">Additional Charges:</span>
+                            <span class="text-slate-400">Additional Charges:</span>
                             <span class="font-semibold text-primary">৳{{ formatPrice(request.additional_charges)
                             }}</span>
                         </div>
                         <div v-if="request.delivery_charge" class="flex justify-between text-sm">
-                            <span class="text-slate-600">Delivery Charge:</span>
+                            <span class="text-slate-400">Delivery Charge:</span>
                             <span class="font-semibold text-primary">৳{{ formatPrice(request.delivery_charge) }}</span>
                         </div>
                         <div v-if="request.payment_processing_fee" class="flex justify-between text-sm">
-                            <span class="text-slate-600">Payment Processing Fee:</span>
+                            <span class="text-slate-400">Payment Processing Fee:</span>
                             <span class="font-semibold text-primary">৳{{ formatPrice(request.payment_processing_fee)
                             }}</span>
                         </div>
@@ -323,34 +339,34 @@
                 </div>
                 <div class="p-6 space-y-3">
                     <div class="flex justify-between text-sm">
-                        <span class="text-slate-600">Product Subtotal</span>
+                        <span class="text-slate-400">Product Subtotal</span>
                         <span class="font-semibold text-primary">৳{{ formatPrice(calculateProductTotal()) }}</span>
                     </div>
                     <div v-if="request.declared_shipping_cost" class="flex justify-between text-sm">
-                        <span class="text-slate-600">Declared Shipping</span>
+                        <span class="text-slate-400">Declared Shipping</span>
                         <span class="font-semibold text-primary">৳{{ formatPrice(request.declared_shipping_cost)
                         }}</span>
                     </div>
                     <div v-if="request.tax" class="flex justify-between text-sm">
-                        <span class="text-slate-600">Tax</span>
+                        <span class="text-slate-400">Tax</span>
                         <span class="font-semibold text-primary">৳{{ formatPrice(request.tax) }}</span>
                     </div>
                     <div v-if="request.additional_charges" class="flex justify-between text-sm">
-                        <span class="text-slate-600">Additional Charges</span>
+                        <span class="text-slate-400">Additional Charges</span>
                         harg <span class="font-semibold text-primary">৳{{ formatPrice(request.additional_charges)
                             }}</span>
                     </div>
                     <div v-if="request.delivery_charge" class="flex justify-between text-sm">
-                        <span class="text-slate-600">Delivery Charge</span>
+                        <span class="text-slate-400">Delivery Charge</span>
                         <span class="font-semibold text-primary">৳{{ formatPrice(request.delivery_charge) }}</span>
                     </div>
                     <div v-if="request.payment_processing_fee" class="flex justify-between text-sm">
-                        <span class="text-slate-600">Payment Processing Fee</span>
+                        <span class="text-slate-400">Payment Processing Fee</span>
                         <span class="font-semibold text-primary">৳{{ formatPrice(request.payment_processing_fee)
                             }}</span>
                     </div>
                     <div class="flex justify-between text-lg font-bold pt-3 border-t border-white/10">
-                        <span class="text-slate-500">Total Amount (BDT)</span>
+                        <span class="text-slate-300">Total Amount (BDT)</span>
                         <span class="text-primary">৳{{ formatPrice(request.total_amount_bdt) }}</span>
                     </div>
                 </div>
@@ -366,76 +382,8 @@
                 </div>
             </div>
 
-            <!-- Invoice (Hidden, for printing) -->
-            <div id="invoice-content" class="hidden">
-                <div class="p-8 bg-surface">
-                    <div class="mb-8 text-center">
-                        <h1 class="text-3xl font-bold text-slate-900 mb-2">PRODUCT REQUEST INVOICE</h1>
-                        <p class="text-sm text-slate-600">Request #{{ request.id }}</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-8 mb-8">
-                        <div>
-                            <h3 class="text-lg font-bold text-slate-900 mb-2">Customer:</h3>
-                            <p class="text-sm text-slate-700">{{ request.user?.name }}</p>
-                            <p class="text-sm text-slate-700">{{ request.user?.email }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-slate-600 mb-1"><strong>Date:</strong> {{ formatDate(request.created_at) }}</p>
-                            <p class="text-sm text-slate-600 mb-1"><strong>Status:</strong> {{ request.order_status?.label || request.status }}</p>
-                        </div>
-                    </div>
-                    <div class="mb-8">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">Product Details</h3>
-                        <p class="text-sm text-slate-700 mb-2"><strong>URL:</strong> {{ request.url }}</p>
-                        <div class="grid grid-cols-3 gap-4 mt-4">
-                            <div>
-                                <p class="text-xs text-slate-500">Price</p>
-                                <p class="text-sm font-semibold">{{ request.currency }} {{ formatPrice(request.price) }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500">Quantity</p>
-                                <p class="text-sm font-semibold">{{ request.quantity }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500">Subtotal</p>
-                                <p class="text-sm font-semibold">{{ request.currency }} {{ formatPrice(request.price * request.quantity) }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="inline-block text-right space-y-2">
-                            <div class="flex justify-between gap-8 text-sm">
-                                <span>Product Subtotal:</span>
-                                <span>৳{{ formatPrice(calculateProductTotal()) }}</span>
-                            </div>
-                            <div v-if="request.declared_shipping_cost" class="flex justify-between gap-8 text-sm">
-                                <span>Declared Shipping:</span>
-                                <span>৳{{ formatPrice(request.declared_shipping_cost) }}</span>
-                            </div>
-                            <div v-if="request.tax" class="flex justify-between gap-8 text-sm">
-                                <span>Tax:</span>
-                                <span>৳{{ formatPrice(request.tax) }}</span>
-                            </div>
-                            <div v-if="request.additional_charges" class="flex justify-between gap-8 text-sm">
-                                <span>Additional Charges:</span>
-                                <span>৳{{ formatPrice(request.additional_charges) }}</span>
-                            </div>
-                            <div v-if="request.delivery_charge" class="flex justify-between gap-8 text-sm">
-                                <span>Delivery Charge:</span>
-                                <span>৳{{ formatPrice(request.delivery_charge) }}</span>
-                            </div>
-                            <div v-if="request.payment_processing_fee" class="flex justify-between gap-8 text-sm">
-                                <span>Payment Processing Fee:</span>
-                                <span>৳{{ formatPrice(request.payment_processing_fee) }}</span>
-                            </div>
-                            <div class="flex justify-between gap-8 text-lg font-bold pt-2 border-t-2">
-                                <span>Total Amount (BDT):</span>
-                                <span>৳{{ formatPrice(request.total_amount_bdt) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+
         </div>
 
         <!-- Payment Option Modal -->
@@ -450,7 +398,7 @@
                             class="w-5 h-5 text-primary focus:ring-primary">
                         <div class="ml-3">
                             <span class="block font-semibold text-slate-900">Full Payment</span>
-                            <span class="block text-sm text-slate-500">Pay the full amount of ৳{{
+                            <span class="block text-sm text-slate-300">Pay the full amount of ৳{{
                                 formatPrice(request.total_amount_bdt) }}</span>
                         </div>
                     </label>
@@ -461,14 +409,14 @@
                             class="w-5 h-5 text-primary focus:ring-primary">
                         <div class="ml-3">
                             <span class="block font-semibold text-slate-900">Minimum Payment</span>
-                            <span class="block text-sm text-slate-500">Pay minimum booking amount of ৳{{
+                            <span class="block text-sm text-slate-300">Pay minimum booking amount of ৳{{
                                 formatPrice(request.min_payment_amount) }}</span>
                         </div>
                     </label>
                 </div>
                 <div class="flex justify-end gap-3 mt-6">
                     <button @click="showPaymentModal = false"
-                        class="px-4 py-2 text-slate-600 hover:text-slate-900 font-medium">Cancel</button>
+                        class="px-4 py-2 text-slate-400 hover:text-slate-900 font-medium">Cancel</button>
                     <button @click="confirmPaymentOption"
                         class="px-6 py-2 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover">
                         Proceed to Pay
@@ -482,6 +430,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { Check, X, Edit2 } from 'lucide-vue-next';
 import axios from '../../axios';
 
 const route = useRoute();
@@ -499,6 +448,11 @@ const processingBkash = ref(false);
 const submittingBank = ref(false);
 const confirmingOrder = ref(false);
 const selectedPaymentOption = ref('full'); // 'full' or 'partial'
+
+// Quantity Editing
+const editingQuantity = ref(false);
+const tempQuantity = ref(1);
+
 const bankTransferForm = ref({
     reference: '',
     file: null
@@ -606,30 +560,7 @@ const formatPrice = (price) => {
     return parseFloat(price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-const printInvoice = () => {
-    const invoiceContent = document.getElementById('invoice-content');
-    if (!invoiceContent) return;
 
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <html>
-            <head>
-                <title>Invoice - Request #${request.value.id}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                </style>
-            </head>
-            <body>
-                ${invoiceContent.innerHTML}
-            </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-};
 
 const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -682,6 +613,10 @@ const processBkashPayment = async (amount) => {
     }
 };
 
+const handleImageError = (e) => {
+    e.target.src = 'https://placehold.co/400x400/1e293b/cbd5e1?text=Image+Blocked+by+Source';
+};
+
 const submitBankTransfer = async () => {
     if (!bankTransferForm.value.reference && !bankTransferForm.value.file) {
         alert('Please provide a reference or upload a slip.');
@@ -708,6 +643,38 @@ const submitBankTransfer = async () => {
         alert(err.response?.data?.message || 'Failed to submit payment details');
     } finally {
         submittingBank.value = false;
+    }
+};
+
+const canEditQuantity = computed(() => {
+    if (!request.value) return false;
+    // Allow edit if status is not paid/completed/cancelled
+    const status = request.value.status;
+    const paymentStatus = request.value.payment_status;
+    return !['completed', 'cancelled', 'paid'].includes(status) && paymentStatus !== 'paid';
+});
+
+const startEditQuantity = () => {
+    tempQuantity.value = request.value.quantity;
+    editingQuantity.value = true;
+};
+
+const cancelEditQuantity = () => {
+    editingQuantity.value = false;
+};
+
+const saveQuantity = async () => {
+    if (tempQuantity.value < 1) return;
+    try {
+        const response = await axios.post(`/product-requests/${requestId}/update-quantity`, {
+            quantity: tempQuantity.value
+        });
+        request.value = response.data.product_request;
+        editingQuantity.value = false;
+        alert('Quantity updated and total recalculated.');
+    } catch (err) {
+        console.error('Update Quantity Error:', err);
+        alert(err.response?.data?.message || 'Failed to update quantity');
     }
 };
 

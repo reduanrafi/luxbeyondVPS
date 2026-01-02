@@ -88,8 +88,14 @@
                             <div v-if="request.admin_image_url" class="mb-6">
                                 <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Product Image
                                 </p>
-                                <img :src="request.admin_image_url" alt="Product Image"
-                                    class="w-full max-w-sm rounded-lg border border-white/10 shadow-lg">
+                                <img :src="request.admin_image_url" 
+                                     alt="Product Image"
+                                     referrerpolicy="no-referrer"
+                                     class="w-full max-w-sm rounded-lg border border-white/10 shadow-lg"
+                                     @error="(e) => e.target.src = 'https://placehold.co/600x400/1e1e1e/FFF?text=Image+Blocked+by+Source'">
+                                <p v-if="request.admin_image_url" class="text-xs text-zinc-500 mt-2">
+                                    Note: If image says "Blocked", the source website prevents external linking. Please re-host the image.
+                                </p>
                             </div>
 
                             <div class="grid grid-cols-3 gap-4 bg-white/[0.02] rounded-lg p-4 border border-white/5">
@@ -127,6 +133,16 @@
                                 <div class="flex items-center gap-2">
                                     <Mail class="w-3 h-3 text-zinc-500" />
                                     <p class="text-sm font-medium text-white">{{ request.user?.email || 'N/A' }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Location</p>
+                                <div class="flex items-center gap-2">
+                                    <MapPin class="w-3 h-3 text-zinc-500" />
+                                    <p class="text-sm font-medium text-white">
+                                        {{ request.user?.city || 'N/A' }} 
+                                        <span v-if="request.user?.country" class="text-zinc-500">({{ request.user.country }})</span>
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -257,73 +273,121 @@
 
             <!-- Invoice (Hidden, for printing) -->
             <div id="invoice-content" class="hidden">
-                <!-- Keep invoice styling basic or update to print friendly if needed. Usually hidden. -->
-                <div class="p-8 bg-white text-black">
-                    <div class="mb-8 text-center border-b pb-4">
-                        <h1 class="text-2xl font-bold mb-2">PRODUCT REQUEST INVOICE</h1>
-                        <p class="text-sm text-gray-600">{{ request.request_number || 'Request #' + request.id }}</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-8 mb-8">
+                <div class="invoice-container bg-white text-slate-800 p-10 max-w-[210mm] mx-auto">
+                    <!-- Header -->
+                    <div class="flex justify-between items-start mb-12 border-b pb-8">
                         <div>
-                            <h3 class="font-bold mb-2">Customer:</h3>
-                            <p>{{ request.user?.name }}</p>
-                            <p>{{ request.user?.email }}</p>
+                            <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">INVOICE</h1>
+                            <p class="text-sm text-slate-500 font-medium">#{{ request.request_number || request.id }}</p>
                         </div>
                         <div class="text-right">
-                            <p><strong>Date:</strong> {{ formatDate(request.created_at) }}</p>
-                            <p><strong>Status:</strong> {{ request.order_status?.label || request.status }}</p>
+                            <img src="/logo.png" alt="LuxBeyond" class="h-12 ml-auto mb-2 object-contain" />
+                            <p class="text-sm text-slate-600">Dhaka, Bangladesh</p>
+                            <p class="text-sm text-slate-600">support@luxbeyond.com</p>
+                            <p class="text-sm text-slate-600">+880 1234 567890</p>
                         </div>
                     </div>
-                    <table class="w-full mb-8 border-collapse">
+
+                    <!-- Bill To & Info -->
+                    <div class="flex justify-between mb-12">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Bill To</p>
+                            <h3 class="font-bold text-slate-900">{{ request.user?.name || 'Guest Customer' }}</h3>
+                            <p class="text-sm text-slate-600 mb-1">{{ request.user?.email }}</p>
+                            <p v-if="request.shipping_address" class="text-sm text-slate-600">
+                                {{ request.shipping_address.street || '' }} {{ request.shipping_address.city ? ', ' + request.shipping_address.city : '' }}<br>
+                                {{ request.shipping_address.state || '' }} {{ request.shipping_address.postal_code ? '- ' + request.shipping_address.postal_code : '' }}
+                            </p>
+                            <p v-else-if="request.user && (request.user.city || request.user.country)" class="text-sm text-slate-600">
+                                {{ request.user.city }}<span v-if="request.user.state">, {{ request.user.state }}</span><br>
+                                {{ request.user.country }}
+                            </p>
+                        </div>
+                        <div class="text-right space-y-2">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Invoice Date</p>
+                                <p class="text-sm font-semibold text-slate-900">{{ formatDate(request.created_at) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</p>
+                                <p class="text-sm font-semibold text-slate-900 capitalize">{{ request.order_status?.label || request.status }}</p>
+                            </div>
+                            <div v-if="request.payment_status">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Payment Status</p>
+                                <p class="text-sm font-semibold capitalize" :class="{
+                                    'text-green-600': request.payment_status === 'paid',
+                                    'text-yellow-600': request.payment_status === 'processing',
+                                    'text-red-600': request.payment_status === 'unpaid'
+                                }">{{ request.payment_status }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <table class="w-full mb-10">
                         <thead>
-                            <tr class="bg-gray-100">
-                                <th class="border p-2 text-left">Item</th>
-                                <th class="border p-2 text-right">Price</th>
-                                <th class="border p-2 text-center">Qty</th>
-                                <th class="border p-2 text-right">Total</th>
+                            <tr class="bg-slate-50">
+                                <th class="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider border-b">Item Details</th>
+                                <th class="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider border-b">Price</th>
+                                <th class="text-center py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider border-b">Qty</th>
+                                <th class="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider border-b">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="border p-2">
-                                    Product Request<br>
-                                    <span class="text-xs text-gray-500">{{ request.url }}</span>
+                                <td class="py-4 px-4 border-b border-slate-100">
+                                    <p class="font-semibold text-slate-800 text-sm">Product Request</p>
+                                    <p class="text-xs text-slate-500 mt-1 break-all">{{ request.url }}</p>
                                 </td>
-                                <td class="border p-2 text-right">{{ request.currency }} {{ formatPrice(request.price)
-                                    }}</td>
-                                <td class="border p-2 text-center">{{ request.quantity }}</td>
-                                <td class="border p-2 text-right">{{ request.currency }} {{ formatPrice(request.price *
-                                    request.quantity) }}</td>
+                                <td class="py-4 px-4 text-right border-b border-slate-100 text-sm text-slate-600">
+                                    {{ request.currency }} {{ formatPrice(request.price) }}
+                                </td>
+                                <td class="py-4 px-4 text-center border-b border-slate-100 text-sm text-slate-600">
+                                    {{ request.quantity }}
+                                </td>
+                                <td class="py-4 px-4 text-right border-b border-slate-100 text-sm font-semibold text-slate-800">
+                                    {{ request.currency }} {{ formatPrice(request.price * request.quantity) }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                    <div class="flex justify-end">
-                        <div class="w-1/2 space-y-2">
-                            <div class="flex justify-between">
-                                <span>Product Subtotal (BDT):</span>
-                                <span>৳{{ formatPrice(calculateProductTotal()) }}</span>
+
+                    <!-- Totals -->
+                    <div class="flex flex-col items-end mb-12">
+                        <div class="w-full max-w-xs space-y-3">
+                            <div class="flex justify-between text-sm text-slate-600">
+                                <span>Subtotal (Approx. BDT)</span>
+                                <span class="font-medium">৳{{ formatPrice(calculateProductTotal()) }}</span>
                             </div>
-                            <div v-if="request.declared_shipping_cost" class="flex justify-between">
-                                <span>Shipping:</span>
-                                <span>৳{{ formatPrice(request.declared_shipping_cost) }}</span>
+                            <div v-if="request.charges_breakdown && request.charges_breakdown.length > 0" class="border-t border-slate-100 pt-2 space-y-2">
+                                <div v-for="(charge, index) in request.charges_breakdown" :key="index" class="flex justify-between text-xs text-slate-500">
+                                    <span>{{ charge.charge }}</span>
+                                    <span>৳{{ formatPrice(charge.amount_in_bdt) }}</span>
+                                </div>
                             </div>
-                            <div v-if="request.tax" class="flex justify-between">
-                                <span>Tax:</span>
-                                <span>৳{{ formatPrice(request.tax) }}</span>
+                            <div v-if="request.tax > 0" class="flex justify-between text-sm text-slate-600">
+                                <span>Tax</span>
+                                <span class="font-medium">৳{{ formatPrice(request.tax) }}</span>
                             </div>
-                            <div v-if="request.additional_charges" class="flex justify-between">
-                                <span>Additional Charges:</span>
-                                <span>৳{{ formatPrice(request.additional_charges) }}</span>
+                            <div v-if="request.delivery_charge > 0" class="flex justify-between text-sm text-slate-600">
+                                <span>Delivery</span>
+                                <span class="font-medium">৳{{ formatPrice(request.delivery_charge) }}</span>
                             </div>
-                            <div v-if="request.delivery_charge" class="flex justify-between">
-                                <span>Delivery Charge:</span>
-                                <span>৳{{ formatPrice(request.delivery_charge) }}</span>
+                             <div v-if="request.additional_charges > 0" class="flex justify-between text-sm text-slate-600">
+                                <span>Other Charges</span>
+                                <span class="font-medium">৳{{ formatPrice(request.additional_charges) }}</span>
                             </div>
-                            <div class="flex justify-between font-bold text-lg pt-2 border-t">
-                                <span>Total:</span>
+                            <div class="flex justify-between text-base font-bold text-slate-900 pt-3 border-t-2 border-slate-200">
+                                <span>Total (BDT)</span>
                                 <span>৳{{ formatPrice(request.total_amount_bdt) }}</span>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="border-t border-slate-100 pt-8 text-center text-xs text-slate-500">
+                        <p class="mb-1">Thank you for choosing LuxBeyond.</p>
+                        <p>For questions concerning this invoice, please contact support@luxbeyond.com</p>
                     </div>
                 </div>
             </div>
@@ -334,7 +398,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Printer, Edit, Package, User, Mail, Link2, ExternalLink, FileText } from 'lucide-vue-next';
+import { Printer, Edit, Package, User, Mail, Link2, ExternalLink, FileText, MapPin } from 'lucide-vue-next';
 import axios from '../../axios';
 
 const route = useRoute();
@@ -416,27 +480,27 @@ const printInvoice = () => {
     printWindow.document.write(`
         <html>
             <head>
-                <title>Invoice - {{ request.value.request_number || 'Request #' + request.value.id }}</title>
+                <title>Invoice - #${request.value.request_number || request.value.id}</title>
+                <base href="${window.location.origin}/" />
+                <script src="https://cdn.tailwindcss.com"><\/script>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                    .text-right { text-align: right; }
-                    .text-center { text-align: center; }
-                    .font-bold { font-weight: bold; }
-                    .mb-8 { margin-bottom: 2rem; }
-                    .flex { display: flex; }
-                    .justify-between { justify-content: space-between; }
+                    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: white; }
+                    /* Restore standard fonts for printing */
+                    body, h1, h2, h3, p, span { font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif !important; }
                 </style>
             </head>
-            <body>
-                ${invoiceContent.innerHTML}
+            <body class="bg-white">
+                <div class="p-8">
+                    ${invoiceContent.innerHTML}
+                </div>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                <\/script>
             </body>
         </html>
     `);
     printWindow.document.close();
-    printWindow.print();
+    // No explicit print() needed as it's stuck in onload to ensure Tailwind loads
 };
 
 onMounted(() => {
