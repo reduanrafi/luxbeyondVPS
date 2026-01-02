@@ -56,4 +56,5 @@ button:disabled {
 input[type="checkbox"] {
   @apply w-5 h-5;
   @apply accent-primary;
+  @apply bg-white/5;
 }
