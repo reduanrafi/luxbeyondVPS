@@ -367,8 +367,6 @@ import {
     Mail,
     Clock,
     FileText,
-    Clock,
-    FileText,
     Image as ImageIcon,
     Edit2
 } from 'lucide-vue-next';
