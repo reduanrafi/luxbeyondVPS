@@ -24,10 +24,15 @@ class CartController extends Controller
                 $product = $item->product;
                 $variant = $item->variant;
 
-                // Get base price (variant price or product price)
-                $basePrice = $variant?->price ?? $product->sellable_price ?? $product->price;
-                $originalPrice = $basePrice;
-                $finalPrice = $basePrice;
+                // Get base price logic
+                $productBasePrice = $product->sellable_price ?? $product->price;
+                $variantPrice = $variant ? $variant->price : 0;
+                
+                // Original price is Product Original (if exists) or Product Base + Variant Price
+                $productOriginalPrice = $product->sellable_price ? $product->original_price : $product->price;
+                $originalPrice = $productOriginalPrice + $variantPrice;
+
+                $finalProductPrice = $productBasePrice;
 
                 // Check if product is in any active event with price
                 $now = now();
@@ -45,15 +50,15 @@ class CartController extends Controller
                 if ($activeEvent) {
                     $priceType = $activeEvent->price_type ?? 'fixed';
                     if ($priceType === 'fixed' && $activeEvent->price) {
-                        $finalPrice = $activeEvent->price;
-                        $originalPrice = $basePrice;
+                        $finalProductPrice = $activeEvent->price;
                     } elseif ($priceType === 'percentage' && $activeEvent->discount_percentage) {
                         // Calculate percentage discount
-                        $discountAmount = ($basePrice * floatval($activeEvent->discount_percentage)) / 100;
-                        $finalPrice = $basePrice - $discountAmount;
-                        $originalPrice = $basePrice;
+                        $discountAmount = ($productBasePrice * floatval($activeEvent->discount_percentage)) / 100;
+                        $finalProductPrice = $productBasePrice - $discountAmount;
                     }
                 }
+                
+                $finalPrice = $finalProductPrice + $variantPrice;
 
                 return [
                     'cart_item_id' => $item->id,
@@ -102,9 +107,11 @@ class CartController extends Controller
             ? ProductVariant::findOrFail($data['product_variant_id'])
             : null;
 
-        // Get base price (variant price or product price)
-        $basePrice = $variant?->price ?? $product->sellable_price ?? $product->price;
-        $finalPrice = $basePrice;
+        // Get base price logic
+        $productBasePrice = $product->sellable_price ?? $product->price;
+        $variantPrice = $variant ? $variant->price : 0;
+        
+        $finalProductPrice = $productBasePrice;
 
         // Check if product is in any active event with price
         $now = now();
@@ -122,13 +129,15 @@ class CartController extends Controller
         if ($activeEvent) {
             $priceType = $activeEvent->price_type ?? 'fixed';
             if ($priceType === 'fixed' && $activeEvent->price) {
-                $finalPrice = $activeEvent->price;
+                $finalProductPrice = $activeEvent->price;
             } elseif ($priceType === 'percentage' && $activeEvent->discount_percentage) {
                 // Calculate percentage discount
-                $discountAmount = ($basePrice * floatval($activeEvent->discount_percentage)) / 100;
-                $finalPrice = $basePrice - $discountAmount;
+                $discountAmount = ($productBasePrice * floatval($activeEvent->discount_percentage)) / 100;
+                $finalProductPrice = $productBasePrice - $discountAmount;
             }
         }
+        
+        $finalPrice = $finalProductPrice + $variantPrice;
 
         $cartItem = CartItem::updateOrCreate(
             [
