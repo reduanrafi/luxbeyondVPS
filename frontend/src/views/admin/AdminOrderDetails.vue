@@ -12,6 +12,11 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <button @click="$router.push(`/admin/orders/${orderId}/edit`)"
+                    class="flex items-center gap-2 px-4 py-2.5 bg-white/5 text-zinc-300 font-bold uppercase tracking-wider text-xs rounded-lg hover:bg-white/10 hover:text-white transition-colors border border-white/10">
+                    <Edit2 class="w-4 h-4" />
+                    Edit Order
+                </button>
                 <button @click="printInvoice"
                     class="flex items-center gap-2 px-4 py-2.5 bg-white/5 text-zinc-300 font-bold uppercase tracking-wider text-xs rounded-lg hover:bg-white/10 hover:text-white transition-colors border border-white/10">
                     <Printer class="w-4 h-4" />
@@ -362,7 +367,10 @@ import {
     Mail,
     Clock,
     FileText,
-    Image as ImageIcon
+    Clock,
+    FileText,
+    Image as ImageIcon,
+    Edit2
 } from 'lucide-vue-next';
 import axios from '../../axios';
 

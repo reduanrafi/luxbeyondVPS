@@ -163,6 +163,11 @@ const routes = [
                 meta: { title: 'Order Details' },
             },
             {
+                path: 'orders/:id/edit',
+                component: () => import('../views/admin/AdminEditOrder.vue'),
+                meta: { title: 'Edit Order' },
+            },
+            {
                 path: 'requests/:id',
                 component: () => import('../views/admin/AdminRequestDetails.vue'),
                             meta: { title: 'Request Details' },
@@ -245,7 +250,9 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const loaderStore = useLoaderStore();
-    loaderStore.startLoading();
+    if (to.path !== '/') {
+        loaderStore.startLoading();
+    }
 
     const authStore = useAuthStore();
     
