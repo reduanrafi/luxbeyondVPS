@@ -145,6 +145,40 @@
                                     </p>
                                 </div>
                             </div>
+                            
+                            <!-- Shipping Address -->
+                            <div class="md:col-span-2 pt-4 border-t border-white/5" v-if="request.shipping_address">
+                                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Shipping Address</p>
+                                <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5">
+                                    <p class="text-sm text-white font-medium">{{ request.shipping_address.street }}</p>
+                                    <p class="text-sm text-zinc-400">
+                                        {{ request.shipping_address.city }}
+                                        <span v-if="request.shipping_address.postal_code">- {{ request.shipping_address.postal_code }}</span>
+                                    </p>
+                                    <p class="text-sm text-zinc-400">{{ request.shipping_address.state }}</p>
+                                    <p class="text-sm text-zinc-400 mt-2 flex items-center gap-2">
+                                        <span class="text-zinc-500 text-xs uppercase">Phone:</span>
+                                        {{ request.shipping_address.phone }}
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Fallback if no specific shipping address but user has one -->
+                             <div class="md:col-span-2 pt-4 border-t border-white/5" v-else-if="!request.shipping_address && request.user?.shipping_address">
+                                <p class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">User Default Address</p>
+                                <div class="bg-white/[0.02] rounded-lg p-3 border border-white/5 opacity-75">
+                                    <p class="text-sm text-white font-medium">{{ request.user.shipping_address.street }}</p>
+                                    <p class="text-sm text-zinc-400">
+                                        {{ request.user.shipping_address.city }}
+                                        <span v-if="request.user.shipping_address.postal_code">- {{ request.user.shipping_address.postal_code }}</span>
+                                    </p>
+                                    <p class="text-sm text-zinc-400">{{ request.user.shipping_address.state }}</p>
+                                     <p class="text-sm text-zinc-400 mt-2 flex items-center gap-2">
+                                        <span class="text-zinc-500 text-xs uppercase">Phone:</span>
+                                        {{ request.user.shipping_address.phone }}
+                                    </p>
+                                    <p class="text-xs text-amber-500 mt-2">* Not confirmed for this specific request yet.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

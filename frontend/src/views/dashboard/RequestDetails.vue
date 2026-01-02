@@ -62,9 +62,9 @@
                         </div>
                         
                         <div class="flex justify-end pt-4">
-                            <button @click="confirmOrder" :disabled="confirmingOrder" 
+                            <button @click="openSummaryModal" :disabled="confirmingOrder" 
                                 class="px-6 py-2 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover disabled:opacity-50 transition-colors">
-                                {{ confirmingOrder ? 'Confirming...' : 'Confirm Order' }}
+                                Confirm Order
                             </button>
                         </div>
                     </div>
@@ -386,6 +386,67 @@
 
         </div>
 
+        <!-- Confirmation Summary Modal -->
+        <div v-if="showSummaryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div class="bg-surface p-6 rounded-2xl shadow-xl max-w-lg w-full mx-4 border border-white/10">
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Confirm Your Order</h3>
+                <p class="text-sm text-slate-300 mb-6">Please review the details before finalizing. You can update the quantity here.</p>
+                
+                <div class="space-y-4 bg-black/20 p-4 rounded-lg border border-white/5">
+                    <!-- Product Info -->
+                    <div class="flex items-start gap-4">
+                        <img v-if="request.admin_image_url" :src="request.admin_image_url" class="w-16 h-16 object-cover rounded bg-white/5" />
+                        <div>
+                            <p class="font-semibold text-primary line-clamp-2 h-10">{{ request.product_name || 'Product Request' }}</p>
+                            <p class="text-xs text-slate-400 mt-1">{{ request.url }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Edit -->
+                    <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                        <span class="text-sm text-slate-300">Quantity</span>
+                        <div class="flex items-center gap-3">
+                            <button @click="summaryQuantity > 1 ? summaryQuantity-- : null" 
+                                class="w-8 h-8 flex items-center justify-center bg-white/5 rounded hover:bg-white/10 text-white disabled:opacity-50"
+                                :disabled="summaryQuantity <= 1">
+                                -
+                            </button>
+                            <input v-model.number="summaryQuantity" type="number" min="1" 
+                                class="w-12 text-center bg-transparent border-b border-white/20 text-white font-bold focus:outline-none focus:border-primary">
+                            <button @click="summaryQuantity++" 
+                                class="w-8 h-8 flex items-center justify-center bg-white/5 rounded hover:bg-white/10 text-white">
+                                +
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Price Summary -->
+                    <div class="border-t border-white/5 pt-4 space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-slate-400">Unit Price</span>
+                            <span class="text-white">{{ request.currency }} {{ formatPrice(request.price) }}</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold pt-2">
+                            <span class="text-white">Estimated Total</span>
+                            <span class="text-primary">৳{{ formatPrice(summaryTotal) }}</span>
+                        </div>
+                        <p v-if="summaryQuantity !== request.quantity" class="text-xs text-amber-500 mt-1">
+                            * Total updated based on new quantity.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-3 mt-6">
+                    <button @click="showSummaryModal = false" :disabled="confirmingWithUpdate"
+                        class="px-4 py-2 text-slate-400 hover:text-slate-900 font-medium">Cancel</button>
+                    <button @click="proceedToFinalConfirm" :disabled="confirmingWithUpdate"
+                        class="px-6 py-2 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover disabled:opacity-50">
+                        {{ confirmingWithUpdate ? 'Processing...' : 'Place Order' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Payment Option Modal -->
         <div v-if="showPaymentModal"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -453,6 +514,11 @@ const selectedPaymentOption = ref('full'); // 'full' or 'partial'
 const editingQuantity = ref(false);
 const tempQuantity = ref(1);
 
+// Confirmation Summary Modal
+const showSummaryModal = ref(false);
+const summaryQuantity = ref(1);
+const confirmingWithUpdate = ref(false);
+
 const bankTransferForm = ref({
     reference: '',
     file: null
@@ -495,26 +561,76 @@ const fetchRequest = async () => {
     }
 };
 
-const confirmOrder = async () => {
+const openSummaryModal = () => {
     if (!shippingAddress.value.street || !shippingAddress.value.city || !shippingAddress.value.phone) {
         alert('Please fill in all required address fields.');
         return;
     }
+    summaryQuantity.value = request.value.quantity;
+    showSummaryModal.value = true;
+};
 
-    confirmingOrder.value = true;
+const proceedToFinalConfirm = async () => {
+    confirmingWithUpdate.value = true;
     try {
+        // 1. Update Quantity if changed
+        if (summaryQuantity.value !== request.value.quantity) {
+             const updateResponse = await axios.post(`/product-requests/${requestId}/update-quantity`, {
+                quantity: summaryQuantity.value
+            });
+            request.value = updateResponse.data.product_request;
+        }
+
+        // 2. Confirm Order
         await axios.post(`/product-requests/${requestId}/confirm-order`, {
             shipping_address: shippingAddress.value
         });
+        
         await fetchRequest(); 
+        showSummaryModal.value = false;
         alert('Order confirmed! Please proceed to payment.');
     } catch (err) {
         console.error('Confirmation Error:', err);
         alert(err.response?.data?.message || 'Failed to confirm order');
     } finally {
-        confirmingOrder.value = false;
+        confirmingWithUpdate.value = false;
     }
 };
+
+const summaryTotal = computed(() => {
+    if (!request.value) return 0;
+    
+    // Ensure inputs are numbers
+    const price = parseFloat(request.value.price || 0);
+    const qty = parseInt(summaryQuantity.value || 0);
+    
+    // Product Total
+    let productTotal = price * qty;
+    const currency = currencies.value.find(c => c.code === request.value.currency);
+    
+    // Handle currency conversion if needed
+    if (currency && !currency.is_base) {
+        productTotal = productTotal * (parseFloat(currency.rate_to_base) || 1);
+    }
+    
+    // Ensure all charges are numbers
+    const declaredShipping = parseFloat(request.value.declared_shipping_cost || 0);
+    
+    // If breakdown exists, use it
+    if (request.value.charges_breakdown && request.value.charges_breakdown.length > 0) {
+        const breakdownTotal = request.value.charges_breakdown.reduce((sum, item) => sum + (parseFloat(item.amount_in_bdt) || 0), 0);
+        return productTotal + declaredShipping + breakdownTotal;
+    }
+
+    // Otherwise sum individual fields
+    const charges = (parseFloat(request.value.tax) || 0) + 
+                    (parseFloat(request.value.delivery_charge) || 0) + 
+                    (parseFloat(request.value.additional_charges) || 0) + 
+                    (parseFloat(request.value.payment_processing_fee) || 0) + 
+                    declaredShipping;
+
+    return productTotal + charges;
+});
 
 const fetchCurrencies = async () => {
     try {
@@ -648,6 +764,10 @@ const submitBankTransfer = async () => {
 
 const canEditQuantity = computed(() => {
     if (!request.value) return false;
+    
+    // Lock if order is confirmed (shipping address present)
+    if (request.value.shipping_address) return false;
+
     // Allow edit if status is not paid/completed/cancelled
     const status = request.value.status;
     const paymentStatus = request.value.payment_status;
