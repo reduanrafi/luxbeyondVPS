@@ -25,11 +25,6 @@
                         order.id }}</p>
                 </div>
                 <div class="flex gap-3">
-                    <button @click="printInvoice"
-                        class="flex gap-2 px-6 py-2 text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-primary border border-white/10 rounded-none hover:border-primary/30 transition-all">
-                        <Printer class="w-5 h-5" />
-                        Print Invoice
-                    </button>
                     <button @click="$router.push('/dashboard/orders')"
                         class="px-6 py-2 text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-primary border border-white/10 rounded-none hover:border-primary/30 transition-all">
                         ← Back
@@ -249,75 +244,8 @@
                 </div>
             </div>
 
-            <!-- Invoice (Hidden, for printing) -->
-            <div id="invoice-content" class="hidden">
-                <div class="p-8 bg-surface">
-                    <div class="mb-8 text-center">
-                        <h1 class="text-3xl font-bold text-white mb-2">INVOICE</h1>
-                        <p class="text-sm text-slate-400">Order #{{ order.order_number || order.id }}</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-8 mb-8">
-                        <div>
-                            <h3 class="text-lg font-bold text-white mb-2">Bill To:</h3>
-                            <p class="text-sm text-slate-300">{{ order.shipping_name || 'N/A' }}</p>
-                            <p class="text-sm text-slate-300">{{ order.shipping_email || 'N/A' }}</p>
-                            <p v-if="order.shipping_address" class="text-sm text-slate-300 mt-2">{{
-                                order.shipping_address }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-slate-400 mb-1"><strong>Date:</strong> {{
-                                formatDate(order.created_at) }}</p>
-                            <p class="text-sm text-slate-400 mb-1"><strong>Status:</strong> {{ order.status?.label ||
-                                order.status }}</p>
-                            <p class="text-sm text-slate-400"><strong>Payment:</strong> {{ order.payment_status }}</p>
-                        </div>
-                    </div>
-                    <table class="w-full mb-8 border-collapse">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="border border-white/10 px-4 py-2 text-left">Product</th>
-                                <th class="border border-white/10 px-4 py-2 text-right">Price</th>
-                                <th class="border border-white/10 px-4 py-2 text-right">Qty</th>
-                                <th class="border border-white/10 px-4 py-2 text-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="item in order.items" :key="item.id">
-                                <td class="border border-white/10 px-4 py-2">{{ item.product_name }}</td>
-                                <td class="border border-white/10 px-4 py-2 text-right">{{ formatPrice(item.price) }}
-                                </td>
-                                <td class="border border-white/10 px-4 py-2 text-right">{{ item.quantity }}</td>
-                                <td class="border border-white/10 px-4 py-2 text-right">{{ formatPrice(item.subtotal ||
-                                    (item.price * item.quantity)) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="text-right">
-                        <div class="inline-block text-right space-y-2">
-                            <div class="flex justify-between gap-8 text-sm">
-                                <span>Subtotal:</span>
-                                <span>{{ formatPrice(order.subtotal || 0) }}</span>
-                            </div>
-                            <div v-if="order.discount > 0" class="flex justify-between gap-8 text-sm">
-                                <span>Discount:</span>
-                                <span>-{{ formatPrice(order.discount) }}</span>
-                            </div>
-                            <div v-if="order.tax > 0" class="flex justify-between gap-8 text-sm">
-                                <span>Tax:</span>
-                                <span>{{ formatPrice(order.tax) }}</span>
-                            </div>
-                            <div v-if="order.shipping > 0" class="flex justify-between gap-8 text-sm">
-                                <span>Shipping:</span>
-                                <span>{{ formatPrice(order.shipping) }}</span>
-                            </div>
-                            <div class="flex justify-between gap-8 text-lg font-bold pt-2 border-t-2">
-                                <span>Total:</span>
-                                <span>{{ formatPrice(order.total || order.total_amount || 0) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+
         </div>
     </div>
 </template>
@@ -326,7 +254,6 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from '../../axios';
-import { Printer } from 'lucide-vue-next';
 
 const route = useRoute();
 const router = useRouter();
@@ -387,30 +314,7 @@ const formatPaymentMethod = (method) => {
     return method.replace(/_/g, ' ');
 };
 
-const printInvoice = () => {
-    const invoiceContent = document.getElementById('invoice-content');
-    if (!invoiceContent) return;
 
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <html>
-            <head>
-                <title>Invoice - Order #${order.value.order_number || order.value.id}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                </style>
-            </head>
-            <body>
-                ${invoiceContent.innerHTML}
-            </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-};
 
 onMounted(() => {
     fetchOrder();
