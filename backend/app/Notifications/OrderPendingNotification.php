@@ -70,6 +70,7 @@ class OrderPendingNotification extends Notification implements ShouldQueue
             'order_id' => $this->order->id,
             'order_number' => $this->order->order_number,
             'amount' => $this->order->total,
+            'url' => '/dashboard/orders/' . $this->order->order_number,
             'type' => 'order_pending'
         ];
     }

@@ -18,7 +18,7 @@ use Ihasan\Bkash\Exceptions\PaymentQueryException;
 class PaymentController extends Controller
 {
     /**
-     * Configure bKash package with credentials from database
+     * Configure bKash package with credentials from database or .env fallback
      */
     private function configureBkashFromPaymentMethod()
     {
@@ -27,20 +27,27 @@ class PaymentController extends Controller
             ->where('is_online', true)
             ->first();
 
-        if (!$paymentMethod || !$paymentMethod->config) {
-            throw new \Exception('bKash payment method is not configured');
+        // If payment method exists and has config, use it
+        if ($paymentMethod && $paymentMethod->config) {
+            $config = $paymentMethod->config;
+            
+            config([
+                'bkash.sandbox' => $config['is_sandbox'] ?? env('BKASH_SANDBOX', true),
+                'bkash.credentials.app_key' => $config['app_key'] ?? env('BKASH_APP_KEY', ''),
+                'bkash.credentials.app_secret' => $config['app_secret'] ?? env('BKASH_APP_SECRET', ''),
+                'bkash.credentials.username' => $config['username'] ?? env('BKASH_USERNAME', ''),
+                'bkash.credentials.password' => $config['password'] ?? env('BKASH_PASSWORD', ''),
+            ]);
+        } else {
+            // Fallback to .env credentials
+            config([
+                'bkash.sandbox' => env('BKASH_SANDBOX', true),
+                'bkash.credentials.app_key' => env('BKASH_APP_KEY', ''),
+                'bkash.credentials.app_secret' => env('BKASH_APP_SECRET', ''),
+                'bkash.credentials.username' => env('BKASH_USERNAME', ''),
+                'bkash.credentials.password' => env('BKASH_PASSWORD', ''),
+            ]);
         }
-
-        $config = $paymentMethod->config;
-        
-        // Temporarily update config for this request
-        config([
-            'bkash.sandbox' => $config['is_sandbox'] ?? true,
-            'bkash.credentials.app_key' => $config['app_key'] ?? '',
-            'bkash.credentials.app_secret' => $config['app_secret'] ?? '',
-            'bkash.credentials.username' => $config['username'] ?? '',
-            'bkash.credentials.password' => $config['password'] ?? '',
-        ]);
 
         return $paymentMethod;
     }
@@ -276,11 +283,17 @@ class PaymentController extends Controller
 
         $order = Order::findOrFail($validated['order_id']);
 
-        // Check if order payment method is bank transfer
-        if ($order->payment_method !== 'bank_transfer') {
+        // Check if order payment method is bank transfer or not set
+        if ($order->payment_method && $order->payment_method !== 'bank_transfer') {
             return response()->json([
                 'message' => 'Payment slip can only be uploaded for bank transfer orders'
             ], 400);
+        }
+
+        // Set payment method to bank_transfer if not set
+        if (!$order->payment_method) {
+            $order->payment_method = 'bank_transfer';
+            $order->save();
         }
 
         // Upload payment slip

@@ -41,7 +41,7 @@
                             <router-link v-for="product in searchResults" :key="product.id"
                                 :to="`/shop/${product.slug || product.id}`" @click="closeSearchDropdown"
                                 class="flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors group">
-                                <img :src="product.image_url ? product.image_url : '/assets/placeholder.png'"
+                                <img :src="product.image_url ? product.image_url : '/assets/placeholder.webp'"
                                     :alt="product.name"
                                     class="w-16 h-16 object-contain rounded-lg border border-white/10" />
                                 <div class="flex-1 min-w-0">
@@ -64,7 +64,8 @@
                             <p class="text-xs text-gray-500 mt-1 mb-5">
                                 We are working on it.
                             </p>
-                            <router-link to="request-product" class="bg-primary rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
+                            <router-link to="request-product"
+                                class="bg-primary rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
                                 Request Product
                             </router-link>
                         </div>
@@ -369,9 +370,18 @@ const unreadCount = computed(() => notificationStore.unreadCount);
 // Fetch notifications when auth state changes or on mount
 watch(() => authStore.isAuthenticated, (isAuthenticated) => {
     if (isAuthenticated) {
-        notificationStore.fetchNotifications();
+        notificationStore.startPolling();
+    } else {
+        notificationStore.stopPolling();
     }
 }, { immediate: true });
+
+onMounted(() => {
+    if (authStore.isAuthenticated) {
+        notificationStore.startPolling();
+    }
+});
+
 
 const handleSearch = () => {
     if (searchTimeout.value) {

@@ -1,13 +1,13 @@
 <template>
   <div :class="[
-  'group bg-surface rounded-none border border-white/[0.05] hover:border-primary/50 transition-all duration-300 relative p-6 flex flex-col',
-  viewMode === 'grid' ? '' : 'sm:flex-row sm:items-center sm:gap-6'
-]">
+    'group bg-surface rounded-none border border-white/[0.05] hover:border-primary/50 transition-all duration-300 relative p-6 flex flex-col',
+    viewMode === 'grid' ? '' : 'sm:flex-row sm:items-center sm:gap-6'
+  ]">
     <!-- Product Image Area -->
     <div :class="[
-  'relative overflow-hidden mb-6 flex items-center justify-center bg-white/[0.02]',
-  viewMode === 'grid' ? 'aspect-square w-full' : 'w-48 h-48 shrink-0'
-]">
+      'relative overflow-hidden mb-6 flex items-center justify-center bg-white/[0.02]',
+      viewMode === 'grid' ? 'aspect-square w-full' : 'w-48 h-48 shrink-0'
+    ]">
       <router-link :to="`/shop/${product.slug || product.id}`" class="block h-full w-full p-4">
         <img :src="getProductImage(product)" :alt="product.name"
           class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
@@ -87,6 +87,7 @@ import { useWishlistStore } from '../stores/wishlist';
 import { useCartStore } from '../stores/cart';
 import { useAuthStore } from '../stores/auth';
 import { useModalStore } from '../stores/modal';
+import { trackAddToCart as trackAddToCartGA4 } from '../utils/analytics';
 
 const props = defineProps({
   product: {
@@ -148,12 +149,12 @@ const getProductImage = (product) => {
   if (product.image_url) {
     return product.image_url;
   }
-  
+
   return '/assets/product-default.png';
 };
 
 const handleImageError = (event) => {
-  event.target.src = '/assets/placeholder.png';
+  event.target.src = '/assets/placeholder.webp';
 };
 
 const formatPrice = (price) => {
@@ -197,6 +198,7 @@ const addToCart = (product) => {
   };
 
   cartStore.addItem(cartProduct);
+  trackAddToCartGA4(cartProduct, 1);
 };
 
 const toggleWishlist = (product) => {

@@ -46,8 +46,7 @@
                 <div class="flex-1 relative group">
                     <Search
                         class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-primary transition-colors" />
-                    <input v-model="filters.search" @input="fetchOrders" type="text"
-                        placeholder="Search order ID, customer, etc..."
+                    <input v-model="filters.search" type="text" placeholder="Search order ID, customer, etc..."
                         class="w-full pl-10 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600">
                 </div>
 
@@ -135,9 +134,9 @@
                             <td class="py-4 px-6">
                                 <div class="flex flex-col">
                                     <span class="text-sm font-bold text-white font-mono">#{{ order.order_number
-                                        }}</span>
+                                    }}</span>
                                     <span v-if="order.event" class="text-[10px] text-primary mt-1">{{ order.event.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </td>
                             <td class="py-4 px-6">
@@ -148,7 +147,7 @@
                                     </div>
                                     <div class="flex flex-col">
                                         <span class="text-sm text-white font-medium">{{ order.user?.name || 'Guest User'
-                                            }}</span>
+                                        }}</span>
                                         <span class="text-xs text-zinc-500">{{ order.user?.email || 'No email' }}</span>
                                     </div>
                                 </div>
@@ -191,7 +190,7 @@
                             <td class="py-4 px-6 text-right">
                                 <div
                                     class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <router-link :to="`/admin/orders/${order.id}`" 
+                                    <router-link :to="`/admin/orders/${order.id}`"
                                         class="p-2 text-zinc-400 hover:text-primary hover:bg-white/5 rounded-lg transition-colors"
                                         title="View Details">
                                         <Eye class="w-4 h-4" />
@@ -212,7 +211,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import {
     Eye,
     Printer,
@@ -229,6 +228,7 @@ import {
 } from 'lucide-vue-next';
 import axios from '../../axios';
 import { useAuthStore } from '../../stores/auth';
+import { debounce } from 'lodash';
 
 const authStore = useAuthStore();
 const loading = ref(false);
@@ -259,7 +259,7 @@ const fetchOrders = async () => {
 
         const response = await axios.get('/admin/orders', { params });
         orders.value = response.data.data || response.data;
-        
+
         // Refresh stats when filters change or just once? Usually stats are global, so maybe just on mount or status update.
         // If we want stats to reflect filters, we'd need to pass params to stats endpoint.
         // But user request said "from order_statuses table not static", usually meaning the overview cards.
@@ -270,6 +270,11 @@ const fetchOrders = async () => {
         loading.value = false;
     }
 };
+
+// Watch search filter with debounce
+watch(() => filters.value.search, debounce(() => {
+    fetchOrders();
+}, 500));
 
 const fetchOrderStatuses = async () => {
     try {

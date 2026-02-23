@@ -6,13 +6,15 @@
                 <h3 class="text-2xl font-bold text-white">
                     {{ event ? 'Edit Event' : 'Create New Event' }}
                 </h3>
-                <button @click="$emit('close')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white">
+                <button @click="$emit('close')"
+                    class="p-2 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white">
                     <X class="w-5 h-5" />
                 </button>
             </div>
 
             <!-- Form -->
-            <form @submit.prevent="handleSubmit" class="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+            <form @submit.prevent="handleSubmit"
+                class="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
                 <!-- Tabs -->
                 <div class="border-b border-white/10">
                     <div class="flex gap-4">
@@ -59,8 +61,7 @@
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Slug</label>
                             <input v-model="form.slug" type="text"
                                 class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
-                                :class="errors.slug ? 'border-red-500/50' : ''"
-                                placeholder="auto-generated">
+                                :class="errors.slug ? 'border-red-500/50' : ''" placeholder="auto-generated">
                             <p v-if="errors.slug" class="text-xs text-red-400 mt-1">{{ errors.slug[0] }}</p>
                             <p v-else class="text-xs text-zinc-500 mt-1">Leave empty to auto-generate from name</p>
                         </div>
@@ -72,7 +73,8 @@
                             class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.short_description ? 'border-red-500/50' : ''"
                             placeholder="Brief description for banners">
-                        <p v-if="errors.short_description" class="text-xs text-red-400 mt-1">{{ errors.short_description[0] }}</p>
+                        <p v-if="errors.short_description" class="text-xs text-red-400 mt-1">{{
+                            errors.short_description[0] }}</p>
                     </div>
 
                     <div>
@@ -88,8 +90,7 @@
                         <label class="block text-sm font-medium text-zinc-400 mb-1">Custom URL</label>
                         <input v-model="form.url" type="text"
                             class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
-                            :class="errors.url ? 'border-red-500/50' : ''"
-                            placeholder="/shop?events=event-slug">
+                            :class="errors.url ? 'border-red-500/50' : ''" placeholder="/shop?events=event-slug">
                         <p v-if="errors.url" class="text-xs text-red-400 mt-1">{{ errors.url[0] }}</p>
                         <p v-else class="text-xs text-zinc-500 mt-1">Optional custom URL for the event</p>
                     </div>
@@ -151,10 +152,12 @@
                             <input type="file" @change="handleImageUpload" accept="image/*"
                                 class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-black hover:file:bg-primary">
                             <div v-if="imagePreview" class="mt-2">
-                                <img :src="imagePreview" class="h-32 w-full object-contain rounded-lg border border-white/10">
+                                <img :src="imagePreview"
+                                    class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                             <div v-else-if="form.image_url" class="mt-2">
-                                <img :src="form.image_url" class="h-32 w-full object-contain rounded-lg border border-white/10">
+                                <img :src="form.image_url"
+                                    class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                         </div>
                         <div>
@@ -165,12 +168,15 @@
                                 class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-black hover:file:bg-primary"
                                 :class="errors.banner_image ? 'border-red-500/50' : ''">
                             <div v-if="bannerPreview" class="mt-2">
-                                <img :src="bannerPreview" class="h-32 w-full object-contain rounded-lg border border-white/10">
+                                <img :src="bannerPreview"
+                                    class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
                             <div v-else-if="form.banner_image_url" class="mt-2">
-                                <img :src="form.banner_image_url" class="h-32 w-full object-contain rounded-lg border border-white/10">
+                                <img :src="form.banner_image_url"
+                                    class="h-32 w-full object-contain rounded-lg border border-white/10">
                             </div>
-                            <p v-if="errors.banner_image" class="text-xs text-red-400 mt-1">{{ errors.banner_image[0] }}</p>
+                            <p v-if="errors.banner_image" class="text-xs text-red-400 mt-1">{{ errors.banner_image[0] }}
+                            </p>
                             <p v-else class="text-xs text-zinc-500 mt-1">Required for hero/sidebar display</p>
                         </div>
                     </div>
@@ -187,13 +193,14 @@
                     </div>
 
                     <div v-if="form.price_type === 'fixed'">
-                        <label class="block text-sm font-medium text-zinc-400 mb-1">Fixed Price (for all products)</label>
-                        <input v-model.number="form.price" type="number" step="0.01" min="0"
-                            placeholder="0.00"
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Fixed Price (for all
+                            products)</label>
+                        <input v-model.number="form.price" type="number" step="0.01" min="0" placeholder="0.00"
                             class="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
                             :class="errors.price ? 'border-red-500/50' : ''">
                         <p v-if="errors.price" class="text-xs text-red-400 mt-1">{{ errors.price[0] }}</p>
-                        <p v-else class="text-xs text-zinc-500 mt-1">All products in this event will be sold at this fixed price. Leave empty to use product's original price.</p>
+                        <p v-else class="text-xs text-zinc-500 mt-1">All products in this event will be sold at this
+                            fixed price. Leave empty to use product's original price.</p>
                     </div>
 
                     <div v-if="form.price_type === 'percentage'">
@@ -205,22 +212,25 @@
                                 :class="errors.discount_percentage ? 'border-red-500/50' : ''">
                             <span class="text-zinc-500">%</span>
                         </div>
-                        <p v-if="errors.discount_percentage" class="text-xs text-red-400 mt-1">{{ errors.discount_percentage[0] }}</p>
-                        <p v-else class="text-xs text-zinc-500 mt-1">Percentage discount will be applied to all products in this event (e.g., 20% off).</p>
+                        <p v-if="errors.discount_percentage" class="text-xs text-red-400 mt-1">{{
+                            errors.discount_percentage[0] }}</p>
+                        <p v-else class="text-xs text-zinc-500 mt-1">Percentage discount will be applied to all products
+                            in this event (e.g., 20% off).</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-zinc-400 mb-1">Background Color (if no image)</label>
+                        <label class="block text-sm font-medium text-zinc-400 mb-1">Background Color (if no
+                            image)</label>
                         <div class="flex gap-2">
                             <input v-model="form.bg_color" type="color"
                                 class="h-10 w-20 border border-white/10 rounded-lg cursor-pointer bg-transparent">
                             <input v-model="form.bg_color" type="text"
                                 class="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:bg-primary/50"
-                                :class="errors.bg_color ? 'border-red-500/50' : ''"
-                                placeholder="#f59e0b">
+                                :class="errors.bg_color ? 'border-red-500/50' : ''" placeholder="#f59e0b">
                         </div>
                         <p v-if="errors.bg_color" class="text-xs text-red-400 mt-1">{{ errors.bg_color[0] }}</p>
-                        <p v-else class="text-xs text-zinc-500 mt-1">Background color will be used when no image is provided</p>
+                        <p v-else class="text-xs text-zinc-500 mt-1">Background color will be used when no image is
+                            provided</p>
                     </div>
 
                     <div class="grid grid-cols-3 gap-4">
@@ -259,11 +269,12 @@
                     <div v-else class="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
                         <div v-for="(product, index) in selectedProducts" :key="product.id"
                             class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10">
-                            <img :src="product.image_url || '/assets/placeholder.png'" :alt="product.name"
+                            <img :src="product.image_url || '/assets/placeholder.webp'" :alt="product.name"
                                 class="w-12 h-12 object-contain rounded">
                             <div class="flex-1">
                                 <div class="font-medium text-white">{{ product.name }}</div>
-                                <div class="text-sm text-zinc-400">৳{{ formatPrice(product.sellable_price || product.price) }}</div>
+                                <div class="text-sm text-zinc-400">৳{{ formatPrice(product.sellable_price ||
+                                    product.price) }}</div>
                             </div>
                             <button type="button" @click="removeProduct(index)"
                                 class="p-2 hover:bg-white/10 rounded-lg transition-colors text-red-400 hover:text-red-300">
@@ -298,9 +309,12 @@
                             <div>
                                 <div class="font-medium text-blue-100">Event Status</div>
                                 <div class="text-sm text-blue-300 mt-1">
-                                    <div v-if="eventStatus === 'live'" class="text-emerald-400 font-semibold">● Live Now</div>
-                                    <div v-else-if="eventStatus === 'upcoming'" class="text-primary-400 font-semibold">● Upcoming</div>
-                                    <div v-else-if="eventStatus === 'expired'" class="text-red-400 font-semibold">● Expired</div>
+                                    <div v-if="eventStatus === 'live'" class="text-emerald-400 font-semibold">● Live Now
+                                    </div>
+                                    <div v-else-if="eventStatus === 'upcoming'" class="text-primary-400 font-semibold">●
+                                        Upcoming</div>
+                                    <div v-else-if="eventStatus === 'expired'" class="text-red-400 font-semibold">●
+                                        Expired</div>
                                     <div v-else class="text-zinc-400">● Not scheduled</div>
                                 </div>
                             </div>
@@ -315,7 +329,8 @@
                             <div>
                                 <div class="font-medium text-primary-500 mb-2">Email Notifications</div>
                                 <p class="text-sm text-primary-200/80">
-                                    When enabled, all registered users will receive email notifications about this event.
+                                    When enabled, all registered users will receive email notifications about this
+                                    event.
                                 </p>
                             </div>
                         </div>
@@ -330,7 +345,8 @@
                             </label>
                         </div>
 
-                        <div v-if="form.send_notification" class="bg-white/5 border border-white/10 rounded-lg p-4 space-y-2">
+                        <div v-if="form.send_notification"
+                            class="bg-white/5 border border-white/10 rounded-lg p-4 space-y-2">
                             <div class="text-sm text-zinc-300">
                                 <strong>Notifications will be sent:</strong>
                             </div>
@@ -359,11 +375,14 @@
             </form>
 
             <!-- Product Selection Modal -->
-            <div v-if="showProductModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-                <div class="bg-zinc-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col border border-white/10">
+            <div v-if="showProductModal"
+                class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                <div
+                    class="bg-zinc-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-hidden flex flex-col border border-white/10">
                     <div class="p-6 border-b border-white/10 flex items-center justify-between">
                         <h4 class="text-xl font-bold text-white">Select Products</h4>
-                        <button @click="showProductModal = false" class="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white">
+                        <button @click="showProductModal = false"
+                            class="p-2 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white">
                             <X class="w-5 h-5" />
                         </button>
                     </div>
@@ -377,11 +396,12 @@
                                 @click="toggleProduct(product)">
                                 <input type="checkbox" :checked="isProductSelected(product.id)"
                                     class="w-4 h-4 text-primary-500 rounded border-white/20 bg-white/5 focus:ring-primary-500">
-                                <img :src="product.image_url || '/assets/placeholder.png'" :alt="product.name"
+                                <img :src="product.image_url || '/assets/placeholder.webp'" :alt="product.name"
                                     class="w-12 h-12 object-contain rounded">
                                 <div class="flex-1">
                                     <div class="font-medium text-white">{{ product.name }}</div>
-                                    <div class="text-sm text-zinc-400">৳{{ formatPrice(product.sellable_price || product.price) }}</div>
+                                    <div class="text-sm text-zinc-400">৳{{ formatPrice(product.sellable_price ||
+                                        product.price) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -470,7 +490,7 @@ const eventStatus = computed(() => {
     const now = new Date();
     const start = new Date(form.value.start_date);
     const end = new Date(form.value.end_date);
-    
+
     if (start <= now && end >= now) return 'live';
     if (start > now) return 'upcoming';
     if (end < now) return 'expired';
@@ -577,7 +597,7 @@ const handleBannerUpload = (event) => {
 const searchProducts = async () => {
     try {
         const response = await axios.get('/admin/events/products/search', {
-            params: { 
+            params: {
                 search: productSearch.value
             }
         });
@@ -590,7 +610,7 @@ const searchProducts = async () => {
 
 const isProductSelected = (productId) => {
     return tempSelectedProducts.value.some(p => p.id === productId) ||
-           selectedProducts.value.some(p => p.id === productId);
+        selectedProducts.value.some(p => p.id === productId);
 };
 
 const toggleProduct = (product) => {
@@ -619,7 +639,7 @@ const handleSubmit = async () => {
     saving.value = true;
     try {
         const formData = new FormData();
-        
+
         // Add all form fields
         Object.keys(form.value).forEach(key => {
             if (key !== 'image' && key !== 'banner_image' && key !== 'products' && key !== 'image_url' && key !== 'banner_image_url') {

@@ -98,7 +98,8 @@
                                     <span
                                         class="text-sm font-medium text-white group-hover:text-primary transition-colors">{{
                                             formatVariantAttributes(variant.attributes) }}</span>
-                                    <span v-if="parseFloat(variant.price) > 0" class="text-xs text-primary font-bold ml-2">
+                                    <span v-if="parseFloat(variant.price) > 0"
+                                        class="text-xs text-primary font-bold ml-2">
                                         + ৳{{ formatPrice(variant.price) }}
                                     </span>
                                 </div>
@@ -247,6 +248,7 @@ import { useWishlistStore } from '../stores/wishlist';
 import { Star, ShoppingCart, Heart, CheckCircle, Minus, Plus, Package } from 'lucide-vue-next';
 import axios from '../axios';
 import ProductCard from '../components/ProductCard.vue';
+import { trackViewItem, trackAddToCart as trackAddToCartGA4 } from '../utils/analytics';
 
 const route = useRoute();
 const cartStore = useCartStore();
@@ -263,14 +265,14 @@ const selectedVariant = ref(null);
 const productImages = computed(() => {
     if (!product.value) return [];
     const images = [];
-    
+
     // Add main product image
     if (product.value.image_url) {
         images.push(product.value.image_url);
     } else if (product.value.image) {
         images.push(product.value.image.startsWith('http') ? product.value.image : `/storage/${product.value.image}`);
     }
-    
+
     // Add gallery images
     if (product.value.images && product.value.images.length > 0) {
         product.value.images.forEach(img => {
@@ -283,8 +285,8 @@ const productImages = computed(() => {
             }
         });
     }
-    
-    return images.length > 0 ? images : ['/assets/placeholder.png'];
+
+    return images.length > 0 ? images : ['/assets/placeholder.webp'];
 });
 
 const selectedImage = ref('');
@@ -306,7 +308,7 @@ const fetchProduct = async () => {
         const response = await axios.get(`/products/${route.params.slug}`);
         product.value = response.data;
         selectedImage.value = productImages.value[0];
-        
+
         // Check if product has variants
         if (product.value.has_variants && product.value.variants && product.value.variants.length > 0) {
             selectedVariant.value = product.value.variants[0];
@@ -314,6 +316,9 @@ const fetchProduct = async () => {
 
         // Fetch related products
         fetchRelatedProducts();
+
+        // Track View Item
+        trackViewItem(product.value);
     } catch (error) {
         console.error('Error fetching product:', error);
         product.value = null;
@@ -386,7 +391,7 @@ const decrementQty = () => {
 
 const addToCart = () => {
     if ((product.value.total_stock || 0) === 0) return;
-    
+
     // Check if variant is required but not selected
     if (product.value.has_variants && !selectedVariant.value) {
         alert('Please select a variant');
@@ -398,7 +403,7 @@ const addToCart = () => {
         id: product.value.id,
         name: product.value.name,
         slug: product.value.slug || product.value.id || String(product.value.id),
-        price: selectedVariant.value 
+        price: selectedVariant.value
             ? (parseFloat(product.value.event_price || product.value.sellable_price || product.value.price) + parseFloat(selectedVariant.value.price))
             : (product.value.event_price || product.value.sellable_price || product.value.price),
         image: product.value.image_url || product.value.image,
@@ -418,6 +423,7 @@ const addToCart = () => {
     } : null;
 
     cartStore.addItem(cartProduct, variant, quantity.value);
+    trackAddToCartGA4(cartProduct, quantity.value);
 };
 
 const toggleWishlist = () => {

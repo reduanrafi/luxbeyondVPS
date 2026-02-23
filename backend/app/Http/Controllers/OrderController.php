@@ -59,11 +59,20 @@ class OrderController extends Controller
 
         // Search
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('order_number', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('user', function($userQuery) use ($request) {
-                      $userQuery->where('name', 'like', '%' . $request->search . '%')
-                                ->orWhere('email', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', '%' . $search . '%')
+                  ->orWhere('id', 'like', '%' . $search . '%')
+                  ->orWhere('payment_reference', 'like', '%' . $search . '%')
+                  ->orWhere('shipping_phone', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('email', 'like', '%' . $search . '%')
+                                ->orWhere('phone', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('items', function($itemQuery) use ($search) {
+                      $itemQuery->where('product_name', 'like', '%' . $search . '%')
+                                ->orWhere('product_sku', 'like', '%' . $search . '%');
                   });
             });
         }

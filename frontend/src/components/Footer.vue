@@ -19,19 +19,15 @@
                         your doorstep with ease, security, and style.
                     </p>
                     <div class="flex gap-4 pt-2">
-                        <a href="https://www.facebook.com/luxbeyondus" target="_blank"
+                        <a href="https://www.facebook.com/luxbeyond.store" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Facebook class="w-5 h-5" />
                         </a>
-                        <a href="#"
-                            class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
-                            <Twitter class="w-5 h-5" />
-                        </a>
-                        <a href="#"
+                        <a href="https://www.instagram.com/luxbeyondbd" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Instagram class="w-5 h-5" />
                         </a>
-                        <a href="#"
+                        <a href="https://www.linkedin.com/company/luxbeyondbd" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Linkedin class="w-5 h-5" />
                         </a>
@@ -105,7 +101,8 @@
                     <div class="space-y-3">
                         <div class="flex items-start gap-3 text-slate-400">
                             <MapPin class="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                            <span class="text-sm">123 Luxury Lane, Business District, New York, NY 10001</span>
+                            <span class="text-sm">Flat 4B,House 33,Road 03,Sector 09,Uttara, Dhaka, Bangladesh,
+                                1230</span>
                         </div>
                         <div class="flex items-center gap-3 text-slate-400">
                             <Mail class="w-5 h-5 text-accent shrink-0" />
@@ -126,7 +123,8 @@
                     <span class="text-sm text-blue-100/50">We Accept:</span>
                     <div class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
                         <CreditCard class="w-4 h-4 text-blue-100/70" />
-                        <span class="text-xs text-blue-100/70 font-medium tracking-wide">VISA • MASTERCARD • AMEX</span>
+                        <span class="text-xs text-blue-100/70 font-medium tracking-wide">VISA • bKash • Bank
+                            Transfer</span>
                     </div>
                 </div>
 
@@ -141,5 +139,5 @@
 </template>
 
 <script setup>
-import { Facebook, Twitter, Instagram, Linkedin, ArrowRight, MapPin, Mail, CreditCard } from 'lucide-vue-next';
+import { Facebook, Instagram, Linkedin, ArrowRight, MapPin, Mail, CreditCard } from 'lucide-vue-next';
 </script>

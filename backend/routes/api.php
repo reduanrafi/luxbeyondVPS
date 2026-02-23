@@ -40,6 +40,33 @@ Route::get('/payment-methods', function () {
     $methods = \App\Models\PaymentMethod::where('is_active', true)
         ->orderBy('sort_order')
         ->get();
+    
+    // If no payment methods found in database, return default methods
+    if ($methods->isEmpty()) {
+        return response()->json([
+            [
+                'id' => 0,
+                'type' => 'bkash',
+                'name' => 'bKash',
+                'description' => 'Pay with bKash mobile wallet',
+                'is_active' => true,
+                'is_online' => true,
+                'sort_order' => 1,
+                'config' => null // Will use .env credentials
+            ],
+            [
+                'id' => 0,
+                'type' => 'bank_transfer',
+                'name' => 'Bank Transfer',
+                'description' => 'Pay via bank transfer and upload payment slip',
+                'is_active' => true,
+                'is_online' => false,
+                'sort_order' => 2,
+                'config' => null
+            ]
+        ]);
+    }
+    
     return response()->json($methods);
 });
 
@@ -54,6 +81,9 @@ Route::get('/payments/bkash/callback', [\App\Http\Controllers\PaymentController:
 // Public Tracking
 Route::post('/track-order', [\App\Http\Controllers\Public\TrackingController::class, 'track']);
 
+// Facebook Catalog XML
+Route::get('/catalog.xml', [\App\Http\Controllers\Public\CatalogController::class, 'facebookCatalog']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
@@ -64,6 +94,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('product-requests', ProductRequestController::class);
     Route::post('/product-requests/{id}/payment', [ProductRequestController::class, 'submitPaymentDetails']);
     Route::post('/product-requests/{id}/confirm-order', [ProductRequestController::class, 'confirmOrder']);
+    Route::post('/product-requests/create-order', [ProductRequestController::class, 'createOrderFromRequests']); // New Route
     Route::post('/product-requests/{id}/update-quantity', [ProductRequestController::class, 'updateQuantity']);
     
     // Orders (for customers)

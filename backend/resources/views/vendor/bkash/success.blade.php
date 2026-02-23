@@ -19,7 +19,7 @@
 <main class="container mx-auto px-4 py-12">
     <div class="max-w-2xl mx-auto">
         <!-- Payment Success Card -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-500 overflow-hidden">
             <!-- Header Section with bKash Branding -->
             <div class="bg-green-600 px-6 py-8 text-center">
                 <div class="flex justify-center mb-4">

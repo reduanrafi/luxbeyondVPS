@@ -61,6 +61,44 @@ export const useNotificationStore = defineStore('notification', {
                 read: false,
                 read_at: null
             });
+        },
+
+        startPolling(interval = 30000) {
+            if (this.pollingInterval) return;
+            
+            // Initial fetch
+            this.fetchNotifications();
+            
+            this.pollingInterval = setInterval(() => {
+                this.fetchNotifications();
+            }, interval);
+        },
+
+        stopPolling() {
+            if (this.pollingInterval) {
+                clearInterval(this.pollingInterval);
+                this.pollingInterval = null;
+            }
+        },
+
+        async handleNotificationClick(notification, router) {
+            // Mark as read if not already
+            if (!notification.read_at) {
+                await this.markAsRead(notification.id);
+            }
+            
+            // Navigate if URL exists
+            const url = notification.data?.url || notification.url;
+            if (url && router) {
+                router.push(url);
+            }
+        }
+    },
+    
+    // Cleanup on store disposal if possible
+    onAction({ name, store }) {
+        if (name === 'stopPolling') {
+            store.stopPolling();
         }
     }
 });
