@@ -199,29 +199,21 @@ class ProductController extends Controller
                 $definitions = json_decode($definitions, true);
             }
 
-            // We need to handle file uploads for attribute images if any
-            // The frontend should send files separately or we handle base64?
-            // Standard way: frontend sends files in `attribute_images[attr_index][value_index]`
-            // But for simplicity let's assume frontend handles image upload separately or we use the existing variant image logic.
-            // Actually, the user wants "Admin can also has option to upload images as attribute".
-            // Let's stick to the plan: store definitions. If images are needed, we might need a separate upload logic.
-            // For now, let's just save the JSON structure.
-
             $validated['attribute_definitions'] = $definitions;
         }
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('products/images', 'public');
-        }
-
         $product = Product::create($validated);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store("products/$product->slug/images", 'public');
+        }
 
         // Handle Variants
         if ($request->has_variants && !empty($request->variants)) {
             foreach ($request->variants as $index => $variantData) {
                 // Handle variant image
                 if ($request->hasFile("variant_images.$index")) {
-                    $variantData['image'] = $request->file("variant_images.$index")->store('products/variants', 'public');
+                    $variantData['image'] = $request->file("variant_images.$index")->store("products/$product->slug/variants", 'public');
                 }
                 $product->variants()->create($variantData);
             }
@@ -230,7 +222,7 @@ class ProductController extends Controller
         // Handle Gallery
         if ($request->hasFile('gallery')) {
             foreach ($request->file('gallery') as $index => $file) {
-                $path = $file->store('products/gallery', 'public');
+                $path = $file->store("products/$product->slug/gallery", 'public');
                 $type = str_starts_with($file->getMimeType(), 'video') ? 'video' : 'image';
                 $product->images()->create([
                     'path' => $path,

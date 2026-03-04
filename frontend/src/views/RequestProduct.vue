@@ -537,13 +537,14 @@ const submitRequest = async () => {
         };
         const response = await axios.post('/product-requests', payload);
         const requestData = response.data.data || response.data;
+        const request = requestData?.product_request;
 
         trackPurchase({
-            order_number: requestData.request_number || ('REQ-' + requestData.id),
+            order_number: request?.request_number,
             total: costBreakdown.value?.grand_total || 0,
             currency: 'BDT',
             items: [{
-                product_id: requestData.id,
+                product_id: request?.id,
                 product_name: form.value.url,
                 price: costBreakdown.value?.grand_total / form.value.quantity,
                 quantity: form.value.quantity
@@ -551,7 +552,7 @@ const submitRequest = async () => {
         });
 
         toast.success('Product request submitted successfully!');
-        router.push('/dashboard/requests');
+        router.push(`/thank-you?type=request&id=${request?.request_number}`);
     } catch (e) {
         toast.error(e.response?.data?.message || 'Error submitting request');
     } finally {

@@ -94,6 +94,9 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
+
+        \Log::info('Request cart store',$request->all());
+
         $user = $request->user();
 
         $data = $request->validate([
@@ -139,17 +142,18 @@ class CartController extends Controller
         
         $finalPrice = $finalProductPrice + $variantPrice;
 
-        $cartItem = CartItem::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'product_id' => $product->id,
-                'product_variant_id' => $variant?->id,
-            ],
-            [
-                'quantity' => $data['quantity'],
-                'price' => $finalPrice,
-            ]
-        );
+       $cartItem = CartItem::firstOrNew([
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'product_variant_id' => $variant?->id,
+        ]);
+
+        \Log::info('Cart item',[$cartItem]);
+        $cartItem->quantity = ($cartItem->exists ? $cartItem->quantity : 0) + $data['quantity'];
+
+        $cartItem->price = $finalPrice;
+
+        $cartItem->save();
 
         return response()->json([
             'message' => 'Cart updated successfully',

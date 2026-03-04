@@ -237,6 +237,12 @@ const routes = [
         component: () => import('../views/Checkout.vue'),
         meta: { requiresAuth: true, title: 'Checkout', description: 'Checkout luxbeyond' },
     },
+    {
+        path: '/thank-you',
+        name: 'thank-you',
+        component: () => import('../views/ThankYou.vue'),
+        meta: { title: 'Thank You', description: 'Thank you for your order' },
+    },
 
     // Public Pages
     { path: '/travellers', component: () => import('../views/TravellerLanding.vue'), meta: { title: 'Travellers', description: 'Travellers luxbeyond' } },

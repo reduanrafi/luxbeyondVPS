@@ -19,7 +19,8 @@ class ProductRequestController extends Controller
         $user = Auth::user();
         
         $query = ProductRequest::with(['orderStatus', 'timeline'])
-            ->where('user_id', $user->id);
+            ->where('user_id', $user->id)
+            ->whereDoesntHave('orderItem');
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;
@@ -219,6 +220,7 @@ class ProductRequestController extends Controller
             'charges_breakdown' => $chargesBreakdown,
         ]);
 
+        $productRequest->refresh();
         // Create initial timeline entry
         \App\Models\ProductRequestTimeline::create([
             'product_request_id' => $productRequest->id,
@@ -686,6 +688,7 @@ class ProductRequestController extends Controller
             'request_items.*.quantity' => 'required|integer|min:1',
             'payment_method' => 'required|string|in:bkash,bank_transfer',
             'payment_type' => 'nullable|string|in:full,partial',
+            'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
             'shipping_address' => 'required|array',
             'shipping_address.street' => 'required|string',
             'shipping_address.city' => 'required|string',
@@ -776,9 +779,25 @@ class ProductRequestController extends Controller
                 'notes' => 'Combined Order from Requests: ' . implode(', ', $productRequests->pluck('request_number')->toArray()),
             ]);
 
+            // Handle Payslip upload
+            if ($request->hasFile('payment_slip')) {
+                $file = $request->file('payment_slip');
+               $folder = 'payment_slips';
+                $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
+                
+                $file->storeAs($folder, $filename, 'public');
+                $newPath = $folder . '/' . $filename;
+                
+                $order->update([
+                    'payment_slip' => $newPath,
+                    'payment_status' => 'pending', 
+                ]);
+            }
+
             // Create Order Items and Update Requests
             foreach ($productRequests as $req) {
                 \App\Models\OrderItem::create([
+                    'request_id' => $req->id,
                     'order_id' => $order->id,
                     'product_name' => $req->product_name ?? 'Product Request #' . $req->request_number,
                     'price' => $req->price,

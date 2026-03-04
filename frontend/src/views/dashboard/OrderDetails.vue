@@ -73,10 +73,17 @@
                                         @click="item.product && router.push(`/shop/${item.product.slug}`)">
                                         <div
                                             class="w-16 h-16 bg-white/5 rounded-none overflow-hidden border border-white/10 group-hover:border-primary/50 transition-colors">
-                                            <img v-if="item.image || (item.product && item.product.image)"
-                                                :src="item.image || (item.product ? item.product.image_url : null)"
-                                                :alt="item.product_name"
-                                                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                                            <div v-if="item.request">
+                                                <img :src="item.request.admin_image_url"
+                                                    :alt="item.request.product_name"
+                                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                                            </div>
+                                            <div v-else-if="item.product">
+                                                <img v-if="item.image || (item.product && item.product.image)"
+                                                    :src="item.image || (item.product ? item.product.image_url : null)"
+                                                    :alt="item.product_name"
+                                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                                            </div>
                                             <div v-else
                                                 class="w-full h-full flex items-center justify-center text-slate-500 text-xs">
                                                 No Image
@@ -85,7 +92,7 @@
                                         <div>
                                             <p
                                                 class="text-sm font-bold text-white group-hover:text-primary transition-colors">
-                                                {{ item.product_name }}</p>
+                                                {{ item.request?.product_name || item.product?.name }}</p>
                                             <p v-if="item.product_sku" class="text-xs text-slate-400 mt-1">SKU: {{
                                                 item.product_sku }}</p>
                                             <p v-if="item.variant_data" class="text-xs text-slate-500 mt-1">{{
@@ -118,7 +125,9 @@
                         <p><span class="font-semibold text-slate-300">Phone:</span> <span class="text-slate-400">{{
                             order.shipping_phone || 'N/A' }}</span></p>
                         <p><span class="font-semibold text-slate-300">Address:</span> <span class="text-slate-400">{{
-                            order.shipping_address || 'N/A' }}</span></p>
+                            JSON.parse(order.shipping_address).street + ', ' +
+                            JSON.parse(order.shipping_address).city || 'N/A' }}</span>
+                        </p>
                     </div>
                 </div>
 
@@ -252,13 +261,19 @@
                     </div>
                     <div>
                         <p class="text-sm text-slate-300 mb-1">
-                            <span class="font-semibold">Transaction ID:</span>
-                            <span class="font-mono text-slate-400 ml-2">{{ order.payment_reference || 'N/A' }}</span>
+                            <span class="font-semibold">Payment Method</span>
+                            <span class="font-mono text-slate-400 ml-2">{{
+                                order.payment_method?.replace('_', ' ').toUpperCase() ||
+                                'N/A' }}</span>
                         </p>
                         <a :href="order.payment_slip_url" target="_blank"
-                            class="text-xs font-bold text-primary hover:underline uppercase tracking-wide">
-                            View Uploaded Slip →
+                            class="text-xs font-bold text-primary hover:underline uppercase tracking-wide"
+                            v-if="order.payment_method === 'bank_transfer'">
+                            View Slip →
                         </a>
+                        <span v-else>
+                            Transaction Id: {{ order.payment_reference }}
+                        </span>
                     </div>
                     <div class="ml-auto">
                         <span

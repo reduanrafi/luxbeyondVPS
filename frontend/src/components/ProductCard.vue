@@ -48,14 +48,20 @@
       </p>
 
       <!-- Price -->
-      <div class="mb-4">
+      <div class="mb-4" v-if="!product.has_variants">
         <span
           v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
           class="text-sm text-slate-600 line-through mr-2">
           ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
         </span>
-        <span class="text-2xl font-serif text-primary font-bold">
+        <span class="text-xl font-serif text-primary font-bold">
           ৳{{ formatPrice(product.event_price || product.sellable_price || product.price) }}
+        </span>
+      </div>
+      <div v-else>
+        <span class="text-xl font-serif text-primary font-bold">
+          ৳{{ formatPrice(product.variants[0].price) }} - {{ formatPrice(product.variants[product.variants.length -
+            1].price) }}
         </span>
       </div>
 

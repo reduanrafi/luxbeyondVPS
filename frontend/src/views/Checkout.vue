@@ -118,7 +118,7 @@
                                     </div>
                                     <div v-if="method.fee_percentage || method.fee" class="text-xs text-slate-600 mt-1">
                                         <span v-if="method.fee_percentage">Processing fee: {{ method.fee_percentage
-                                            }}%</span>
+                                        }}%</span>
                                         <span v-else-if="method.fee">Processing fee: ৳{{ method.fee }}</span>
                                     </div>
                                     <!-- Show payment instructions for manual methods -->
@@ -316,7 +316,7 @@
                                         </span>
                                     </span>
                                     <span class="font-semibold text-white">৳{{ formatPrice(charge.amount_in_bdt)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </template>
                             <div class="flex justify-between text-sm">
@@ -346,7 +346,7 @@
                                 <div class="flex justify-between text-sm">
                                     <span class="text-primary font-semibold">Payment Now ({{
                                         checkoutSettings.min_payment_percentage_shop
-                                    }}%)</span>
+                                        }}%)</span>
                                     <span class="font-bold text-primary">৳{{ formatPrice(bkashPaymentAmount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
@@ -354,13 +354,13 @@
                                         checkoutSettings.min_payment_percentage_shop }}%)</span>
                                     <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total -
                                         bkashPaymentAmount)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="border-t border-white/10 pt-3 flex justify-between">
                                 <span class="text-lg font-bold text-white">Total</span>
                                 <span class="text-lg font-bold text-primary">৳{{ formatPrice(orderSummary.total)
-                                    }}</span>
+                                }}</span>
                             </div>
                             <div v-if="orderSummary.min_payment > 0"
                                 class="text-xs text-slate-600 pt-2 border-t border-white/5">
@@ -713,9 +713,12 @@ const placeOrder = async () => {
             // For manual payment methods, clear cart and redirect
             trackPurchase(order);
             cartStore.clearCart();
+            uploadPaymentSlip()
 
             // Redirect to order confirmation
-            router.push(`/dashboard/orders/${order.id}`);
+            let id = order.order_number ?? order.request_number
+
+            router.push(`/thank-you?type=order&id=${id}`);
         }
     } catch (error) {
         console.error('Error placing order:', error);
@@ -758,6 +761,7 @@ const uploadPaymentSlip = async () => {
         formData.append('payment_slip', paymentSlipFile.value);
         formData.append('order_id', currentOrder.value.id);
 
+        let id = currentOrder.value.order_number ?? currentOrder.value.request_number
         const response = await axios.post(`/orders/${currentOrder.value.id}/upload-payment-slip`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -771,11 +775,9 @@ const uploadPaymentSlip = async () => {
         // Clear cart after successful upload
         cartStore.clearCart();
 
-        alert('Payment slip uploaded successfully! Your order is pending verification.');
-
-        // Redirect to order page after a delay
+        // Redirect to thank you page after a delay
         setTimeout(() => {
-            router.push(`/dashboard/orders/${currentOrder.value.id}`);
+            router.push(`/thank-you?type=order&id=${id}`);
         }, 2000);
     } catch (error) {
         console.error('Error uploading payment slip:', error);

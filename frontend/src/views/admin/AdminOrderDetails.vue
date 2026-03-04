@@ -20,7 +20,7 @@
                 <button @click="printInvoice"
                     class="flex items-center gap-2 px-4 py-2.5 bg-white/5 text-zinc-300 font-bold uppercase tracking-wider text-xs rounded-lg hover:bg-white/10 hover:text-white transition-colors border border-white/10">
                     <Printer class="w-4 h-4" />
-                    Print Invoice
+                    Invoice
                 </button>
                 <button @click="$router.push('/admin/orders')"
                     class="flex items-center gap-2 px-4 py-2.5 bg-primary text-black font-bold uppercase tracking-wider text-xs rounded-lg hover:bg-primary-hover transition-colors">
@@ -256,6 +256,10 @@
                         </div>
                     </div>
 
+                    <div v-if="order.payments">
+                        {{ order.payments }}
+                    </div>
+
                     <!-- Status History -->
                     <div v-if="order.status_histories && order.status_histories.length > 0"
                         class="bg-[#111111] rounded-xl border border-white/5 overflow-hidden">
@@ -275,7 +279,7 @@
                                         <span class="text-sm font-bold text-white">{{ history.status?.label || `Status
                                             Changed` }}</span>
                                         <span class="text-xs text-zinc-500 mt-0.5">{{ formatDate(history.created_at)
-                                        }}</span>
+                                            }}</span>
                                         <p v-if="history.note"
                                             class="text-xs text-zinc-400 mt-2 bg-white/5 p-2 rounded border border-white/5">
                                             {{ history.note }}

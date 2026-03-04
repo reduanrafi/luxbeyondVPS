@@ -34,6 +34,7 @@ class Order extends Model
         'shipped_at',
         'delivered_at',
         'paid_at',
+        'request_id'
     ];
 
     protected $casts = [
@@ -101,6 +102,11 @@ class Order extends Model
         return $this->hasMany(OrderPayment::class);
     }
 
+    public function productRequests()
+{
+    return $this->belongsToMany(ProductRequest::class, 'order_product_request');
+}
+
     /**
      * Get the total amount paid (sum of completed payments)
      */
@@ -155,6 +161,6 @@ class Order extends Model
         if (!$this->payment_slip) {
             return null;
         }
-        return asset('storage/' . $this->payment_slip);
+        return \Storage::disk('public')->url($this->payment_slip);
     }
 }

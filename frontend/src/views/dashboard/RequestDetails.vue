@@ -86,7 +86,8 @@
                                     </div>
                                     <div class="bg-slate-800 rounded-lg p-3 border border-slate-700">
                                         <p class="text-xs text-slate-500 mb-2">Quantity</p>
-                                        <div class="flex items-center gap-2">
+                                        <div class="flex items-center gap-2"
+                                            v-if="request.status === 'request_accepted' || request.status === 'accepted'">
                                             <button @click="decreaseQuantity"
                                                 :disabled="updatingQuantity || editableQuantity <= 1"
                                                 class="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded text-white font-bold transition-colors">
@@ -101,7 +102,9 @@
                                                 +
                                             </button>
                                         </div>
-                                        <p v-if="updatingQuantity" class="text-xs text-primary mt-1">Updating...</p>
+                                        <div v-else>
+                                            <p class="text-xs text-primary mt-1">{{ editableQuantity }}</p>
+                                        </div>
                                     </div>
                                     <div class="bg-slate-800 rounded-lg p-3 border border-slate-700">
                                         <p class="text-xs text-slate-500 mb-1">Subtotal</p>
@@ -185,7 +188,37 @@ const openAddressModal = () => {
 const handleConfirmOrder = async (orderPayload) => {
     confirmingOrder.value = true;
     try {
-        const response = await axios.post('/product-requests/create-order', orderPayload);
+        let payload = orderPayload;
+        let config = {};
+
+        // If there's a payment slip, we must send FormData
+        if (orderPayload.payment_slip) {
+            payload = new FormData();
+
+            payload.append('payment_method', orderPayload.payment_method);
+            if (orderPayload.payment_type) {
+                payload.append('payment_type', orderPayload.payment_type);
+            }
+
+            Object.keys(orderPayload.shipping_address).forEach(key => {
+                payload.append(`shipping_address[${key}]`, orderPayload.shipping_address[key]);
+            });
+
+            orderPayload.request_items.forEach((item, index) => {
+                payload.append(`request_items[${index}][id]`, item.id);
+                payload.append(`request_items[${index}][quantity]`, item.quantity);
+            });
+
+            payload.append('payment_slip', orderPayload.payment_slip);
+
+            config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            };
+        }
+
+        const response = await axios.post('/product-requests/create-order', payload, config);
 
         showAddressModal.value = false;
 

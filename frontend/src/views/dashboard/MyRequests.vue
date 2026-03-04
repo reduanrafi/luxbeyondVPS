@@ -213,7 +213,37 @@ const openConfirmationModal = () => {
 const createOrder = async (orderPayload) => {
     creatingOrder.value = true;
     try {
-        const response = await axios.post('/product-requests/create-order', orderPayload);
+        let payload = orderPayload;
+        let config = {};
+
+        // If there's a payment slip, we must send FormData
+        if (orderPayload.payment_slip) {
+            payload = new FormData();
+
+            payload.append('payment_method', orderPayload.payment_method);
+            if (orderPayload.payment_type) {
+                payload.append('payment_type', orderPayload.payment_type);
+            }
+
+            Object.keys(orderPayload.shipping_address).forEach(key => {
+                payload.append(`shipping_address[${key}]`, orderPayload.shipping_address[key]);
+            });
+
+            orderPayload.request_items.forEach((item, index) => {
+                payload.append(`request_items[${index}][id]`, item.id);
+                payload.append(`request_items[${index}][quantity]`, item.quantity);
+            });
+
+            payload.append('payment_slip', orderPayload.payment_slip);
+
+            config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            };
+        }
+
+        const response = await axios.post('/product-requests/create-order', payload, config);
 
         showAddressModal.value = false;
 

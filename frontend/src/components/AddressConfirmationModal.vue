@@ -116,6 +116,16 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- Bank Transfer Payment Options -->
+                    <div v-if="paymentMethod === 'bank_transfer'"
+                        class="mt-4 space-y-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Upload
+                            Payment Slip (Optional)</label>
+                        <input type="file" accept="image/*,application/pdf" @change="handleFileUpload"
+                            class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-slate-900 hover:file:bg-white transition-all cursor-pointer">
+                        <p class="text-xs text-slate-500 mt-2">Accepted formats: JPG, PNG, PDF. Max size: 5MB.</p>
+                    </div>
                 </div>
 
                 <!-- Address Form -->
@@ -185,6 +195,16 @@ const emit = defineEmits(['close', 'confirm']);
 const editableItems = ref([]);
 const paymentMethod = ref('bkash');
 const paymentType = ref('partial');
+const paymentSlip = ref(null);
+
+const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        paymentSlip.value = file;
+    } else {
+        paymentSlip.value = null;
+    }
+};
 
 const form = ref({
     street: '',
@@ -240,8 +260,8 @@ const formatPrice = (price) => {
 };
 
 const submit = () => {
-    if (!form.value.street || !form.value.city || !form.value.phone) {
-        alert('Please fill in required fields (Street, City, Phone)');
+    if (!form.value.street || !form.value.city || !form.value.phone || !paymentSlip.value) {
+        alert('Please fill in required fields (Street, City, Phone) and upload payment slip');
         return;
     }
 
@@ -252,7 +272,8 @@ const submit = () => {
             quantity: item.quantity
         })),
         payment_method: paymentMethod.value,
-        payment_type: paymentType.value
+        payment_type: paymentType.value,
+        payment_slip: paymentSlip.value
     });
 };
 </script>

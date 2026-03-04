@@ -22,6 +22,8 @@ class OrderPayment extends Model
         'paid_at' => 'datetime',
     ];
 
+    protected $appends = ['payment_slip_url'];
+
     public function order()
     {
         return $this->belongsTo(Order::class);

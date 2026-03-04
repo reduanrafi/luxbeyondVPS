@@ -277,7 +277,7 @@ class PaymentController extends Controller
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
-            'payment_slip' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+            'payment_slip' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:5120', // 5MB max
             'transaction_id' => 'nullable|string|max:255',
         ]);
 
