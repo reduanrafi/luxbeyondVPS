@@ -160,7 +160,7 @@ class EventController extends Controller
 
         // Refresh to get accessors
         $event->refresh();
-        
+
         // Load relationships
         $event->load('products');
 
@@ -245,10 +245,10 @@ class EventController extends Controller
         // Extract products - FormData sends products[] as array
         // When using FormData with products[], Laravel parses it as 'products' key
         $products = [];
-        
+
         // Get all request data to check for products
         $allInput = $request->all();
-        
+
         // Check if products are sent in the request (FormData sends products[] as 'products' array)
         if (isset($allInput['products']) && is_array($allInput['products'])) {
             $products = $allInput['products'];
@@ -258,7 +258,7 @@ class EventController extends Controller
                 $products = json_decode($products, true) ?? [];
             }
         }
-        
+
         // Log for debugging
         \Log::debug('Products received in update', [
             'has_products' => $request->has('products'),
@@ -267,7 +267,7 @@ class EventController extends Controller
             'products_array' => $products,
             'products_count' => count($products)
         ]);
-        
+
         // Filter out any non-numeric values and ensure they're integers
         $products = array_values(array_filter(array_map('intval', $products), function($id) {
             return $id > 0;
@@ -291,7 +291,7 @@ class EventController extends Controller
 
         // Refresh to get accessors
         $event->refresh();
-        
+
         // Load relationships
         $event->load('products');
 
@@ -341,7 +341,7 @@ class EventController extends Controller
         $products = $query->select('id', 'name', 'image', 'price', 'sellable_price')
             ->limit(100)
             ->get();
-        
+
         // image_url is automatically included via the Product model's $appends array
 
         return response()->json($products);

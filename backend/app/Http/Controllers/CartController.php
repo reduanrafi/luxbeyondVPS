@@ -94,9 +94,6 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-
-        \Log::info('Request cart store',$request->all());
-
         $user = $request->user();
 
         $data = $request->validate([
@@ -148,7 +145,6 @@ class CartController extends Controller
             'product_variant_id' => $variant?->id,
         ]);
 
-        \Log::info('Cart item',[$cartItem]);
         $cartItem->quantity = ($cartItem->exists ? $cartItem->quantity : 0) + $data['quantity'];
 
         $cartItem->price = $finalPrice;
