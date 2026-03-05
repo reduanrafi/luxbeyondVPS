@@ -81,7 +81,7 @@ class WishlistController extends Controller
      */
     public function destroy(Request $request, WishlistItem $wishlistItem)
     {
-        if ($wishlistItem->user_id !== $request->user()->id) {
+        if ($wishlistItem->user_id != $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 

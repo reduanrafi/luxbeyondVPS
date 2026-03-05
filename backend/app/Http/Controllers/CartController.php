@@ -27,7 +27,7 @@ class CartController extends Controller
                 // Get base price logic
                 $productBasePrice = $product->sellable_price ?? $product->price;
                 $variantPrice = $variant ? $variant->price : 0;
-                
+
                 // Original price is Product Original (if exists) or Product Base + Variant Price
                 $productOriginalPrice = $product->sellable_price ? $product->original_price : $product->price;
                 $originalPrice = $productOriginalPrice + $variantPrice;
@@ -57,7 +57,7 @@ class CartController extends Controller
                         $finalProductPrice = $productBasePrice - $discountAmount;
                     }
                 }
-                
+
                 $finalPrice = $finalProductPrice + $variantPrice;
 
                 return [
@@ -110,7 +110,7 @@ class CartController extends Controller
         // Get base price logic
         $productBasePrice = $product->sellable_price ?? $product->price;
         $variantPrice = $variant ? $variant->price : 0;
-        
+
         $finalProductPrice = $productBasePrice;
 
         // Check if product is in any active event with price
@@ -136,7 +136,7 @@ class CartController extends Controller
                 $finalProductPrice = $productBasePrice - $discountAmount;
             }
         }
-        
+
         $finalPrice = $finalProductPrice + $variantPrice;
 
         $cartItem = CartItem::updateOrCreate(
@@ -162,7 +162,7 @@ class CartController extends Controller
      */
     public function update(Request $request, CartItem $cartItem)
     {
-        if ($cartItem->user_id !== $request->user()->id) {
+        if ($cartItem->user_id != $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -185,7 +185,7 @@ class CartController extends Controller
      */
     public function destroy(Request $request, CartItem $cartItem)
     {
-        if ($cartItem->user_id !== $request->user()->id) {
+        if ($cartItem->user_id != $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
