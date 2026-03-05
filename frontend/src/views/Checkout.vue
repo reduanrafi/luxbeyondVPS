@@ -118,7 +118,7 @@
                                     </div>
                                     <div v-if="method.fee_percentage || method.fee" class="text-xs text-slate-600 mt-1">
                                         <span v-if="method.fee_percentage">Processing fee: {{ method.fee_percentage
-                                            }}%</span>
+                                        }}%</span>
                                         <span v-else-if="method.fee">Processing fee: ৳{{ method.fee }}</span>
                                     </div>
                                     <!-- Show payment instructions for manual methods -->
@@ -163,7 +163,8 @@
                                             Partial Payment ({{ checkoutSettings.min_payment_percentage_shop }}%)
                                         </div>
                                         <div class="text-xs text-slate-500 mt-1">
-                                            Pay {{ checkoutSettings.min_payment_percentage_shop }}% now, {{ 100 - checkoutSettings.min_payment_percentage_shop }}% on delivery
+                                            Pay {{ checkoutSettings.min_payment_percentage_shop }}% now, {{ 100 -
+                                                checkoutSettings.min_payment_percentage_shop }}% on delivery
                                         </div>
                                     </div>
                                 </div>
@@ -188,7 +189,7 @@
                             class="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-none">
                             <p class="text-xs text-slate-300">
                                 <strong class="text-primary">Note:</strong> Remaining ৳{{ formatPrice(orderSummary.total
-                                * 0.4) }} will be collected on delivery.
+                                    * 0.4) }} will be collected on delivery.
                             </p>
                         </div>
                     </div>
@@ -315,7 +316,7 @@
                                         </span>
                                     </span>
                                     <span class="font-semibold text-white">৳{{ formatPrice(charge.amount_in_bdt)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </template>
                             <div class="flex justify-between text-sm">
@@ -343,19 +344,23 @@
                             <div v-if="selectedPaymentMethod === 'bkash' && paymentAmount === 'partial'"
                                 class="space-y-2 py-3 border-t border-white/10">
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-primary font-semibold">Payment Now ({{ checkoutSettings.min_payment_percentage_shop }}%)</span>
+                                    <span class="text-primary font-semibold">Payment Now ({{
+                                        checkoutSettings.min_payment_percentage_shop
+                                        }}%)</span>
                                     <span class="font-bold text-primary">৳{{ formatPrice(bkashPaymentAmount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span class="text-slate-500">On Delivery ({{ 100 - checkoutSettings.min_payment_percentage_shop }}%)</span>
-                                    <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total - bkashPaymentAmount)
+                                    <span class="text-slate-500">On Delivery ({{ 100 -
+                                        checkoutSettings.min_payment_percentage_shop }}%)</span>
+                                    <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total -
+                                        bkashPaymentAmount)
                                         }}</span>
                                 </div>
                             </div>
                             <div class="border-t border-white/10 pt-3 flex justify-between">
                                 <span class="text-lg font-bold text-white">Total</span>
                                 <span class="text-lg font-bold text-primary">৳{{ formatPrice(orderSummary.total)
-                                    }}</span>
+                                }}</span>
                             </div>
                             <div v-if="orderSummary.min_payment > 0"
                                 class="text-xs text-slate-600 pt-2 border-t border-white/5">
@@ -394,6 +399,7 @@ import { useCartStore } from '../stores/cart';
 import { useAuthStore } from '../stores/auth';
 import { MapPin, CreditCard, ShoppingCart, Lock, Upload, CheckCircle } from 'lucide-vue-next';
 import axios from '../axios';
+import { trackBeginCheckout, trackPurchase } from '../utils/analytics';
 
 const router = useRouter();
 const cartStore = useCartStore();
@@ -445,7 +451,7 @@ const checkoutSettings = ref({
 
 const bkashPaymentAmount = computed(() => {
     if (selectedPaymentMethod.value !== 'bkash') return 0;
-    
+
     // Use dynamic percentage if partial payment selected
     if (paymentAmount.value === 'partial') {
         const percentage = parseFloat(checkoutSettings.value.min_payment_percentage_shop) || 60;
@@ -499,7 +505,7 @@ const isFormValid = computed(() => {
 const getProductImage = (item) => {
     if (item.image_url) return item.image_url;
     if (item.image) return item.image.startsWith('http') ? item.image : `/storage/${item.image}`;
-    return '/assets/placeholder.png';
+    return '/assets/placeholder.webp';
 };
 
 const getItemPrice = (item) => {
@@ -705,10 +711,14 @@ const placeOrder = async () => {
             }
         } else {
             // For manual payment methods, clear cart and redirect
+            trackPurchase(order);
             cartStore.clearCart();
+            uploadPaymentSlip()
 
             // Redirect to order confirmation
-            router.push(`/dashboard/orders/${order.id}`);
+            let id = order.order_number ?? order.request_number
+
+            router.push(`/thank-you?type=order&id=${id}`);
         }
     } catch (error) {
         console.error('Error placing order:', error);
@@ -751,6 +761,7 @@ const uploadPaymentSlip = async () => {
         formData.append('payment_slip', paymentSlipFile.value);
         formData.append('order_id', currentOrder.value.id);
 
+        let id = currentOrder.value.order_number ?? currentOrder.value.request_number
         const response = await axios.post(`/orders/${currentOrder.value.id}/upload-payment-slip`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -760,15 +771,13 @@ const uploadPaymentSlip = async () => {
         currentOrder.value = response.data.order;
         paymentSlipFile.value = null;
         paymentSlipPreview.value = null;
-        
+
         // Clear cart after successful upload
         cartStore.clearCart();
-        
-        alert('Payment slip uploaded successfully! Your order is pending verification.');
-        
-        // Redirect to order page after a delay
+
+        // Redirect to thank you page after a delay
         setTimeout(() => {
-            router.push(`/dashboard/orders/${currentOrder.value.id}`);
+            router.push(`/thank-you?type=order&id=${id}`);
         }, 2000);
     } catch (error) {
         console.error('Error uploading payment slip:', error);
@@ -825,16 +834,19 @@ const handlePaymentCallback = () => {
 };
 
 // Load user data if available
-onMounted(() => {
+onMounted(async () => {
     if (authStore.user) {
         shippingForm.value.email = authStore.user.email || '';
         shippingForm.value.name = authStore.user.name || '';
     }
-    fetchBDTCurrency(); // Just fetch it, don't wait
-    calculateCharges(); // Calculate immediately (currency_id might be null, that's fine now)
+    await fetchBDTCurrency();
+    await fetchCheckoutSettings();
+    await calculateCharges();
     fetchPaymentMethods();
-    fetchCheckoutSettings();
     handlePaymentCallback();
+
+    if (cartStore.items.length > 0) {
+        trackBeginCheckout(cartStore.items, orderSummary.value.total);
+    }
 });
 </script>
-

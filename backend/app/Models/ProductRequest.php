@@ -61,6 +61,12 @@ class ProductRequest extends Model
         return $this->payment_slip ? asset(config('app.storage_repo').'/' . $this->payment_slip) : null;
     }
 
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_product_request')
+                    ->withTimestamps();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -74,5 +80,9 @@ class ProductRequest extends Model
     public function timeline()
     {
         return $this->hasMany(ProductRequestTimeline::class)->orderBy('created_at', 'desc');
+    }
+    public function orderItem()
+    {
+        return $this->hasOne(OrderItem::class, 'request_id');
     }
 }

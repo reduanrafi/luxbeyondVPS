@@ -26,8 +26,7 @@
             </div>
 
             <!-- Products Grid -->
-            <div v-else-if="products.length > 0"
-                class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4  2xl:grid-cols-6 gap-6">
+            <div v-else-if="products.length > 0" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <ProductCard v-for="product in products" :key="product.id" :product="product" view-mode="grid"
                     :show-stock="true" :show-category="true" :show-brand="true" :show-quick-view="true"
                     :show-wishlist="true" />

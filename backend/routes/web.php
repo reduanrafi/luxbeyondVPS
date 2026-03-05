@@ -8,10 +8,16 @@ Route::get('/', function () {
 });
 
 
-Route::get('/clear-cache', function () {
+Route::get('/deploy', function () {
+    Artisan::call('migrate --force');
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
     Artisan::call('view:clear');
     Artisan::call('optimize:clear');
+    return redirect()->back();
+});
+
+Route::get('/storage-link', function () {
+    Artisan::call('storage:link');
     return redirect()->back();
 });

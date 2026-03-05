@@ -38,6 +38,7 @@
                     <!-- Notifications List -->
                     <div class="flex-1 overflow-y-auto p-4 space-y-3">
                         <div v-for="notification in notifications" :key="notification.id"
+                            @click="handleNotificationClick(notification)"
                             class="p-4 bg-background border transition-all hover:border-primary/30 cursor-pointer relative"
                             :class="notification.read ? 'border-white/5' : 'border-primary/20'">
                             <!-- Unread Indicator -->
@@ -56,11 +57,12 @@
                                         :class="notification.read ? 'text-slate-300' : 'text-white'">
                                         {{ notification.data.title || notification.type }}
                                     </p>
-                                    <p class="text-slate-400 text-xs mt-1 leading-relaxed text-wrap">{{ notification.data.message
+                                    <p class="text-slate-400 text-xs mt-1 leading-relaxed text-wrap">{{
+                                        notification.data.message
                                         }}
                                     </p>
                                     <p class="text-slate-600 text-[10px] mt-2 uppercase tracking-wider">{{
-    formatTime(notification.created_at) }}</p>
+                                        formatTime(notification.created_at) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -88,6 +90,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { Bell, X, ShoppingBag, Package, Tag, CheckCircle } from 'lucide-vue-next';
 import { useNotificationStore } from '../stores/notification';
 
@@ -141,5 +144,11 @@ const formatTime = (isoString) => {
 
 const markAllAsRead = async () => {
     await notificationStore.markAllAsRead();
+};
+
+const router = useRouter();
+const handleNotificationClick = async (notification) => {
+    await notificationStore.handleNotificationClick(notification, router);
+    emit('close');
 };
 </script>

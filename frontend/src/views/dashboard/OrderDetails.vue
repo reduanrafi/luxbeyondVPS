@@ -73,10 +73,17 @@
                                         @click="item.product && router.push(`/shop/${item.product.slug}`)">
                                         <div
                                             class="w-16 h-16 bg-white/5 rounded-none overflow-hidden border border-white/10 group-hover:border-primary/50 transition-colors">
-                                            <img v-if="item.image || (item.product && item.product.image)"
-                                                :src="item.image || (item.product ? item.product.image_url : null)"
-                                                :alt="item.product_name"
-                                                class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                                            <div v-if="item.request">
+                                                <img :src="item.request.admin_image_url"
+                                                    :alt="item.request.product_name"
+                                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                                            </div>
+                                            <div v-else-if="item.product">
+                                                <img v-if="item.image || (item.product && item.product.image)"
+                                                    :src="item.image || (item.product ? item.product.image_url : null)"
+                                                    :alt="item.product_name"
+                                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
+                                            </div>
                                             <div v-else
                                                 class="w-full h-full flex items-center justify-center text-slate-500 text-xs">
                                                 No Image
@@ -85,7 +92,7 @@
                                         <div>
                                             <p
                                                 class="text-sm font-bold text-white group-hover:text-primary transition-colors">
-                                                {{ item.product_name }}</p>
+                                                {{ item.request?.product_name || item.product?.name }}</p>
                                             <p v-if="item.product_sku" class="text-xs text-slate-400 mt-1">SKU: {{
                                                 item.product_sku }}</p>
                                             <p v-if="item.variant_data" class="text-xs text-slate-500 mt-1">{{
@@ -118,7 +125,9 @@
                         <p><span class="font-semibold text-slate-300">Phone:</span> <span class="text-slate-400">{{
                             order.shipping_phone || 'N/A' }}</span></p>
                         <p><span class="font-semibold text-slate-300">Address:</span> <span class="text-slate-400">{{
-                            order.shipping_address || 'N/A' }}</span></p>
+                            JSON.parse(order.shipping_address).street + ', ' +
+                            JSON.parse(order.shipping_address).city || 'N/A' }}</span>
+                        </p>
                     </div>
                 </div>
 
@@ -154,16 +163,38 @@
                             <div class="flex justify-between">
                                 <span class="text-xs text-slate-400">Paid:</span>
                                 <span class="text-xs font-bold text-green-500">{{ formatPrice(order.paid_amount || 0)
-                                    }}</span>
+                                }}</span>
                             </div>
                             <!-- Due Amount -->
                             <div class="flex justify-between">
                                 <span class="text-xs text-slate-400">Due:</span>
                                 <span class="text-xs font-bold text-red-500">{{ formatPrice(order.due_amount || 0)
-                                    }}</span>
+                                }}</span>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Payment Options -->
+            <div v-if="order.payment_status === 'unpaid'" class="bg-surface border border-white/5 p-6">
+                <h3 class="text-sm font-serif text-white uppercase tracking-widest mb-4 border-b border-white/5 pb-3">
+                    Payment Options</h3>
+
+                <div class="flex flex-col md:flex-row gap-4">
+                    <!-- Bkash -->
+                    <button @click="initiateBkash" :disabled="processingBkash"
+                        class="px-6 py-3 bg-[#E2136E] text-white font-bold rounded-lg hover:bg-[#C2105E] transition-colors flex items-center justify-center gap-2">
+                        <span v-if="processingBkash"
+                            class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                        {{ processingBkash ? 'Processing...' : 'Pay with bKash' }}
+                    </button>
+
+                    <!-- Bank Transfer -->
+                    <button @click="showPayment = true"
+                        class="px-6 py-3 bg-white text-slate-900 border border-slate-300 font-bold rounded-lg hover:bg-slate-50 transition-colors">
+                        Bank Transfer / Manual
+                    </button>
                 </div>
             </div>
 
@@ -214,6 +245,45 @@
                 </div>
             </div>
 
+            <!-- Pending Payment Slip (if exists but no payment record yet) -->
+            <div v-if="order.payment_slip && (!order.payments || order.payments.length === 0)"
+                class="bg-surface border border-white/5 p-6">
+                <h3 class="text-sm font-serif text-white uppercase tracking-widest mb-4 border-b border-white/5 pb-3">
+                    Payment Slip (Pending Verification)
+                </h3>
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-white/5 rounded border border-white/10">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-300 mb-1">
+                            <span class="font-semibold">Payment Method</span>
+                            <span class="font-mono text-slate-400 ml-2">{{
+                                order.payment_method?.replace('_', ' ').toUpperCase() ||
+                                'N/A' }}</span>
+                        </p>
+                        <a :href="order.payment_slip_url" target="_blank"
+                            class="text-xs font-bold text-primary hover:underline uppercase tracking-wide"
+                            v-if="order.payment_method === 'bank_transfer'">
+                            View Slip →
+                        </a>
+                        <span v-else>
+                            Transaction Id: {{ order.payment_reference }}
+                        </span>
+                    </div>
+                    <div class="ml-auto">
+                        <span
+                            class="px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs font-bold uppercase tracking-wider">
+                            Pending Review
+                        </span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Notes -->
             <div v-if="order.notes" class="bg-surface border border-white/5 p-6">
                 <h3 class="text-sm font-serif text-white uppercase tracking-widest mb-3 border-b border-white/5 pb-3">
@@ -230,9 +300,12 @@
                 <div class="p-6">
                     <div class="relative pl-4 border-l-2 border-white/10 space-y-8">
                         <div v-for="(history, index) in order.status_histories" :key="history.id" class="relative">
-                            <div class="absolute -left-[21px] bg-background border-2 border-primary rounded-full w-4 h-4"></div>
+                            <div
+                                class="absolute -left-[21px] bg-background border-2 border-primary rounded-full w-4 h-4">
+                            </div>
                             <div class="mb-1">
-                                <span class="font-bold text-white">{{ history.status?.label || 'Status Changed' }}</span>
+                                <span class="font-bold text-white">{{ history.status?.label || 'Status Changed'
+                                    }}</span>
                                 <span class="text-xs text-slate-400 ml-2">{{ formatDate(history.created_at) }}</span>
                             </div>
                             <p v-if="history.note" class="text-xs text-slate-400 opacity-80 mb-1">{{ history.note }}</p>
@@ -244,9 +317,10 @@
                 </div>
             </div>
 
-
-
         </div>
+
+        <PaymentModal :isOpen="showPayment" :amount="order?.due_amount || order?.total" :orderId="order?.id"
+            :isOrder="true" @close="showPayment = false" @payment-submitted="handleBankTransfer" />
     </div>
 </template>
 
@@ -254,6 +328,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from '../../axios';
+import PaymentModal from '../../components/PaymentModal.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -261,19 +336,70 @@ const order = ref(null);
 const loading = ref(true);
 const error = ref(null);
 
+// Payment States
+const showPayment = ref(false);
+const processingBkash = ref(false);
+
 const fetchOrder = async () => {
     loading.value = true;
     error.value = null;
     try {
-        // Use order_number from route params
-        const orderNumber = route.params.orderNumber;
-        const response = await axios.get(`/orders/${orderNumber}`);
-        order.value = response.data;
+        const orderId = route.params.orderNumber; // Use orderNumber from route
+        const response = await axios.get(`/orders/${orderId}`);
+        order.value = response.data.data || response.data;
     } catch (err) {
         console.error('Error fetching order:', err);
         error.value = err.response?.data?.message || 'Order not found';
     } finally {
         loading.value = false;
+    }
+};
+
+const initiateBkash = async () => {
+    if (processingBkash.value) return;
+    processingBkash.value = true;
+    try {
+        const response = await axios.post('/payments/bkash/initiate', {
+            order_id: order.value.id,
+            amount: order.value.due_amount || order.value.total
+        });
+
+        if (response.data.bkashURL) {
+            window.location.href = response.data.bkashURL;
+        } else {
+            alert('Failed to get payment URL');
+        }
+    } catch (err) {
+        console.error('Bkash Error:', err);
+        alert(err.response?.data?.message || 'Payment initiation failed');
+    } finally {
+        processingBkash.value = false;
+    }
+};
+
+const handleBankTransfer = async (data) => {
+    // PaymentModal emits 'payment-submitted' with { transactionId, proof: File, ... }
+    // But for Order, we usually hit /orders/{id}/upload-payment-slip
+    // Let's assume PaymentModal handles the data formatting
+
+    // We need to construct FormData
+    const formData = new FormData();
+    formData.append('order_id', order.value.id);
+    formData.append('transaction_id', data.transactionId);
+    if (data.proof) {
+        formData.append('payment_slip', data.proof);
+    }
+
+    try {
+        await axios.post(`/orders/${order.value.id}/upload-payment-slip`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        showPayment.value = false;
+        alert('Payment slip uploaded successfully! Waiting for admin approval.');
+        fetchOrder();
+    } catch (err) {
+        console.error('Bank Transfer Error:', err);
+        alert(err.response?.data?.message || 'Failed to upload payment slip');
     }
 };
 
@@ -320,4 +446,3 @@ onMounted(() => {
     fetchOrder();
 });
 </script>
-

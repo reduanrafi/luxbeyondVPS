@@ -30,7 +30,7 @@
     </div>
 
     <!-- Nested Children (Simplified) -->
-    <div v-if="hasChildren && isOpen" class="ml-4 space-y-0 border-gray-100">
+    <div v-if="hasChildren && isOpen" class="ml-4 space-y-0 border-gray-500">
       <SidebarItem v-for="(child, childIndex) in category.children" :key="child.id" :category="child"
         :is-last="childIndex === category.children.length - 1" />
     </div>

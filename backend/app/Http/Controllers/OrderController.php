@@ -59,11 +59,20 @@ class OrderController extends Controller
 
         // Search
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('order_number', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('user', function($userQuery) use ($request) {
-                      $userQuery->where('name', 'like', '%' . $request->search . '%')
-                                ->orWhere('email', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', '%' . $search . '%')
+                  ->orWhere('id', 'like', '%' . $search . '%')
+                  ->orWhere('payment_reference', 'like', '%' . $search . '%')
+                  ->orWhere('shipping_phone', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('email', 'like', '%' . $search . '%')
+                                ->orWhere('phone', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('items', function($itemQuery) use ($search) {
+                      $itemQuery->where('product_name', 'like', '%' . $search . '%')
+                                ->orWhere('product_sku', 'like', '%' . $search . '%');
                   });
             });
         }
@@ -128,7 +137,7 @@ class OrderController extends Controller
             'shipping_phone' => 'nullable|string',
             'shipping_email' => 'nullable|email',
             'notes' => 'nullable|string',
-            'payment_slip' => 'nullable|file|image|max:5120', // 5MB max
+            'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120', // 5MB max
         ]);
 
         // Calculate total
@@ -192,16 +201,18 @@ class OrderController extends Controller
         $paymentSlipPath = null;
         if ($request->hasFile('payment_slip') && $validated['payment_method'] === 'bank_transfer') {
             $file = $request->file('payment_slip');
-            $filename = 'payment_slips/' . $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $paymentSlipPath = $file->storeAs('public', $filename);
-            $paymentSlipPath = $filename; // Store relative path
+            $folder = 'payment_slips';
+            $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
+    
+            $file->storeAs($folder, $filename, 'public');
+            $newPath = $folder . '/' . $filename;
 
             // Create payment record with pending status for bank transfer
             OrderPayment::create([
                 'order_id' => $order->id,
                 'payment_method' => 'bank_transfer',
                 'amount' => $total,
-                'payment_slip' => $paymentSlipPath,
+                'payment_slip' => $newPath,
                 'status' => 'pending', // Pending admin verification
             ]);
 
@@ -237,7 +248,7 @@ class OrderController extends Controller
     public function show(Request $request, $id)
     {
         // Support both ID and order_number lookup
-        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
+        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'items.request', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
                      ->where(function($query) use ($id) {
                          $query->where('id', $id)
                                ->orWhere('order_number', $id);

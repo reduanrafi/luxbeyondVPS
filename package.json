@@ -1,0 +1,19 @@
+{
+    "name": "frontend",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev:web": "cd frontend && npm run dev",
+        "build:web": "cd frontend && npm run build",
+        "preview:web": "cd frontend && npm run preview",
+        "dev:admin": "cd admin && npm run dev",
+        "build:admin": "cd admin && npm run build",
+        "preview:admin": "cd admin && npm run preview"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.0.0",
+        "@vue/compiler-sfc": "^3.4.0",
+        "vite": "^5.0.0"
+    }
+}
