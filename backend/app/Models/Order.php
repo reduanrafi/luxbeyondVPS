@@ -34,6 +34,7 @@ class Order extends Model
         'shipped_at',
         'delivered_at',
         'paid_at',
+        'request_id'
     ];
 
     protected $casts = [
@@ -52,6 +53,7 @@ class Order extends Model
         'paid_amount',
         'due_amount',
         'is_fully_paid',
+        'payment_slip_url',
     ];
 
     protected static function boot()
@@ -100,6 +102,11 @@ class Order extends Model
         return $this->hasMany(OrderPayment::class);
     }
 
+    public function productRequests()
+{
+    return $this->belongsToMany(ProductRequest::class, 'order_product_request');
+}
+
     /**
      * Get the total amount paid (sum of completed payments)
      */
@@ -124,6 +131,7 @@ class Order extends Model
         return $this->due_amount <= 0;
     }
 
+
     public function updateStatus($statusId, $note = null, $userId = null)
     {
         $status = OrderStatus::findOrFail($statusId);
@@ -143,5 +151,16 @@ class Order extends Model
         ]);
 
         return $this;
+    }
+
+    /**
+     * Get the payment slip URL
+     */
+    public function getPaymentSlipUrlAttribute()
+    {
+        if (!$this->payment_slip) {
+            return null;
+        }
+        return \Storage::disk('public')->url($this->payment_slip);
     }
 }

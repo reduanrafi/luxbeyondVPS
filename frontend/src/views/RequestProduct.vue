@@ -361,6 +361,7 @@ import { Link as LinkIcon, Check, CheckCircle, Info } from 'lucide-vue-next';
 import axios from '../axios';
 
 import { useToast } from 'vue-toastification';
+import { trackPurchase, trackBeginCheckout as trackBeginCheckoutGA4 } from '../utils/analytics';
 
 const router = useRouter();
 const toast = useToast();
@@ -486,6 +487,14 @@ const handleCalculateAndNext = async () => {
 
     if (await calculateEstimate()) {
         currentStep.value = 2; // Go to Estimate Step
+
+        // Track Begin Checkout for the request
+        trackBeginCheckoutGA4([{
+            product_id: 'request-' + Date.now(),
+            product_name: 'Product Request: ' + form.value.url,
+            price: costBreakdown.value?.grand_total || 0,
+            quantity: form.value.quantity
+        }], costBreakdown.value?.grand_total || 0);
     }
 };
 
@@ -526,9 +535,24 @@ const submitRequest = async () => {
             charges_breakdown: costBreakdown.value?.breakdown || [],
             // Extract tax if possible, or leave null for admin to set
         };
-        await axios.post('/product-requests', payload);
+        const response = await axios.post('/product-requests', payload);
+        const requestData = response.data.data || response.data;
+        const request = requestData?.product_request;
+
+        trackPurchase({
+            order_number: request?.request_number,
+            total: costBreakdown.value?.grand_total || 0,
+            currency: 'BDT',
+            items: [{
+                product_id: request?.id,
+                product_name: form.value.url,
+                price: costBreakdown.value?.grand_total / form.value.quantity,
+                quantity: form.value.quantity
+            }]
+        });
+
         toast.success('Product request submitted successfully!');
-        router.push('/dashboard/requests');
+        router.push(`/thank-you?type=request&id=${request?.request_number}`);
     } catch (e) {
         toast.error(e.response?.data?.message || 'Error submitting request');
     } finally {

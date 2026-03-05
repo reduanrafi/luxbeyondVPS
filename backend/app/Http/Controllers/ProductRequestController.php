@@ -10,27 +10,82 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Ihasan\Bkash\Facades\Bkash;
+use Illuminate\Support\Facades\DB;
 
 class ProductRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        // Always return only the user's requests for the standard index route
-        $requests = ProductRequest::with(['orderStatus', 'timeline'])
+        
+        $query = ProductRequest::with(['orderStatus', 'timeline'])
             ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->whereDoesntHave('orderItem');
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('product_name', 'like', "%{$search}%")
+                  ->orWhere('id', 'like', "%{$search}%")
+                  ->orWhere('url', 'like', "%{$search}%")
+                  ->orWhere('request_number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->has('status') && $request->status) {
+            $query->where('status_id', $request->status);
+        }
+
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $requests = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json($requests);
     }
 
-    public function adminIndex()
+    public function adminIndex(Request $request)
     {
-        // Admin only route to get all requests
-        $requests = ProductRequest::with(['user', 'orderStatus', 'timeline'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $query = ProductRequest::with(['user', 'orderStatus', 'timeline']);
+
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('product_name', 'like', "%{$search}%")
+                  ->orWhere('id', 'like', "%{$search}%")
+                  ->orWhere('url', 'like', "%{$search}%")
+                  ->orWhere('request_number', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->has('status') && $request->status) {
+            $statusId = $request->status;
+            // Support filtering by both ID and Name if needed, but ID is cleaner
+            $query->where(function($q) use ($statusId) {
+                $q->where('status_id', $statusId)
+                  ->orWhere('status', $statusId); // Fallback for legacy status strings
+            });
+        }
+
+        if ($request->has('date_from') && $request->date_from) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $requests = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return response()->json($requests);
     }
@@ -165,6 +220,7 @@ class ProductRequestController extends Controller
             'charges_breakdown' => $chargesBreakdown,
         ]);
 
+        $productRequest->refresh();
         // Create initial timeline entry
         \App\Models\ProductRequestTimeline::create([
             'product_request_id' => $productRequest->id,
@@ -201,28 +257,39 @@ class ProductRequestController extends Controller
     public function initiateBkashPayment(Request $request)
     {
         $validated = $request->validate([
-            'product_request_id' => 'required|exists:product_requests,id',
+            'request_id' => 'required|exists:product_requests,id',
             'amount' => 'required|numeric|min:1',
+            'payment_type' => 'nullable|string|in:full,partial',
         ]);
 
-        $productRequest = ProductRequest::findOrFail($validated['product_request_id']);
+        $productRequest = ProductRequest::findOrFail($validated['request_id']);
 
         if ($productRequest->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Configure Bkash
+        // Configure Bkash - use DB config if available, otherwise fallback to .env
         $paymentMethod = \App\Models\PaymentMethod::where('type', 'bkash')->where('is_active', true)->first();
-        if (!$paymentMethod || !$paymentMethod->config) {
-            return response()->json(['message' => 'bKash not configured'], 500);
+        
+        if ($paymentMethod && $paymentMethod->config) {
+            // Use database credentials
+            config([
+                'bkash.sandbox' => $paymentMethod->config['is_sandbox'] ?? env('BKASH_SANDBOX', true),
+                'bkash.credentials.app_key' => $paymentMethod->config['app_key'] ?? env('BKASH_APP_KEY', ''),
+                'bkash.credentials.app_secret' => $paymentMethod->config['app_secret'] ?? env('BKASH_APP_SECRET', ''),
+                'bkash.credentials.username' => $paymentMethod->config['username'] ?? env('BKASH_USERNAME', ''),
+                'bkash.credentials.password' => $paymentMethod->config['password'] ?? env('BKASH_PASSWORD', ''),
+            ]);
+        } else {
+            // Fallback to .env credentials
+            config([
+                'bkash.sandbox' => env('BKASH_SANDBOX', true),
+                'bkash.credentials.app_key' => env('BKASH_APP_KEY', ''),
+                'bkash.credentials.app_secret' => env('BKASH_APP_SECRET', ''),
+                'bkash.credentials.username' => env('BKASH_USERNAME', ''),
+                'bkash.credentials.password' => env('BKASH_PASSWORD', ''),
+            ]);
         }
-        config([
-            'bkash.sandbox' => $paymentMethod->config['is_sandbox'] ?? true,
-            'bkash.credentials.app_key' => $paymentMethod->config['app_key'] ?? '',
-            'bkash.credentials.app_secret' => $paymentMethod->config['app_secret'] ?? '',
-            'bkash.credentials.username' => $paymentMethod->config['username'] ?? '',
-            'bkash.credentials.password' => $paymentMethod->config['password'] ?? '',
-        ]);
 
         try {
             $backendUrl = rtrim(config('app.url'), '/');
@@ -484,6 +551,13 @@ class ProductRequestController extends Controller
                 'note' => $request->admin_note ? 'Status changed: ' . $newStatusName : 'Status updated',
                 'created_by' => Auth::id(),
             ]);
+
+            // Notify user about status change
+            try {
+                $productRequest->user->notify(new \App\Notifications\ProductRequestStatusUpdated($productRequest, $newStatusName));
+            } catch (\Exception $e) {
+                \Log::error('Failed to notify user about status update: ' . $e->getMessage());
+            }
         } elseif (isset($updateData['status_id']) && $updateData['status_id'] != $oldStatusId) {
              // Fallback if name was same but ID changed (unlikely but safe)
              \App\Models\ProductRequestTimeline::create([
@@ -492,6 +566,12 @@ class ProductRequestController extends Controller
                 'note' => 'Status ID updated',
                 'created_by' => Auth::id(),
             ]);
+
+            try {
+                $productRequest->user->notify(new \App\Notifications\ProductRequestStatusUpdated($productRequest, $newStatusName ?? 'updated'));
+            } catch (\Exception $e) {
+                \Log::error('Failed to notify user about status ID update: ' . $e->getMessage());
+            }
         }
 
         return response()->json([
@@ -598,5 +678,201 @@ class ProductRequestController extends Controller
         }
         $productRequest->delete();
         return response()->json(['message' => 'Product request deleted successfully']);
+    }
+
+    public function createOrderFromRequests(Request $request)
+    {
+        $validated = $request->validate([
+            'request_items' => 'required|array|min:1',
+            'request_items.*.id' => 'required|exists:product_requests,id',
+            'request_items.*.quantity' => 'required|integer|min:1',
+            'payment_method' => 'required|string|in:bkash,bank_transfer',
+            'payment_type' => 'nullable|string|in:full,partial',
+            'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
+            'shipping_address' => 'required|array',
+            'shipping_address.street' => 'required|string',
+            'shipping_address.city' => 'required|string',
+            'shipping_address.phone' => 'required|string',
+        ]);
+
+        $userId = Auth::id();
+        $requestItems = $validated['request_items'];
+        $requestIds = collect($requestItems)->pluck('id')->toArray();
+        $quantitiesMap = collect($requestItems)->pluck('quantity', 'id')->toArray();
+        
+        // Fetch valid requests
+        $productRequests = ProductRequest::whereIn('id', $requestIds)
+            ->where('user_id', $userId)
+            ->whereIn('status', ['request_accepted', 'accepted'])
+            ->whereNull('shipping_address') // Ensure not already confirmed/ordered
+            ->get();
+
+        if ($productRequests->isEmpty()) {
+            return response()->json(['message' => 'No valid requests found or allowed for order creation.'], 422);
+        }
+
+        if ($productRequests->count() !== count($requestIds)) {
+             return response()->json(['message' => 'Some selected requests are invalid or already processed.'], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Calculate Totals
+            $subtotal = 0;
+            $tax = 0;
+            $shipping = 0; // Declared shipping cost
+            $additionalCharges = 0;
+            $totalAmount = 0;
+            $minPaymentAmount = 0; // If any has min payment, handling logic? Usually sum.
+
+            foreach ($productRequests as $req) {
+                 // Update quantity if changed
+                 $newQty = $quantitiesMap[$req->id] ?? $req->quantity;
+                 if ($newQty != $req->quantity) {
+                     $req->quantity = $newQty;
+                     
+                     // Recalculate Total BDT (following logic in updateQuantity)
+                     $currency = \App\Models\Currency::where('code', $req->currency)->first();
+                     $rate = ($currency && !$currency->is_base) ? $currency->rate_to_base : 1;
+                     $productTotalBDT = $req->price * $req->quantity * $rate;
+                     
+                     $breakdownTotal = 0;
+                     if (!empty($req->charges_breakdown)) {
+                          foreach ($req->charges_breakdown as $charge) {
+                              $breakdownTotal += ($charge['amount_in_bdt'] ?? 0);
+                          }
+                     }
+                     
+                     $req->total_amount_bdt = $productTotalBDT + ($req->declared_shipping_cost ?? 0) + $breakdownTotal;
+                     $req->save();
+                 }
+
+                 // Sum up the totals for the order
+                 $subtotal += ($req->price * $req->quantity);
+                 $totalAmount += $req->total_amount_bdt;
+                 $tax += $req->tax ?? 0;
+                 $shipping += ($req->declared_shipping_cost ?? 0) + ($req->delivery_charge ?? 0);
+                 $additionalCharges += ($req->additional_charges ?? 0) + ($req->payment_processing_fee ?? 0);
+                 $minPaymentAmount += $req->min_payment_amount ?? 0;
+            }
+
+            // Determine Status
+            $defaultStatus = OrderStatus::where('name', 'pending')->first(); // Or 'Awaiting Payment'
+            
+            // Create Order
+            $order = Order::create([
+                'user_id' => $userId,
+                'status_id' => $defaultStatus?->id,
+                'status' => $defaultStatus?->name ?? 'pending',
+                'subtotal' => $subtotal,
+                'tax' => $tax,
+                'shipping' => $shipping,
+                'total' => $totalAmount,
+                'min_payment_amount' => $minPaymentAmount,
+                'currency' => 'BDT',
+                'payment_method' => $validated['payment_method'],
+                'payment_status' => 'unpaid',
+                'shipping_address' => json_encode($validated['shipping_address']),
+                'shipping_name' => Auth::user()->name,
+                'shipping_phone' => $validated['shipping_address']['phone'],
+                'notes' => 'Combined Order from Requests: ' . implode(', ', $productRequests->pluck('request_number')->toArray()),
+            ]);
+
+            // Handle Payslip upload
+            if ($request->hasFile('payment_slip')) {
+                $file = $request->file('payment_slip');
+               $folder = 'payment_slips';
+                $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
+                
+                $file->storeAs($folder, $filename, 'public');
+                $newPath = $folder . '/' . $filename;
+                
+                $order->update([
+                    'payment_slip' => $newPath,
+                    'payment_status' => 'pending', 
+                ]);
+            }
+
+            // Create Order Items and Update Requests
+            foreach ($productRequests as $req) {
+                \App\Models\OrderItem::create([
+                    'request_id' => $req->id,
+                    'order_id' => $order->id,
+                    'product_name' => $req->product_name ?? 'Product Request #' . $req->request_number,
+                    'price' => $req->price,
+                    'quantity' => $req->quantity,
+                    'subtotal' => $req->total_amount_bdt, // Storing line total provided in request
+                    'image' => $req->admin_image_url ?? $req->url, 
+                    'variant_data' => [
+                        'request_url' => $req->url,
+                        'request_number' => $req->request_number,
+                        'request_id' => $req->id
+                    ],
+                ]);
+
+                // Update Request
+                $req->update([
+                    'status' => 'completed', // Or a dedicated 'converted' status
+                    'shipping_address' => $validated['shipping_address']
+                ]);
+                
+                // Add Timeline
+                 \App\Models\ProductRequestTimeline::create([
+                    'product_request_id' => $req->id,
+                    'status' => 'completed',
+                    'note' => 'Converted to Order #' . $order->order_number,
+                    'created_by' => $userId,
+                ]);
+            }
+            
+            // Initial Order Status History
+            $order->updateStatus($defaultStatus->id, 'Created from Product Requests', $userId);
+            
+            // Notify User
+            try {
+                Auth::user()->notify(new \App\Notifications\OrderPlacedNotification($order));
+            } catch (\Exception $e) {}
+
+            DB::commit();
+
+            // Handle bKash redirection if selected
+            if ($validated['payment_method'] === 'bkash') {
+                $payAmount = ($validated['payment_type'] ?? 'partial') === 'full' 
+                    ? $order->total 
+                    : $order->min_payment_amount;
+
+                // Create a request with same data as initiateBkashOrderPayment
+                $paymentRequest = new Request([
+                    'order_id' => $order->id,
+                    'amount' => $payAmount,
+                    'payment_type' => $validated['payment_type'] ?? 'partial'
+                ]);
+
+                // Call PaymentController@initiateBkashOrderPayment logic
+                // For simplicity, we can just return the order info and let frontend initiate
+                // OR instantiate controller and call it.
+                // Better: Return order AND a flag that bkash is needed.
+                return response()->json([
+                    'message' => 'Order created. Redirecting to bKash...',
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'initiate_bkash' => true,
+                    'pay_amount' => $payAmount,
+                    'payment_type' => $validated['payment_type'] ?? 'partial'
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Order created successfully',
+                'order_id' => $order->id,
+                'order_number' => $order->order_number
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order Creation Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to create order: ' . $e->getMessage()], 500);
+        }
     }
 }

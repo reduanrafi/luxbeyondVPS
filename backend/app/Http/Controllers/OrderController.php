@@ -46,7 +46,7 @@ class OrderController extends Controller
 
         // Check if this is an admin request (admin routes have /admin prefix)
         $isAdminRequest = $request->is('api/admin/*');
-        
+
         // For customer requests, automatically filter by authenticated user
         if (!$isAdminRequest && $request->user()) {
             $query->where('user_id', $request->user()->id);
@@ -59,11 +59,20 @@ class OrderController extends Controller
 
         // Search
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('order_number', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('user', function($userQuery) use ($request) {
-                      $userQuery->where('name', 'like', '%' . $request->search . '%')
-                                ->orWhere('email', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'like', '%' . $search . '%')
+                  ->orWhere('id', 'like', '%' . $search . '%')
+                  ->orWhere('payment_reference', 'like', '%' . $search . '%')
+                  ->orWhere('shipping_phone', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('email', 'like', '%' . $search . '%')
+                                ->orWhere('phone', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('items', function($itemQuery) use ($search) {
+                      $itemQuery->where('product_name', 'like', '%' . $search . '%')
+                                ->orWhere('product_sku', 'like', '%' . $search . '%');
                   });
             });
         }
@@ -128,13 +137,13 @@ class OrderController extends Controller
             'shipping_phone' => 'nullable|string',
             'shipping_email' => 'nullable|email',
             'notes' => 'nullable|string',
-            'payment_slip' => 'nullable|file|image|max:5120', // 5MB max
+            'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120', // 5MB max
         ]);
 
         // Calculate total
-        $total = $validated['subtotal'] 
-               + ($validated['tax'] ?? 0) 
-               + ($validated['shipping'] ?? 0) 
+        $total = $validated['subtotal']
+               + ($validated['tax'] ?? 0)
+               + ($validated['shipping'] ?? 0)
                - ($validated['discount'] ?? 0);
 
         // Calculate minimum payment amount for shop orders
@@ -192,16 +201,18 @@ class OrderController extends Controller
         $paymentSlipPath = null;
         if ($request->hasFile('payment_slip') && $validated['payment_method'] === 'bank_transfer') {
             $file = $request->file('payment_slip');
-            $filename = 'payment_slips/' . $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $paymentSlipPath = $file->storeAs('public', $filename);
-            $paymentSlipPath = $filename; // Store relative path
+            $folder = 'payment_slips';
+            $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
+    
+            $file->storeAs($folder, $filename, 'public');
+            $newPath = $folder . '/' . $filename;
 
             // Create payment record with pending status for bank transfer
             OrderPayment::create([
                 'order_id' => $order->id,
                 'payment_method' => 'bank_transfer',
                 'amount' => $total,
-                'payment_slip' => $paymentSlipPath,
+                'payment_slip' => $newPath,
                 'status' => 'pending', // Pending admin verification
             ]);
 
@@ -237,15 +248,15 @@ class OrderController extends Controller
     public function show(Request $request, $id)
     {
         // Support both ID and order_number lookup
-        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
+        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'items.request', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
                      ->where(function($query) use ($id) {
                          $query->where('id', $id)
                                ->orWhere('order_number', $id);
                      })
                      ->firstOrFail();
-        
+
         // For customer requests, ensure they can only view their own orders
-        if (!$request->is('api/admin/*') && $request->user() && $order->user_id !== $request->user()->id) {
+        if (!$request->is('api/admin/*') && $request->user() && $order->user_id != $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -273,7 +284,7 @@ class OrderController extends Controller
         // Handle status update
         if (isset($validated['status_id'])) {
             $newStatus = OrderStatus::findOrFail($validated['status_id']);
-            
+
             // Check if transition is allowed
             // Fix: $order->status returns string column, use status_id to find model
             $currentStatus = OrderStatus::find($order->status_id);
@@ -335,7 +346,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
-        
+
         // Only allow deletion of pending/cancelled orders
         if (!in_array($order->status, ['pending', 'cancelled'])) {
             return response()->json([
@@ -353,14 +364,14 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        
+
         $request->validate([
             'status_id' => 'required|exists:order_statuses,id',
             'note' => 'nullable|string',
         ]);
 
         $newStatus = OrderStatus::findOrFail($request->status_id);
-        
+
         // Check if transition is allowed
         $currentStatus = OrderStatus::find($order->status_id);
         if ($currentStatus && !$currentStatus->canTransitionTo($request->status_id)) {
@@ -370,7 +381,7 @@ class OrderController extends Controller
         }
 
         $order->updateStatus($request->status_id, $request->note, Auth::id());
-        
+
         try {
             $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
         } catch (\Exception $e) {}

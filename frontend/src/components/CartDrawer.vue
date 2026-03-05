@@ -116,7 +116,7 @@
                                                         class="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-50">-</button>
                                                     <span
                                                         class="px-2 py-1 text-white font-mono min-w-[2ch] text-center">{{
-                                                        item.quantity }}</span>
+                                                            item.quantity }}</span>
                                                     <button
                                                         @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.variant)"
                                                         class="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/5 transition-colors">+</button>
@@ -201,7 +201,7 @@ const getItemImage = (item) => {
             : `/storage/${item.image}`;
     }
     // Default placeholder
-    return '/assets/placeholder.png';
+    return '/assets/placeholder.webp';
 };
 
 // Stock Validation Logic
