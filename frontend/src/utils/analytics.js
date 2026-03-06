@@ -4,7 +4,7 @@
  */
 
 export const trackEvent = (eventName, data = {}) => {
-  if (typeof window !== 'undefined' && window.dataLayer) {
+  if (typeof window != 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: eventName,
       ...data
@@ -13,7 +13,7 @@ export const trackEvent = (eventName, data = {}) => {
 };
 
 export const trackEcommerceEvent = (eventName, ecommerceData) => {
-  if (typeof window !== 'undefined' && window.dataLayer) {
+  if (typeof window != 'undefined' && window.dataLayer) {
     // Clear the previous ecommerce object to prevent overlapping data
     window.dataLayer.push({ ecommerce: null });
     

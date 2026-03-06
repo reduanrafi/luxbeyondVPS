@@ -460,7 +460,7 @@ const formatPrice = (price) => {
 };
 
 const formatVariantAttributes = (attributes) => {
-    if (!attributes || typeof attributes !== 'object') return '';
+    if (!attributes || typeof attributes != 'object') return '';
     return Object.entries(attributes).map(([key, value]) => `${key}: ${value}`).join(', ');
 };
 

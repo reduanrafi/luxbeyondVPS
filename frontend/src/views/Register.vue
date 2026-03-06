@@ -99,7 +99,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 const handleRegister = async () => {
-    if (password.value !== password_confirmation.value) {
+    if (password.value != password_confirmation.value) {
         error.value = "Passwords do not match";
         return;
     }

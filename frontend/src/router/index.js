@@ -256,7 +256,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const loaderStore = useLoaderStore();
-    if (to.path !== '/') {
+    if (to.path != '/') {
         loaderStore.startLoading();
     }
 

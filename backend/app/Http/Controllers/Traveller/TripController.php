@@ -49,7 +49,7 @@ class TripController extends Controller
     public function update(Request $request, Trip $trip)
     {
         // Ensure user owns the trip
-        if ($trip->user_id !== auth()->id()) {
+        if ($trip->user_id != auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -73,7 +73,7 @@ class TripController extends Controller
      */
     public function destroy(Trip $trip)
     {
-        if ($trip->user_id !== auth()->id()) {
+        if ($trip->user_id != auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         

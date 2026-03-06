@@ -138,10 +138,10 @@ const isInWishlist = computed(() => {
 
 const isInStock = computed(() => {
   // Support both total_stock and in_stock properties
-  if (props.product.total_stock !== undefined) {
+  if (props.product.total_stock != undefined) {
     return (props.product.total_stock || 0) > 0;
   }
-  return props.product.in_stock !== false;
+  return props.product.in_stock != false;
 });
 
 const stockStatus = computed(() => {

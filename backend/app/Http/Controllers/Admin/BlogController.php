@@ -100,7 +100,7 @@ class BlogController extends Controller
         }
         
         // Handle slug update if title changes
-        if (isset($validated['title']) && $validated['title'] !== $post->title) {
+        if (isset($validated['title']) && $validated['title'] != $post->title) {
             $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(6);
         }
 

@@ -21,7 +21,7 @@ class BkashController extends Controller
         $paymentId = $request->input('paymentID');
         $status = $request->input('status');
 
-        if ($status !== 'success') {
+        if ($status != 'success') {
             return redirect()->route('bkash.failed')
                 ->with('error', 'Payment was not successful')
                 ->with('payment_id', $paymentId);

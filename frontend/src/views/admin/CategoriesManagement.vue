@@ -232,7 +232,7 @@ const availableParentCategories = computed(() => {
 
     // Always show all categories, but exclude self when editing
     if (showEditModal.value && editingId.value) {
-        return allCategories.value.filter(cat => cat.id !== editingId.value);
+        return allCategories.value.filter(cat => cat.id != editingId.value);
         // return allCategories.value;
     }
     return allCategories.value;

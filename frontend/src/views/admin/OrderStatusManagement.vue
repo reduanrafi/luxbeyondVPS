@@ -338,7 +338,7 @@ const saveStatus = async () => {
             sort_order: statusForm.value.sort_order || 0,
             is_default: statusForm.value.is_default || false,
             is_final: statusForm.value.is_final || false,
-            is_active: statusForm.value.is_active !== false,
+            is_active: statusForm.value.is_active != false,
             allowed_next_statuses: selectedNextStatuses.value.length > 0 ? selectedNextStatuses.value : null,
         };
 

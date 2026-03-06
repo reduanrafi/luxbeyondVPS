@@ -503,7 +503,7 @@ const validateForm = () => {
         isValid = false;
     }
 
-    if (password.value !== password_confirmation.value) {
+    if (password.value != password_confirmation.value) {
         errors.value.password_confirmation = "Passwords do not match";
         isValid = false;
     }

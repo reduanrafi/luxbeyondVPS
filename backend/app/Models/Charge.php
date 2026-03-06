@@ -50,10 +50,10 @@ class Charge extends Model
         }
 
         // Apply min/max constraints
-        if ($this->min_value !== null && $amount < $this->min_value) {
+        if ($this->min_value != null && $amount < $this->min_value) {
             $amount = $this->min_value;
         }
-        if ($this->max_value !== null && $amount > $this->max_value) {
+        if ($this->max_value != null && $amount > $this->max_value) {
             $amount = $this->max_value;
         }
 

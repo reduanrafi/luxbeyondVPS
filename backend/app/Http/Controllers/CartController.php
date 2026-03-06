@@ -166,7 +166,7 @@ class CartController extends Controller
      */
     public function update(Request $request, CartItem $cartItem)
     {
-        if ($cartItem->user_id !== $request->user()->id) {
+        if ($cartItem->user_id != $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
@@ -189,7 +189,7 @@ class CartController extends Controller
      */
     public function destroy(Request $request, CartItem $cartItem)
     {
-        if ($cartItem->user_id !== $request->user()->id) {
+        if ($cartItem->user_id != $request->user()->id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 

@@ -219,7 +219,7 @@ const fetchRequests = async () => {
         const params = {};
 
         // Only add search param if it has a value
-        if (filters.value.search && filters.value.search.trim() !== '') {
+        if (filters.value.search && filters.value.search.trim() != '') {
             params.search = filters.value.search.trim();
         }
 
@@ -246,7 +246,7 @@ const debouncedFetchRequests = debounce(() => {
 // Watch search filter with debounce - only trigger if search has value
 watch(() => filters.value.search, (newValue) => {
     // Only fetch if search has a value (not empty)
-    if (newValue && newValue.trim() !== '') {
+    if (newValue && newValue.trim() != '') {
         debouncedFetchRequests();
     }
 });

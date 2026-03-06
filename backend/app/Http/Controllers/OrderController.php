@@ -256,7 +256,7 @@ class OrderController extends Controller
                      ->firstOrFail();
         
         // For customer requests, ensure they can only view their own orders
-        if (!$request->is('api/admin/*') && $request->user() && $order->user_id !== $request->user()->id) {
+        if (!$request->is('api/admin/*') && $request->user() && $order->user_id != $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

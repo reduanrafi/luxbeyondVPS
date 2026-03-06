@@ -215,10 +215,10 @@ class ChargeController extends Controller
             }
 
             // Min/Max constraints
-            if ($charge->min_value !== null && $chargeAmountInCurrency < $charge->min_value) {
+            if ($charge->min_value != null && $chargeAmountInCurrency < $charge->min_value) {
                 $chargeAmountInCurrency = $charge->min_value;
             }
-            if ($charge->max_value !== null && $chargeAmountInCurrency > $charge->max_value) {
+            if ($charge->max_value != null && $chargeAmountInCurrency > $charge->max_value) {
                 $chargeAmountInCurrency = $charge->max_value;
             }
 

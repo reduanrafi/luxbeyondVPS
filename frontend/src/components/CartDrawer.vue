@@ -118,7 +118,7 @@
                                                         class="px-2 py-1 text-white font-mono min-w-[2ch] text-center">{{
                                                             item.quantity }}</span>
                                                     <button
-                                                        @click="cartStore.updateQuantity(item.id, item.quantity + 1, item.variant)"
+                                                        @click="cartStore.updateQuantity(item.id, Number(item.quantity) + 1, item.variant)"
                                                         class="px-2 py-1 text-slate-400 hover:text-white hover:bg-white/5 transition-colors">+</button>
                                                 </div>
                                                 <div class="flex">
@@ -206,7 +206,7 @@ const getItemImage = (item) => {
 
 // Stock Validation Logic
 const isOutOfStock = (item) => {
-    return (item.total_stock !== undefined && item.total_stock <= 0);
+    return (item.total_stock != undefined && item.total_stock <= 0);
 };
 
 const hasStockIssues = computed(() => {
@@ -222,7 +222,7 @@ const handleCheckout = () => {
 
 // Format variant attributes for display
 const formatVariantAttributes = (attributes) => {
-    if (!attributes || typeof attributes !== 'object') return '';
+    if (!attributes || typeof attributes != 'object') return '';
     return Object.entries(attributes)
         .map(([key, value]) => `${key}: ${value}`)
         .join(', ');

@@ -336,7 +336,7 @@ const fetchRelatedProducts = async () => {
         const response = await axios.get('/products', { params });
         const allProducts = response.data.data || response.data || [];
         relatedProducts.value = allProducts
-            .filter(p => p.id !== product.value.id)
+            .filter(p => p.id != product.value.id)
             .slice(0, 4);
     } catch (error) {
         console.error('Error fetching related products:', error);
