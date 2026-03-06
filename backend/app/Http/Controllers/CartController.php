@@ -27,7 +27,7 @@ class CartController extends Controller
                 // Get base price logic
                 $productBasePrice = $product->sellable_price ?? $product->price;
                 $variantPrice = $variant ? $variant->price : 0;
-                
+
                 // Original price is Product Original (if exists) or Product Base + Variant Price
                 $productOriginalPrice = $product->sellable_price ? $product->original_price : $product->price;
                 $originalPrice = $productOriginalPrice + $variantPrice;
@@ -57,7 +57,7 @@ class CartController extends Controller
                         $finalProductPrice = $productBasePrice - $discountAmount;
                     }
                 }
-                
+
                 $finalPrice = $finalProductPrice + $variantPrice;
 
                 return [
@@ -94,9 +94,6 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-
-        \Log::info('Request cart store',$request->all());
-
         $user = $request->user();
 
         $data = $request->validate([
@@ -113,7 +110,7 @@ class CartController extends Controller
         // Get base price logic
         $productBasePrice = $product->sellable_price ?? $product->price;
         $variantPrice = $variant ? $variant->price : 0;
-        
+
         $finalProductPrice = $productBasePrice;
 
         // Check if product is in any active event with price
@@ -139,7 +136,7 @@ class CartController extends Controller
                 $finalProductPrice = $productBasePrice - $discountAmount;
             }
         }
-        
+
         $finalPrice = $finalProductPrice + $variantPrice;
 
        $cartItem = CartItem::firstOrNew([
@@ -148,7 +145,6 @@ class CartController extends Controller
             'product_variant_id' => $variant?->id,
         ]);
 
-        \Log::info('Cart item',[$cartItem]);
         $cartItem->quantity = ($cartItem->exists ? $cartItem->quantity : 0) + $data['quantity'];
 
         $cartItem->price = $finalPrice;

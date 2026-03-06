@@ -46,7 +46,7 @@ class OrderController extends Controller
 
         // Check if this is an admin request (admin routes have /admin prefix)
         $isAdminRequest = $request->is('api/admin/*');
-        
+
         // For customer requests, automatically filter by authenticated user
         if (!$isAdminRequest && $request->user()) {
             $query->where('user_id', $request->user()->id);
@@ -141,9 +141,9 @@ class OrderController extends Controller
         ]);
 
         // Calculate total
-        $total = $validated['subtotal'] 
-               + ($validated['tax'] ?? 0) 
-               + ($validated['shipping'] ?? 0) 
+        $total = $validated['subtotal']
+               + ($validated['tax'] ?? 0)
+               + ($validated['shipping'] ?? 0)
                - ($validated['discount'] ?? 0);
 
         // Calculate minimum payment amount for shop orders
@@ -254,7 +254,7 @@ class OrderController extends Controller
                                ->orWhere('order_number', $id);
                      })
                      ->firstOrFail();
-        
+
         // For customer requests, ensure they can only view their own orders
         if (!$request->is('api/admin/*') && $request->user() && $order->user_id != $request->user()->id) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -284,7 +284,7 @@ class OrderController extends Controller
         // Handle status update
         if (isset($validated['status_id'])) {
             $newStatus = OrderStatus::findOrFail($validated['status_id']);
-            
+
             // Check if transition is allowed
             // Fix: $order->status returns string column, use status_id to find model
             $currentStatus = OrderStatus::find($order->status_id);
@@ -346,7 +346,7 @@ class OrderController extends Controller
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
-        
+
         // Only allow deletion of pending/cancelled orders
         if (!in_array($order->status, ['pending', 'cancelled'])) {
             return response()->json([
@@ -364,14 +364,14 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);
-        
+
         $request->validate([
             'status_id' => 'required|exists:order_statuses,id',
             'note' => 'nullable|string',
         ]);
 
         $newStatus = OrderStatus::findOrFail($request->status_id);
-        
+
         // Check if transition is allowed
         $currentStatus = OrderStatus::find($order->status_id);
         if ($currentStatus && !$currentStatus->canTransitionTo($request->status_id)) {
@@ -381,7 +381,7 @@ class OrderController extends Controller
         }
 
         $order->updateStatus($request->status_id, $request->note, Auth::id());
-        
+
         try {
             $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
         } catch (\Exception $e) {}

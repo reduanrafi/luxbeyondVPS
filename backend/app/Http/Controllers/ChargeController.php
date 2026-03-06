@@ -127,12 +127,12 @@ class ChargeController extends Controller
         if ($request->currency_id) {
             $currency = \App\Models\Currency::find($request->currency_id);
         }
-        
+
         $scope = $request->scope ?? 'request';
 
         // Build Query
         $query = Charge::where('is_active', true);
-        
+
         if ($currency) {
             $query->whereHas('currency', function($q) use ($currency) {
                 // Get charges in the selected currency OR base currency
@@ -157,14 +157,14 @@ class ChargeController extends Controller
                 if ($request->has('charge_types') && !empty($request->charge_types)) {
                     $q->orWhereIn('type', $request->charge_types);
                 }
-                
+
                 // CRITICAL: Include ALL charges that belong to the selected currency
                 // (User requirement: "all charges from the charge table should be added for the selected currency")
                 if ($currency) {
                     $q->orWhere('currency_id', $currency->id);
                 }
             });
-            
+
             // Safety: Never include 'hub' charges in requests
             $query->where('type', '!=', 'hub');
         }
@@ -183,8 +183,8 @@ class ChargeController extends Controller
 
         foreach ($charges as $charge) {
             // Determine the base amount to use for calculation in the charge's currency
-            $chargeBaseAmount = $request->base_amount; 
-            
+            $chargeBaseAmount = $request->base_amount;
+
             if ($currency) {
                 if ($charge->currency->id === $currency->id) {
                     $chargeBaseAmount = $baseAmountInSelectedCurrency;
@@ -229,7 +229,7 @@ class ChargeController extends Controller
             }
 
             $totalCharges += $chargeAmountBDT;
-            
+
             $chargeBreakdown[] = [
                 'charge' => $charge->name,
                 'type' => $charge->type,
@@ -256,7 +256,7 @@ class ChargeController extends Controller
         $isInsideCity = $additionalData['is_inside_city'] ?? false;
         $weight = $additionalData['weight'] ?? 0;
         $paymentMethod = $additionalData['payment_method'] ?? null;
-        
+
         $deliveryCharge = $this->calculateDeliveryCharge($request->base_amount, $isInsideCity, $weight, $paymentMethod);
 
         // Add delivery to total
@@ -276,7 +276,7 @@ class ChargeController extends Controller
         // Payment Processing Fee
         $subtotalBeforePaymentFee = $request->base_amount + $totalCharges;
         $paymentProcessingFee = $this->calculatePaymentProcessingFee($subtotalBeforePaymentFee, $paymentMethod);
-        
+
         if ($paymentProcessingFee > 0) {
             $totalCharges += $paymentProcessingFee;
             $chargeBreakdown[] = [
@@ -312,16 +312,6 @@ class ChargeController extends Controller
         $outsideCityCharge = (float) \App\Models\Setting::get('delivery_charge_outside_city', 0);
         $freeDeliveryThreshold = (float) \App\Models\Setting::get('free_delivery_threshold', 0);
         $deliveryChargePerKg = (float) \App\Models\Setting::get('delivery_charge_per_kg', 0);
-
-        \Illuminate\Support\Facades\Log::info('Calculating Delivery Charge', [
-            'totalAmount' => $totalAmount,
-            'isInsideCity' => $isInsideCity,
-            'weight' => $weight,
-            'insideCityCharge' => $insideCityCharge,
-            'outsideCityCharge' => $outsideCityCharge,
-            'freeDeliveryThreshold' => $freeDeliveryThreshold,
-            'deliveryChargePerKg' => $deliveryChargePerKg,
-        ]);
 
         // Check if order qualifies for free delivery
         if ($freeDeliveryThreshold > 0 && $totalAmount >= $freeDeliveryThreshold) {
