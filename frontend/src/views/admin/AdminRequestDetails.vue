@@ -221,7 +221,7 @@
                                     <div v-for="(charge, index) in request.charges_breakdown" :key="index" class="flex justify-between text-xs">
                                         <span class="text-zinc-400">
                                             {{ charge.charge }} 
-                                            <span v-if="charge.currency !== 'BDT'" class="text-[10px] text-zinc-600">
+                                            <span v-if="charge.currency != 'BDT'" class="text-[10px] text-zinc-600">
                                                 ({{ charge.currency }} {{ formatPrice(charge.amount_in_currency) }})
                                             </span>
                                         </span>

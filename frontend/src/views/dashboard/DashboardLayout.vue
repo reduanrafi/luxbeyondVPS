@@ -224,7 +224,7 @@ const currentPageTitle = computed(() => {
 
 const isActive = (path) => {
     if (path === '/dashboard' && route.path === '/dashboard') return true;
-    if (path !== '/dashboard' && route.path.startsWith(path)) return true;
+    if (path != '/dashboard' && route.path.startsWith(path)) return true;
     return false;
 };
 

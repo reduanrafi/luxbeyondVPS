@@ -64,21 +64,16 @@ class PaymentController extends Controller
 
         $order = Order::findOrFail($validated['order_id']);
         
-        // Verify order belongs to authenticated user
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id != auth()->id()) {
             return response()->json([
                 'message' => 'Unauthorized access to order'
             ], 403);
         }
 
         try {
-            // Configure bKash with credentials from database
-            $this->configureBkashFromPaymentMethod();
+            // $this->configureBkashFromPaymentMethod();
 
-            // Prepare payment data
-            // Callback URL must point to the backend API server (APP_URL), not frontend
-            // APP_URL is the backend server URL (e.g., http://127.0.0.1:8000)
-            $backendUrl = rtrim(config('app.url'), '/'); // APP_URL is the backend URL
+            $backendUrl = rtrim(config('app.url'), '/');
             $callbackUrl = $backendUrl . '/api/payments/bkash/callback';
             
             $paymentData = [
@@ -93,10 +88,8 @@ class PaymentController extends Controller
                 'callback_url' => $callbackUrl,
             ]);
 
-            // Create payment using the package
             $response = Bkash::createPayment($paymentData);
 
-            // Store payment reference in order
             $order->update([
                 'payment_reference' => $response['paymentID'] ?? null,
             ]);
@@ -152,7 +145,7 @@ class PaymentController extends Controller
 
         $frontendUrl = config('app.frontend_url', config('app.url'));
 
-        if ($status !== 'success') {
+        if ($status != 'success') {
             return redirect($frontendUrl . ($requestId ? '/dashboard/requests' : '/checkout') . '?payment=failed');
         }
 
@@ -284,7 +277,7 @@ class PaymentController extends Controller
         $order = Order::findOrFail($validated['order_id']);
 
         // Check if order payment method is bank transfer or not set
-        if ($order->payment_method && $order->payment_method !== 'bank_transfer') {
+        if ($order->payment_method && $order->payment_method != 'bank_transfer') {
             return response()->json([
                 'message' => 'Payment slip can only be uploaded for bank transfer orders'
             ], 400);

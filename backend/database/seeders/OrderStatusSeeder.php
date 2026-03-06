@@ -104,7 +104,7 @@ class OrderStatusSeeder extends Seeder
         
         // Then, update allowed_next_statuses with actual IDs
         foreach ($statuses as $status) {
-            if (isset($status['allowed_next_statuses']) && $status['allowed_next_statuses'] !== null) {
+            if (isset($status['allowed_next_statuses']) && $status['allowed_next_statuses'] != null) {
                 $created = $createdStatuses[$status['sort_order']];
                 $nextStatusIds = [];
                 foreach ($status['allowed_next_statuses'] as $nextSortOrder) {

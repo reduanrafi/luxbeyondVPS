@@ -111,7 +111,7 @@ class ProductRequestController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if ($request->has('declared_shipping_cost') && $request->declared_shipping_cost !== null) {
+        if ($request->has('declared_shipping_cost') && $request->declared_shipping_cost != null) {
             $shippingCost = $request->declared_shipping_cost;
         } else {
             // Basic estimation logic if not provided (server-side fallback)
@@ -264,7 +264,7 @@ class ProductRequestController extends Controller
 
         $productRequest = ProductRequest::findOrFail($validated['request_id']);
 
-        if ($productRequest->user_id !== Auth::id()) {
+        if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -318,7 +318,7 @@ class ProductRequestController extends Controller
     {
         $productRequest = ProductRequest::findOrFail($id);
 
-        if ($productRequest->user_id !== Auth::id()) {
+        if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -349,7 +349,7 @@ class ProductRequestController extends Controller
     {
         $productRequest = ProductRequest::findOrFail($id);
 
-        if ($productRequest->user_id !== Auth::id()) {
+        if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -385,7 +385,7 @@ class ProductRequestController extends Controller
     {
         $productRequest = ProductRequest::findOrFail($id);
 
-        if ($productRequest->user_id !== Auth::id()) {
+        if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -472,7 +472,7 @@ class ProductRequestController extends Controller
     public function show($id)
     {
         $productRequest = ProductRequest::with(['user', 'orderStatus', 'timeline.creator'])->findOrFail($id);
-        if ($productRequest->user_id !== Auth::id() && !Auth::user()->hasRole('Admin')) {
+        if ($productRequest->user_id != Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         return response()->json($productRequest);
@@ -544,7 +544,7 @@ class ProductRequestController extends Controller
         $productRequest->update($updateData);
 
         // Check for status change and log timeline
-        if ($newStatusName && $newStatusName !== $oldStatus) {
+        if ($newStatusName && $newStatusName != $oldStatus) {
             \App\Models\ProductRequestTimeline::create([
                 'product_request_id' => $productRequest->id,
                 'status' => $newStatusName,
@@ -673,7 +673,7 @@ class ProductRequestController extends Controller
     public function destroy($id)
     {
         $productRequest = ProductRequest::findOrFail($id);
-        if ($productRequest->user_id !== Auth::id() && !Auth::user()->hasRole('Admin')) {
+        if ($productRequest->user_id != Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         $productRequest->delete();
@@ -711,7 +711,7 @@ class ProductRequestController extends Controller
             return response()->json(['message' => 'No valid requests found or allowed for order creation.'], 422);
         }
 
-        if ($productRequests->count() !== count($requestIds)) {
+        if ($productRequests->count() != count($requestIds)) {
              return response()->json(['message' => 'Some selected requests are invalid or already processed.'], 422);
         }
 

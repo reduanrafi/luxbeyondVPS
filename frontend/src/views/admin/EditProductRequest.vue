@@ -450,7 +450,7 @@ const updateRequest = async () => {
                      });
                 } else if (key === 'is_inside_city') {
                     formData.append(key, isInsideCity ? '1' : '0');
-                } else if (form.value[key] !== null && form.value[key] !== undefined) {
+                } else if (form.value[key] != null && form.value[key] != undefined) {
                     formData.append(key, form.value[key]);
                 }
             });

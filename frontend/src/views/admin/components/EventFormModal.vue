@@ -540,7 +540,7 @@ watch(() => props.event, (newEvent) => {
             bg_color: newEvent.bg_color || '#7c3aed',
             position: newEvent.position || 'hero',
             url: newEvent.url || '',
-            show_button: newEvent.show_button !== undefined ? newEvent.show_button : true,
+            show_button: newEvent.show_button != undefined ? newEvent.show_button : true,
             button_text: newEvent.button_text || 'Shop Now',
             button_color: newEvent.button_color || '#7c3aed',
             price: newEvent.price || null,
@@ -548,8 +548,8 @@ watch(() => props.event, (newEvent) => {
             discount_percentage: newEvent.discount_percentage || null,
             start_date: newEvent.start_date ? formatDateTimeLocal(newEvent.start_date) : '',
             end_date: newEvent.end_date ? formatDateTimeLocal(newEvent.end_date) : '',
-            is_active: newEvent.is_active !== undefined ? Boolean(newEvent.is_active) : true,
-            send_notification: newEvent.send_notification !== undefined ? Boolean(newEvent.send_notification) : false,
+            is_active: newEvent.is_active != undefined ? Boolean(newEvent.is_active) : true,
+            send_notification: newEvent.send_notification != undefined ? Boolean(newEvent.send_notification) : false,
             sort_order: newEvent.sort_order || 0,
             priority: newEvent.priority || 0,
             products: []
@@ -642,10 +642,10 @@ const handleSubmit = async () => {
 
         // Add all form fields
         Object.keys(form.value).forEach(key => {
-            if (key !== 'image' && key !== 'banner_image' && key !== 'products' && key !== 'image_url' && key !== 'banner_image_url') {
+            if (key != 'image' && key != 'banner_image' && key != 'products' && key != 'image_url' && key != 'banner_image_url') {
                 const value = form.value[key];
                 // Always send the value, even if it's null or empty (Laravel will handle it)
-                if (value !== null && value !== undefined) {
+                if (value != null && value != undefined) {
                     // Convert boolean values properly for Laravel validation
                     if (key === 'is_active' || key === 'show_button' || key === 'send_notification') {
                         formData.append(key, value ? '1' : '0');

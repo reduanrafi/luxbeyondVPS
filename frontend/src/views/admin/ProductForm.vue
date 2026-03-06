@@ -508,7 +508,7 @@ import axios from '../../axios';
 
 const route = useRoute();
 const router = useRouter();
-const isEditing = computed(() => route.params.id !== undefined);
+const isEditing = computed(() => route.params.id != undefined);
 const loading = ref(false);
 const categories = ref([]);
 const brands = ref([]);

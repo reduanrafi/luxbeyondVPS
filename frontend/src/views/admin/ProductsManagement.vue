@@ -173,7 +173,7 @@ const fetchProducts = async (page = 1) => {
             params: {
                 page,
                 search: filters.value.search,
-                category: filters.value.category !== 'all' ? filters.value.category : null,
+                category: filters.value.category != 'all' ? filters.value.category : null,
                 status: filters.value.status,
                 per_page: 15
             }

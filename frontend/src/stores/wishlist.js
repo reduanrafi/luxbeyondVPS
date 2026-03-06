@@ -73,7 +73,7 @@ export const useWishlistStore = defineStore('wishlist', () => {
 
     async function removeItem(productId, variant = null) {
         const target = items.value.find((item) => {
-            if (item.id !== productId) return false;
+            if (item.id != productId) return false;
             if (variant && item.variant) {
                 return item.variant.id === variant.id;
             }

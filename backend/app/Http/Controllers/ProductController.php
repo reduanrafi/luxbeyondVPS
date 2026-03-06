@@ -14,7 +14,7 @@ class ProductController extends Controller
 
         // Only show published products for public API (header search, shop page, etc.)
         // Admin can see all products by passing status parameter
-        if (!$request->has('status') || $request->status !== 'all') {
+        if (!$request->has('status') || $request->status != 'all') {
             $query->where('status', 'published');
         }
 
@@ -69,7 +69,7 @@ class ProductController extends Controller
         }
 
         // Price range filter
-        if ($request->has('min_price') && $request->min_price !== null) {
+        if ($request->has('min_price') && $request->min_price != null) {
             $query->where(function($q) use ($request) {
                 $q->where('sellable_price', '>=', $request->min_price)
                   ->orWhere(function($subQ) use ($request) {
@@ -79,7 +79,7 @@ class ProductController extends Controller
             });
         }
 
-        if ($request->has('max_price') && $request->max_price !== null) {
+        if ($request->has('max_price') && $request->max_price != null) {
             $query->where(function($q) use ($request) {
                 $q->where(function($subQ) use ($request) {
                     $subQ->whereNotNull('sellable_price')
@@ -143,10 +143,10 @@ class ProductController extends Controller
                 $product->slug = null; // Explicitly set to null so it's in JSON
             }
             // Apply event price if set
-            if ($eventPriceType === 'fixed' && $eventPrice !== null) {
+            if ($eventPriceType === 'fixed' && $eventPrice != null) {
                 $product->event_price = $eventPrice;
                 $product->original_price = $product->sellable_price ?: $product->price;
-            } elseif ($eventPriceType === 'percentage' && $eventDiscountPercentage !== null) {
+            } elseif ($eventPriceType === 'percentage' && $eventDiscountPercentage != null) {
                 // Calculate percentage discount
                 $originalPrice = floatval($product->sellable_price ?: $product->price);
                 $discountAmount = ($originalPrice * floatval($eventDiscountPercentage)) / 100;

@@ -21,7 +21,7 @@
                             class="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
                             <Edit class="w-4 h-4" />
                         </button>
-                        <button v-if="role.name !== 'Super Admin'" @click="deleteRole(role.id)"
+                        <button v-if="role.name != 'Super Admin'" @click="deleteRole(role.id)"
                             class="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all">
                             <Trash2 class="w-4 h-4" />
                         </button>

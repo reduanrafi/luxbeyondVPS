@@ -187,7 +187,7 @@
                                                 class="flex justify-between">
                                                 <span>
                                                     {{ charge.charge }}
-                                                    <span v-if="charge.currency !== 'BDT'"
+                                                    <span v-if="charge.currency != 'BDT'"
                                                         class="text-xs text-slate-500 ml-1">
                                                         ({{ charge.currency }} {{ charge.amount_in_currency }})
                                                     </span>

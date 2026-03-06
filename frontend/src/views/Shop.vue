@@ -351,11 +351,11 @@ const fetchProducts = async () => {
             params.category = filters.value.category;
         }
 
-        if (filters.value.minPrice !== null) {
+        if (filters.value.minPrice != null) {
             params.min_price = filters.value.minPrice;
         }
 
-        if (filters.value.maxPrice !== null) {
+        if (filters.value.maxPrice != null) {
             params.max_price = filters.value.maxPrice;
         }
 

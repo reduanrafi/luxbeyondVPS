@@ -64,7 +64,7 @@ const handlePayment = async (paymentData) => {
 
         // Update local state
         const index = requestStore.requests.findIndex(r => r.id === paymentData.requestId);
-        if (index !== -1) {
+        if (index != -1) {
             requestStore.requests[index].status = 'paid';
         }
         showPayment.value = false;

@@ -311,7 +311,7 @@
                                 <div v-if="charge.type === 'hub'" class="flex justify-between text-sm">
                                     <span class="text-slate-500">
                                         {{ charge.charge }}
-                                        <span v-if="charge.currency !== 'BDT'" class="text-xs ml-1">
+                                        <span v-if="charge.currency != 'BDT'" class="text-xs ml-1">
                                             ({{ charge.currency }} {{ charge.amount_in_currency }})
                                         </span>
                                     </span>
@@ -450,7 +450,7 @@ const checkoutSettings = ref({
 });
 
 const bkashPaymentAmount = computed(() => {
-    if (selectedPaymentMethod.value !== 'bkash') return 0;
+    if (selectedPaymentMethod.value != 'bkash') return 0;
 
     // Use dynamic percentage if partial payment selected
     if (paymentAmount.value === 'partial') {
@@ -496,7 +496,7 @@ const isFormValid = computed(() => {
 
     // For bank transfer, payment slip is required
     if (selectedPaymentMethod.value === 'bank_transfer') {
-        return baseValid && paymentSlipFile.value !== null;
+        return baseValid && paymentSlipFile.value != null;
     }
 
     return baseValid;
@@ -662,7 +662,7 @@ const placeOrder = async () => {
         if (selectedPaymentMethod.value === 'bank_transfer' && paymentSlipFile.value) {
             const formData = new FormData();
             Object.keys(orderData).forEach(key => {
-                if (orderData[key] !== null && orderData[key] !== undefined) {
+                if (orderData[key] != null && orderData[key] != undefined) {
                     if (key === 'items') {
                         formData.append(key, JSON.stringify(orderData[key]));
                     } else {
