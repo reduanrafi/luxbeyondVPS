@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Invoice #{{ $order->tracking_number ?? $order->id }}</title>
+    <title>Invoice #{{ $order->order_number }}</title>
     <style type="text/css">
     /* DejaVu Sans is built into DomPDF and supports the ৳ symbol */
     body { 
@@ -29,9 +29,18 @@
     .totals-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 11px; }
     .grand-total { background-color: #000; color: #fff; font-weight: bold; }
     .footer { margin-top: 50px; font-size: 9px; color: #888; text-align: center; clear: both; }
-    .variant-text { color: #666; font-size: 9px; margin-top: 4px; display: block; font-style: italic; }
+    .variant-text { color: #666; font-size: 9px; margin-top: 1px; display: block; font-style: italic; }
     
     .taka { font-family: 'DejaVu Sans'; }
+    .footer-thanks {
+    position: fixed;
+    bottom: 30px; /* Adjust distance from the bottom */
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+}
 </style>
 </head>
 <body>
@@ -144,6 +153,11 @@
                 <td style="text-align: right;">{!! $currency !!}{{ number_format($order->total, 2) }}</td>
             </tr>
         </table>
+
     </div>
+    <div class="footer-thanks">
+    <p style="margin-bottom: 5px;"><strong>Thank you for choosing Luxbeyond!</strong></p>
+    <p style="font-size: 10px; color: #777;">We appreciate your business. Visit us again at {{ env('FRONTEND_URL') }}</p>
+</div>
 </body>
 </html>
