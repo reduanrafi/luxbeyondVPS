@@ -6,7 +6,7 @@
                 <h2 class="text-3xl font-serif font-bold text-white tracking-wide">Edit Order</h2>
                 <p class="text-zinc-400 mt-1" v-if="order">Order #{{ order.order_number }}</p>
             </div>
-            <button @click="$router.back()" 
+            <button @click="$router.back()"
                 class="flex items-center gap-2 px-4 py-2 bg-white/5 text-zinc-300 rounded-lg hover:bg-white/10 transition-colors">
                 <ArrowLeft class="w-4 h-4" />
                 Back
@@ -25,26 +25,26 @@
                     <!-- Shipping Details -->
                     <div class="bg-[#111111] p-6 rounded-xl border border-white/5 space-y-4">
                         <h3 class="text-lg font-bold text-white mb-4">Shipping Details</h3>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Name</label>
-                                <input v-model="form.shipping_name" type="text" 
+                                <input v-model="form.shipping_name" type="text"
                                     class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Phone</label>
-                                <input v-model="form.shipping_phone" type="text" 
+                                <input v-model="form.shipping_phone" type="text"
                                     class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Email</label>
-                                <input v-model="form.shipping_email" type="email" 
+                                <input v-model="form.shipping_email" type="email"
                                     class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-zinc-400 mb-1">Address</label>
-                                <textarea v-model="form.shipping_address" rows="3" 
+                                <textarea v-model="form.shipping_address" rows="3"
                                     class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary"></textarea>
                             </div>
                         </div>
@@ -55,7 +55,7 @@
                         <h3 class="text-lg font-bold text-white mb-4">Notes</h3>
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Admin Notes</label>
-                            <textarea v-model="form.notes" rows="3" 
+                            <textarea v-model="form.notes" rows="3"
                                 class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary"
                                 placeholder="Internal notes about this order..."></textarea>
                         </div>
@@ -67,18 +67,19 @@
                     <!-- Status -->
                     <div class="bg-[#111111] p-6 rounded-xl border border-white/5 space-y-4">
                         <h3 class="text-lg font-bold text-white mb-4">Status & Payment</h3>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Order Status</label>
-                            <select v-model="form.status_id" 
+                            <select v-model="form.status_id"
                                 class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
-                                <option v-for="status in orderStatuses" :key="status.id" :value="status.id">
-                                    {{ status.label }}
+                                <option v-for="status in orderStatuses" :key="status?.id" :value="status?.id">
+                                    {{ status?.label }}
                                 </option>
                             </select>
-                            
+
                             <div class="mt-2">
-                                <label class="block text-xs font-medium text-zinc-500 mb-1">Status Note (Optional)</label>
+                                <label class="block text-xs font-medium text-zinc-500 mb-1">Status Note
+                                    (Optional)</label>
                                 <input v-model="form.status_note" type="text" placeholder="Reason for status change"
                                     class="w-full px-3 py-1.5 text-sm bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
                             </div>
@@ -86,7 +87,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Payment Status</label>
-                            <select v-model="form.payment_status" 
+                            <select v-model="form.payment_status"
                                 class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
                                 <option value="pending">Pending</option>
                                 <option value="paid">Paid</option>
@@ -97,7 +98,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-zinc-400 mb-1">Event</label>
-                             <select v-model="form.event_id" 
+                            <select v-model="form.event_id"
                                 class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:border-primary">
                                 <option :value="null">No Event</option>
                                 <option v-for="event in events" :key="event.id" :value="event.id">
@@ -149,6 +150,7 @@ const form = ref({
 });
 
 const fetchData = async () => {
+    console.log(orderId);
     loading.value = true;
     try {
         const [orderRes, statusesRes, eventsRes] = await Promise.all([
@@ -157,6 +159,8 @@ const fetchData = async () => {
             axios.get('/admin/events')
         ]);
 
+
+        console.log(statusesRes.data);
         order.value = orderRes.data;
         orderStatuses.value = statusesRes.data;
         events.value = eventsRes.data.data || eventsRes.data || [];

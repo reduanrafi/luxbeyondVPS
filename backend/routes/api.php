@@ -80,6 +80,7 @@ Route::get('/payments/bkash/callback', [\App\Http\Controllers\PaymentController:
 
 // Public Tracking
 Route::post('/track-order', [\App\Http\Controllers\Public\TrackingController::class, 'track']);
+Route::get('/download-invoice/{orderId}', [\App\Http\Controllers\OrderController::class, 'downloadInvoice']);
 
 // Facebook Catalog XML
 Route::get('/catalog.xml', [\App\Http\Controllers\Public\CatalogController::class, 'facebookCatalog']);
@@ -147,9 +148,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'show']);
         Route::put('/customers/{id}', [\App\Http\Controllers\CustomerController::class, 'update']);
         Route::post('/customers/{id}/toggle-status', [\App\Http\Controllers\CustomerController::class, 'toggleStatus']);
-        
-        
-    
 
     // User & Role Management
     Route::apiResource('users', \App\Http\Controllers\Admin\UsersController::class);

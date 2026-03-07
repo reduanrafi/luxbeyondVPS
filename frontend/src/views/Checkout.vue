@@ -118,7 +118,7 @@
                                     </div>
                                     <div v-if="method.fee_percentage || method.fee" class="text-xs text-slate-600 mt-1">
                                         <span v-if="method.fee_percentage">Processing fee: {{ method.fee_percentage
-                                        }}%</span>
+                                            }}%</span>
                                         <span v-else-if="method.fee">Processing fee: ৳{{ method.fee }}</span>
                                     </div>
                                     <!-- Show payment instructions for manual methods -->
@@ -316,7 +316,7 @@
                                         </span>
                                     </span>
                                     <span class="font-semibold text-white">৳{{ formatPrice(charge.amount_in_bdt)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </template>
                             <div class="flex justify-between text-sm">
@@ -346,7 +346,7 @@
                                 <div class="flex justify-between text-sm">
                                     <span class="text-primary font-semibold">Payment Now ({{
                                         checkoutSettings.min_payment_percentage_shop
-                                        }}%)</span>
+                                    }}%)</span>
                                     <span class="font-bold text-primary">৳{{ formatPrice(bkashPaymentAmount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
@@ -354,13 +354,13 @@
                                         checkoutSettings.min_payment_percentage_shop }}%)</span>
                                     <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total -
                                         bkashPaymentAmount)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="border-t border-white/10 pt-3 flex justify-between">
                                 <span class="text-lg font-bold text-white">Total</span>
                                 <span class="text-lg font-bold text-primary">৳{{ formatPrice(orderSummary.total)
-                                }}</span>
+                                    }}</span>
                             </div>
                             <div v-if="orderSummary.min_payment > 0"
                                 class="text-xs text-slate-600 pt-2 border-t border-white/5">
@@ -400,7 +400,9 @@ import { useAuthStore } from '../stores/auth';
 import { MapPin, CreditCard, ShoppingCart, Lock, Upload, CheckCircle } from 'lucide-vue-next';
 import axios from '../axios';
 import { trackBeginCheckout, trackPurchase } from '../utils/analytics';
+import { useToast } from 'vue-toastification';
 
+const toast = useToast();
 const router = useRouter();
 const cartStore = useCartStore();
 const authStore = useAuthStore();
@@ -829,7 +831,7 @@ const handlePaymentCallback = () => {
         // Redirect to order page
         router.push(`/dashboard/orders/${orderId}`);
     } else if (paymentStatus === 'failed' || paymentStatus === 'error') {
-        alert('Payment failed. Please try again.');
+        toast.error('Payment failed. Please try again.');
     }
 };
 

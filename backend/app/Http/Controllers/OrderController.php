@@ -13,6 +13,9 @@ use App\Notifications\OrderPlacedNotification;
 use App\Notifications\OrderPendingNotification;
 use App\Notifications\NewOrderNotification;
 use App\Notifications\OrderStatusUpdated;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Dompdf\Options;
+
 
 class OrderController extends Controller
 {
@@ -126,6 +129,7 @@ class OrderController extends Controller
             'items.*.product_name' => 'required|string',
             'items.*.price' => 'required|numeric|min:0',
             'items.*.quantity' => 'required|integer|min:1',
+            'items.*.variant_data' => 'nullable',
             'subtotal' => 'required|numeric|min:0',
             'tax' => 'nullable|numeric|min:0',
             'shipping' => 'nullable|numeric|min:0',
@@ -266,6 +270,91 @@ class OrderController extends Controller
         return response()->json($order);
     }
 
+    // public function update(Request $request, $id)
+    // {
+    //     $order = Order::findOrFail($id);
+
+    //     $validated = $request->validate([
+    //         'status_id' => 'sometimes|exists:order_statuses,id',
+    //         'event_id' => 'nullable|exists:events,id',
+    //         'payment_status' => 'sometimes|in:pending,paid,failed,refunded',
+    //         'shipping_address' => 'nullable|string',
+    //         'shipping_name' => 'nullable|string',
+    //         'shipping_phone' => 'nullable|string',
+    //         'shipping_email' => 'nullable|email',
+    //         'notes' => 'nullable|string',
+    //         'items' => 'nullable|array',
+    //         'items.*.id' => 'nullable',
+    //         'items.*.product_name' => 'nullable|string',
+    //         'items.*.price' => 'nullable|numeric|min:0',
+    //         'items.*.quantity' => 'nullable|integer|min:1',
+    //         'items.*.variant_data' => 'nullable',
+    //     ]);
+
+    //     // Handle status update
+    //     if (isset($validated['status_id'])) {
+    //         $newStatus = OrderStatus::findOrFail($validated['status_id']);
+
+    //         // Check if transition is allowed
+    //         // Fix: $order->status returns string column, use status_id to find model
+    //         $currentStatus = OrderStatus::find($order->status_id);
+    //         if ($currentStatus && $currentStatus->canTransitionTo($validated['status_id'])) {
+    //             $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
+    //             // Notify User
+    //             try {
+    //                 $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
+    //             } catch (\Exception $e) {}
+    //         } elseif (!$currentStatus) {
+    //             // If no current status (shouldn't happen), allow update
+    //             $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
+    //              // Notify User
+    //             try {
+    //                 $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
+    //             } catch (\Exception $e) {}
+    //         } else {
+    //             return response()->json([
+    //                 'message' => 'Status transition not allowed'
+    //             ], 422);
+    //         }
+    //     }
+
+    //     \Log::info('Order update request: ' . json_encode($validated));
+
+    //     // Update other fields
+    //     $order->update($validated);
+
+    //     // Check for Admin Approval of Bank Transfer
+    //     // If payment method is bank_transfer AND (status changed to Processing/Completed OR payment_status changed to paid)
+    //     if ($order->payment_method === 'bank_transfer') {
+    //         $isApproved = false;
+
+    //         // Check status change (assuming ID 2 is Processing, 3 is Completed, 4 is Delivered)
+    //         // Or simply if status is NOT Pending (1) and NOT Cancelled (5)
+    //         if (isset($validated['status_id']) && in_array($validated['status_id'], [2, 3, 4])) {
+    //             $isApproved = true;
+    //         }
+
+    //         // Check payment status change
+    //         if (isset($validated['payment_status']) && $validated['payment_status'] === 'paid') {
+    //             $isApproved = true;
+    //         }
+
+    //         if ($isApproved) {
+    //             // Determine if we should send the "Placed" notification (which acts as Approved/Confirmed)
+    //             // We typically only want to send this once.
+    //             // For simplicity, we send it.
+    //             $order->user->notify(new OrderPlacedNotification($order));
+    //         }
+    //     }
+
+    //     $order->load(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy']);
+
+    //     return response()->json([
+    //         'message' => 'Order updated successfully',
+    //         'order' => $order
+    //     ]);
+    // }
+
     public function update(Request $request, $id)
     {
         $order = Order::findOrFail($id);
@@ -279,63 +368,83 @@ class OrderController extends Controller
             'shipping_phone' => 'nullable|string',
             'shipping_email' => 'nullable|email',
             'notes' => 'nullable|string',
+            'items' => 'nullable|array',
+            'items.*.id' => 'nullable',
+            'items.*.product_id' => 'required_with:items|exists:products,id',
+            'items.*.product_name' => 'nullable|string',
+            'items.*.price' => 'nullable|numeric|min:0',
+            'items.*.quantity' => 'nullable|integer|min:1',
+            'items.*.variant_data' => 'nullable',
         ]);
 
-        // Handle status update
-        if (isset($validated['status_id'])) {
+        // 1. FIXED: Handle status update ONLY if it changed
+        if (isset($validated['status_id']) && (int)$validated['status_id'] !== (int)$order->status_id) {
             $newStatus = OrderStatus::findOrFail($validated['status_id']);
-
-            // Check if transition is allowed
-            // Fix: $order->status returns string column, use status_id to find model
             $currentStatus = OrderStatus::find($order->status_id);
-            if ($currentStatus && $currentStatus->canTransitionTo($validated['status_id'])) {
+
+            if (!$currentStatus || $currentStatus->canTransitionTo($validated['status_id'])) {
                 $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
-                // Notify User
                 try {
-                    $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
-                } catch (\Exception $e) {}
-            } elseif (!$currentStatus) {
-                // If no current status (shouldn't happen), allow update
-                $order->updateStatus($validated['status_id'], $request->status_note ?? null, Auth::id());
-                 // Notify User
-                try {
-                    $order->user->notify(new OrderStatusUpdated($order, $newStatus->name ?? $newStatus->label));
+                    $order->user->notify(new OrderStatusUpdated($order, $newStatus->label));
                 } catch (\Exception $e) {}
             } else {
-                return response()->json([
-                    'message' => 'Status transition not allowed'
-                ], 422);
+                return response()->json(['message' => 'Status transition not allowed'], 422);
             }
         }
 
-        // Update other fields
-        $order->update($validated);
+        // 2. Update the main Order fields
+        $order->update($request->only([
+            'event_id', 'payment_status', 'shipping_address', 'shipping_name', 
+            'shipping_phone', 'shipping_email', 'notes'
+        ]));
 
-        // Check for Admin Approval of Bank Transfer
-        // If payment method is bank_transfer AND (status changed to Processing/Completed OR payment_status changed to paid)
+        // 3. FIXED: Sync Items (Add, Update, or Remove)
+        if ($request->has('items')) {
+            $incomingItemIds = collect($request->items)->pluck('id')->filter()->toArray();
+
+            // A. Delete items that were removed in the UI
+            $order->items()->whereNotIn('id', $incomingItemIds)->delete();
+
+            $runningSubtotal = 0;
+
+           foreach ($request->items as $itemData) {
+    $price = (float)$itemData['price'];
+    $qty = (int)$itemData['quantity'];
+    $itemSubtotal = $price * $qty; // Calculate row subtotal
+    $runningSubtotal += $itemSubtotal;
+
+    $order->items()->updateOrCreate(
+        ['id' => $itemData['id'] ?? null],
+        [
+            'product_id'   => $itemData['product_id'],
+            'product_name' => $itemData['product_name'],
+            'price'        => $price,
+            'quantity'     => $qty,
+            'subtotal'     => $itemSubtotal, // <--- ADD THIS LINE
+            'variant_data' => is_array($itemData['variant_data']) 
+                              ? json_encode($itemData['variant_data']) 
+                              : $itemData['variant_data'],
+        ]
+    );
+}
+
+            // C. Update Order Subtotal/Total
+            $order->subtotal = $runningSubtotal;
+            $order->total = $runningSubtotal; // Adjust if you add tax/shipping logic
+            $order->save();
+        }
+
+        // 4. Notification Logic for Bank Transfer
         if ($order->payment_method === 'bank_transfer') {
-            $isApproved = false;
-
-            // Check status change (assuming ID 2 is Processing, 3 is Completed, 4 is Delivered)
-            // Or simply if status is NOT Pending (1) and NOT Cancelled (5)
-            if (isset($validated['status_id']) && in_array($validated['status_id'], [2, 3, 4])) {
-                $isApproved = true;
-            }
-
-            // Check payment status change
-            if (isset($validated['payment_status']) && $validated['payment_status'] === 'paid') {
-                $isApproved = true;
-            }
+            $isApproved = (isset($validated['status_id']) && in_array($validated['status_id'], [2, 3, 4])) 
+                    || (isset($validated['payment_status']) && $validated['payment_status'] === 'paid');
 
             if ($isApproved) {
-                // Determine if we should send the "Placed" notification (which acts as Approved/Confirmed)
-                // We typically only want to send this once.
-                // For simplicity, we send it.
                 $order->user->notify(new OrderPlacedNotification($order));
             }
         }
 
-        $order->load(['user', 'status', 'event', 'coupon', 'items.product', 'statusHistories.changedBy']);
+        $order->load(['user', 'status', 'event', 'items.product']);
 
         return response()->json([
             'message' => 'Order updated successfully',
@@ -392,5 +501,44 @@ class OrderController extends Controller
             'message' => 'Order status updated successfully',
             'order' => $order
         ]);
+    }
+
+     public function downloadInvoice($orderId)
+    {
+        $payloads = [];
+       
+        try {
+            $order = Order::with('items.product')->where('order_number',$orderId)->latest()->first();
+            if(!$order){
+                return response()->json([
+                    'success'=> false
+                ]);
+            }
+            $logoPath = public_path('/logo.png'); // Adjust path as needed
+
+            $logoBase64 = '';
+
+            if (file_exists($logoPath)) {
+                $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
+            }
+           
+            $invoiceData = [
+                'order' => $order,
+                'logo' => $logoBase64,
+            ];
+
+            $pdf = PDF::loadView('pdf.order-invoice', $invoiceData);
+
+            $options = new Options();
+            $options->setIsPhpEnabled(true);
+            $options->setIsJavascriptEnabled(true);
+            $pdf->getDomPDF()->setOptions($options);
+
+            $filename = 'invoice-order-' . $order->order_number . '.pdf';
+
+            return $pdf->download($filename);
+        } catch (MarvelException $e) {
+            throw new MarvelException(NOT_FOUND);
+        }
     }
 }

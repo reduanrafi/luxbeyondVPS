@@ -29,8 +29,8 @@
                             <router-link v-for="item in group.items" :key="item.name" :to="item.href"
                                 class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all relative group border border-transparent"
                                 :class="isActive(item.href)
-    ? 'text-primary bg-primary/10 border-primary/20'
-    : 'text-zinc-400 hover:text-white hover:bg-white/5'"
+                                    ? 'text-primary bg-primary/10 border-primary/20'
+                                    : 'text-zinc-400 hover:text-white hover:bg-white/5'"
                                 @click="isSidebarOpen = false">
                                 <component :is="item.icon" class="w-5 h-5 flex-shrink-0" />
                                 <span class="flex-1">{{ item.name }}</span>
@@ -105,19 +105,20 @@
                                     {{ unreadCount }}
                                 </span>
                             </button>
-                            
+
                             <!-- Notification Dropdown -->
-                            <div v-if="showNotifications" 
+                            <div v-if="showNotifications"
                                 class="absolute right-0 top-full mt-2 w-80 bg-[#111111] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 origin-top-right">
                                 <div class="p-4 border-b border-white/5 flex justify-between items-center">
                                     <h3 class="font-semibold text-white">Notifications</h3>
-                                    <button v-if="unreadCount > 0" @click="notificationStore.markAllAsRead" 
+                                    <button v-if="unreadCount > 0" @click="notificationStore.markAllAsRead"
                                         class="text-xs text-primary hover:underline">
                                         Mark all read
                                     </button>
                                 </div>
                                 <div class="max-h-[400px] overflow-y-auto">
-                                    <div v-if="notifications.length === 0" class="p-8 text-center text-zinc-500 text-sm">
+                                    <div v-if="notifications.length === 0"
+                                        class="p-8 text-center text-zinc-500 text-sm">
                                         No notifications
                                     </div>
                                     <div v-else>
@@ -126,17 +127,19 @@
                                             :class="{ 'bg-white/[0.02]': !notification.read_at }"
                                             @click="handleNotificationClick(notification)">
                                             <p class="text-sm text-white mb-1">{{ notification.data.message }}</p>
-                                            <p class="text-xs text-zinc-500">{{ new Date(notification.created_at).toLocaleString() }}</p>
+                                            <p class="text-xs text-zinc-500">{{ new
+                                                Date(notification.created_at).toLocaleString() }}</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="p-3 border-t border-white/5 text-center">
-                                    <router-link to="/admin/notifications" class="text-xs text-zinc-400 hover:text-white">
+                                    <router-link to="/admin/notifications"
+                                        class="text-xs text-zinc-400 hover:text-white">
                                         View all notifications
                                     </router-link>
                                 </div>
                             </div>
-                         </div>
+                        </div>
 
                         <div class="flex items-center gap-3 pl-4 border-l border-white/10">
                             <img :src="`https://ui-avatars.com/api/?name=${user?.name || 'Admin'}&background=D4AF37&color=000`"
@@ -155,9 +158,10 @@
                 <router-view />
             </main>
         </div>
-        
+
         <!-- Backdrop for notifications -->
-        <div v-if="showNotifications" @click="showNotifications = false" class="fixed inset-0 z-20 cursor-default"></div>
+        <div v-if="showNotifications" @click="showNotifications = false" class="fixed inset-0 z-20 cursor-default">
+        </div>
     </div>
 </template>
 
@@ -202,18 +206,6 @@ const route = useRoute();
 const isSidebarOpen = ref(false);
 const showNotifications = ref(false);
 const pendingCounts = ref({ orders: 0, requests: 0 });
-
-const fetchPendingCounts = async () => {
-    try {
-        const response = await axios.get('/admin/dashboard/stats');
-        pendingCounts.value = {
-            orders: response.data.pending_orders || 0,
-            requests: response.data.pending_requests || 0
-        };
-    } catch (error) {
-        console.error('Error fetching pending counts:', error);
-    }
-};
 
 const navigationGroups = computed(() => [
     {
@@ -274,7 +266,6 @@ onMounted(() => {
     if (authStore.isAuthenticated) {
         notificationStore.fetchNotifications();
     }
-    fetchPendingCounts();
 });
 
 const toggleNotifications = () => {
@@ -301,15 +292,15 @@ const currentDate = computed(() => {
 const currentTime = ref("");
 
 const updateTime = () => {
-  const now = new Date();
-  currentTime.value = now.toLocaleTimeString();
+    const now = new Date();
+    currentTime.value = now.toLocaleTimeString();
 };
 
 onMounted(() => {
-  updateTime();
-  const interval = setInterval(updateTime, 1000);
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
 
-  onUnmounted(() => clearInterval(interval));
+    onUnmounted(() => clearInterval(interval));
 });
 
 const isActive = (path) => {

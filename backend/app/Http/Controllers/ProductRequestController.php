@@ -271,25 +271,25 @@ class ProductRequestController extends Controller
         // Configure Bkash - use DB config if available, otherwise fallback to .env
         $paymentMethod = \App\Models\PaymentMethod::where('type', 'bkash')->where('is_active', true)->first();
         
-        if ($paymentMethod && $paymentMethod->config) {
-            // Use database credentials
-            config([
-                'bkash.sandbox' => $paymentMethod->config['is_sandbox'] ?? env('BKASH_SANDBOX', true),
-                'bkash.credentials.app_key' => $paymentMethod->config['app_key'] ?? env('BKASH_APP_KEY', ''),
-                'bkash.credentials.app_secret' => $paymentMethod->config['app_secret'] ?? env('BKASH_APP_SECRET', ''),
-                'bkash.credentials.username' => $paymentMethod->config['username'] ?? env('BKASH_USERNAME', ''),
-                'bkash.credentials.password' => $paymentMethod->config['password'] ?? env('BKASH_PASSWORD', ''),
-            ]);
-        } else {
-            // Fallback to .env credentials
-            config([
-                'bkash.sandbox' => env('BKASH_SANDBOX', true),
-                'bkash.credentials.app_key' => env('BKASH_APP_KEY', ''),
-                'bkash.credentials.app_secret' => env('BKASH_APP_SECRET', ''),
-                'bkash.credentials.username' => env('BKASH_USERNAME', ''),
-                'bkash.credentials.password' => env('BKASH_PASSWORD', ''),
-            ]);
-        }
+        // if ($paymentMethod && $paymentMethod->config) {
+        //     // Use database credentials
+        //     // config([
+        //     //     'bkash.sandbox' => $paymentMethod->config['is_sandbox'] ?? env('BKASH_SANDBOX', true),
+        //     //     'bkash.credentials.app_key' => $paymentMethod->config['app_key'] ?? env('BKASH_APP_KEY', ''),
+        //     //     'bkash.credentials.app_secret' => $paymentMethod->config['app_secret'] ?? env('BKASH_APP_SECRET', ''),
+        //     //     'bkash.credentials.username' => $paymentMethod->config['username'] ?? env('BKASH_USERNAME', ''),
+        //     //     'bkash.credentials.password' => $paymentMethod->config['password'] ?? env('BKASH_PASSWORD', ''),
+        //     // ]);
+        // } else {
+        //     // Fallback to .env credentials
+        //     config([
+        //         'bkash.sandbox' => env('BKASH_SANDBOX', true),
+        //         'bkash.credentials.app_key' => env('BKASH_APP_KEY', ''),
+        //         'bkash.credentials.app_secret' => env('BKASH_APP_SECRET', ''),
+        //         'bkash.credentials.username' => env('BKASH_USERNAME', ''),
+        //         'bkash.credentials.password' => env('BKASH_PASSWORD', ''),
+        //     ]);
+        // }
 
         try {
             $backendUrl = rtrim(config('app.url'), '/');
