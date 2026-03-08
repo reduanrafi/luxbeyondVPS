@@ -46,7 +46,7 @@
 <body>
     @php
         $settings = $settings->options ?? [];
-        $currency = '&#2547;'; // Based on your previous context
+        $currency = 'BDT'; // Based on your previous context
     @endphp
 
     <div class="invoice-wrapper">
@@ -80,11 +80,29 @@
                 </td>
                 <td width="4%"></td>
                 <td class="address-box">
-                    <div class="address-title">Ship To</div>
+                    <div class="address-title">Bill To</div>
                     <strong>{{ $order->shipping_name }}</strong><br>
                     Phone: {{ $order->shipping_phone }}<br>
                     Email: {{ $order->shipping_email }}<br>
-                    Address: {{ $order->shipping_address }}
+                    @php
+                    $rawAddress = $order->shipping_address;
+                    
+                    // Check if it's JSON (starts with { )
+                    if (is_string($rawAddress) && str_starts_with(trim($rawAddress), '{')) {
+                        $data = json_decode($rawAddress, true);
+                        
+                        $address = implode(', ', array_filter([
+                            $data['street'] ?? $data['address'] ?? null,
+                            $data['city'] ?? null,
+                            $data['state'] ?? null,
+                            $data['zip'] ?? null,
+                            $data['phone'] ?? null
+                        ]));
+                    } else {
+                        $address = $rawAddress;
+                    }
+                @endphp
+                Address: {{ $address }}
                 </td>
             </tr>
         </table>
@@ -117,9 +135,9 @@
                             </span>
                         @endif
                     </td>
-                    <td> {!! $currency !!}{{ number_format($item->price, 2) }}</td>
+                    <td> {{ $currency }} {{ number_format($item->price, 2) }}</td>
                     <td>{{ $item->quantity }}</td>
-                    <td style="text-align: right;">{!! $currency !!}{{ number_format($item->price * $item->quantity, 2) }}</td>
+                    <td style="text-align: right;">{{ $currency }} {{ number_format($item->price * $item->quantity, 2) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -128,36 +146,36 @@
         <table class="totals-table">
             <tr>
                 <td>Subtotal</td>
-                <td style="text-align: right;">{!! $currency !!}{{ number_format($order->subtotal, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->subtotal, 2) }}</td>
             </tr>
             @if($order->discount > 0)
             <tr>
                 <td>Discount</td>
-                <td style="text-align: right;">-{!! $currency !!}{{ number_format($order->discount, 2) }}</td>
+                <td style="text-align: right;">-{{ $currency }} {{ number_format($order->discount, 2) }}</td>
             </tr>
             @endif
             <tr>
                 <td>Shipping</td>
-                <td style="text-align: right;">{!! $currency !!}{{ number_format($order->delivery_fee ?? 0, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->delivery_fee ?? 0, 2) }}</td>
             </tr>
             <tr>
                 <td>Tax</td>
-                <td style="text-align: right;">{!! $currency !!}{{ number_format($order->tax ?? 0, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->tax ?? 0, 2) }}</td>
             </tr>
             <tr>
                 <td>Discount</td>
-                <td style="text-align: right;">{!! $currency !!}{{ number_format($order->discount ?? 0, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->discount ?? 0, 2) }}</td>
             </tr>
             <tr class="grand-total">
                 <td>Total Payable</td>
-                <td style="text-align: right;">{!! $currency !!}{{ number_format($order->total, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->total, 2) }}</td>
             </tr>
         </table>
 
     </div>
     <div class="footer-thanks">
-    <p style="margin-bottom: 5px;"><strong>Thank you for choosing Luxbeyond!</strong></p>
-    <p style="font-size: 10px; color: #777;">We appreciate your business. Visit us again at {{ env('FRONTEND_URL') }}</p>
+    <p style="margin-bottom: 2px;"><strong>Thank you for choosing Luxbeyond!</strong></p>
+    <p style="font-size: 9px; color: #777;">We appreciate your business. Visit us again at {{ env('FRONTEND_URL') }}</p>
 </div>
 </body>
 </html>
