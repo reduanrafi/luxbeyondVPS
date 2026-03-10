@@ -47,6 +47,7 @@ class Order extends Model
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
         'paid_at' => 'datetime',
+        'shipping_address' => 'array',
     ];
 
     protected $appends = [

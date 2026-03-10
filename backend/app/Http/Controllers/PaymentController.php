@@ -298,6 +298,17 @@ class PaymentController extends Controller
                 'payment_status' => 'pending', // Admin will verify
             ]);
 
+            // Create an OrderPayment record so it shows in order.payments
+            OrderPayment::updateOrCreate(
+                ['order_id' => $order->id, 'payment_method' => 'bank_transfer'],
+                [
+                    'amount' => $order->total,
+                    'payment_reference' => $validated['transaction_id'] ?? null,
+                    'payment_slip' => $filename,
+                    'status' => 'pending',
+                ]
+            );
+
             return response()->json([
                 'message' => 'Payment slip uploaded successfully',
                 'order' => $order->fresh(),

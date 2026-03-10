@@ -113,12 +113,36 @@
                                     </div>
                                 </div>
 
+                                <!-- Charges Breakdown -->
+                                <div v-if="request.charges_breakdown && request.charges_breakdown.length > 0"
+                                    class="mt-4 bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
+                                    <div class="px-4 py-2 border-b border-slate-700">
+                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Charges
+                                            Breakdown</p>
+                                    </div>
+                                    <div class="divide-y divide-slate-700">
+                                        <div v-for="(charge, index) in request.charges_breakdown" :key="index"
+                                            class="flex justify-between items-center px-4 py-2">
+                                            <span class="text-xs text-slate-400">{{ charge.name || charge.label ||
+                                                'Charge' }}</span>
+                                            <span class="text-xs font-semibold text-white">৳{{
+                                                formatPrice(charge.amount_in_bdt ?? charge.amount ?? 0) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Total Amount -->
-                                <div class="bg-slate-800 rounded-lg p-4 mt-4 border border-slate-700">
+                                <div class="bg-slate-800 rounded-lg p-4 mt-4 border border-slate-700 space-y-2">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm font-semibold text-white">Total Amount</span>
+                                        <span class="text-sm font-semibold text-white">Total Amount (BDT)</span>
                                         <span class="text-xl font-bold text-primary">৳{{
                                             formatPrice(request.total_amount_bdt) }}</span>
+                                    </div>
+                                    <div v-if="request.min_payment_amount && request.min_payment_amount > 0"
+                                        class="flex justify-between items-center text-xs pt-2 border-t border-slate-700">
+                                        <span class="text-slate-400">Minimum Payment (60%)</span>
+                                        <span class="font-semibold text-yellow-400">৳{{
+                                            formatPrice(request.min_payment_amount) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -152,10 +176,10 @@ const editableQuantity = ref(1);
 const updatingQuantity = ref(false);
 
 const shippingAddress = ref({
+    name: '',
+    division: '',
+    thana: '',
     street: '',
-    city: '',
-    state: '',
-    postal_code: '',
     phone: ''
 });
 
@@ -172,6 +196,10 @@ const fetchRequest = async () => {
             shippingAddress.value = { ...request.value.user.shipping_address };
         } else if (request.value.shipping_address) {
             shippingAddress.value = { ...request.value.shipping_address };
+        }
+
+        if (!shippingAddress.value.name && request.value.user?.name) {
+            shippingAddress.value.name = request.value.user.name;
         }
     } catch (err) {
         console.error('Error fetching request:', err);

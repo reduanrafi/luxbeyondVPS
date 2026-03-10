@@ -84,9 +84,8 @@
                         </label>
                     </div>
 
-                    <!-- BKash Payment Options -->
-                    <div v-if="paymentMethod === 'bkash'"
-                        class="mt-4 space-y-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <!-- Payment Type Options (Partial/Full) -->
+                    <div class="mt-4 space-y-3 p-4 bg-white/5 rounded-2xl border border-white/5">
                         <div class="flex gap-4">
                             <label class="flex-1 flex items-center gap-3 cursor-pointer group">
                                 <input type="radio" v-model="paymentType" value="partial" class="sr-only">
@@ -134,18 +133,30 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-2">
                             <label
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Name</label>
+                            <input v-model="form.name" type="text" placeholder="John Doe"
+                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Division</label>
+                            <input v-model="form.division" type="text" placeholder="Dhaka"
+                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Thana</label>
+                            <input v-model="form.thana" type="text" placeholder="Dhanmondi"
+                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
+                        </div>
+                        <div class="col-span-2">
+                            <label
                                 class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Street
                                 Address</label>
                             <input v-model="form.street" type="text" placeholder="e.g. 123 Luxury Lane"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
-                        <div>
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">City</label>
-                            <input v-model="form.city" type="text" placeholder="City"
-                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
-                        </div>
-                        <div>
+                        <div class="col-span-2">
                             <label
                                 class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Phone</label>
                             <input v-model="form.phone" type="text" placeholder="+880..."
@@ -160,8 +171,8 @@
                     class="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors disabled:opacity-50">
                     Cancel
                 </button>
-                <button @click="submit" :disabled="loading"
-                    class="px-8 py-3 bg-primary text-slate-900 text-[10px] font-bold rounded-xl hover:bg-white transition-all disabled:opacity-50 flex items-center gap-3 uppercase tracking-widest">
+                <button @click="submit" :disabled="loading || !isFormValid"
+                    class="px-8 py-3 bg-primary text-slate-900 text-[10px] font-bold rounded-xl hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 uppercase tracking-widest">
                     <span v-if="loading"
                         class="animate-spin h-3 w-3 border-2 border-slate-900 border-t-transparent rounded-full"></span>
                     {{ loading ? 'Processing...' : (paymentMethod === 'bkash' ? 'Proceed to bKash' : 'Confirm Order') }}
@@ -207,12 +218,17 @@ const handleFileUpload = (event) => {
 };
 
 const form = ref({
+    name: '',
+    division: '',
+    thana: '',
     street: '',
-    city: '',
-    state: '',
-    postal_code: '',
     phone: '',
-    country: 'Bangladesh'
+});
+
+const isFormValid = computed(() => {
+    if (!form.value.name || !form.value.division || !form.value.thana || !form.value.street || !form.value.phone) return false;
+    if (paymentMethod.value === 'bank_transfer' && !paymentSlip.value) return false;
+    return true;
 });
 
 watch(() => props.isOpen, (newVal) => {
@@ -260,8 +276,8 @@ const formatPrice = (price) => {
 };
 
 const submit = () => {
-    if (!form.value.street || !form.value.city || !form.value.phone || !paymentSlip.value) {
-        alert('Please fill in required fields (Street, City, Phone) and upload payment slip');
+    if (!isFormValid.value) {
+        alert('Please fill in required fields correctly.');
         return;
     }
 

@@ -47,49 +47,41 @@
                                         placeholder="+880 1XXX-XXXXXX" />
                                 </div>
                             </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                    Email Address <span class="text-red-500">*</span>
-                                </label>
-                                <input v-model="shippingForm.email" type="email" required
-                                    class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
-                                    placeholder="john@example.com" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                    Address <span class="text-red-500">*</span>
-                                </label>
-                                <textarea v-model="shippingForm.address" rows="3" required
-                                    class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
-                                    placeholder="House/Flat No, Road, Area"></textarea>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                        City <span class="text-red-500">*</span>
+                                        Division <span class="text-red-500">*</span>
                                     </label>
-                                    <input v-model="shippingForm.city" type="text" required
+                                    <input v-model="shippingForm.address.division" type="text" required
                                         class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
                                         placeholder="Dhaka" />
                                 </div>
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                        Postal Code
+                                        Thana <span class="text-red-500">*</span>
                                     </label>
-                                    <input v-model="shippingForm.postal_code" type="text"
+                                    <input v-model="shippingForm.address.thana" type="text" required
                                         class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
-                                        placeholder="1200" />
+                                        placeholder="Dhanmondi" />
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                        Delivery Location <span class="text-red-500">*</span>
-                                    </label>
-                                    <select v-model="shippingForm.is_inside_city" required @change="calculateCharges"
-                                        class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all bg-surface">
-                                        <option :value="true">Inside City</option>
-                                        <option :value="false">Outside City</option>
-                                    </select>
-                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-300 mb-2">
+                                    Street Address <span class="text-red-500">*</span>
+                                </label>
+                                <textarea v-model="shippingForm.address.street" rows="2" required
+                                    class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
+                                    placeholder="House/Flat No, Road, Area"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-300 mb-2">
+                                    Delivery Location <span class="text-red-500">*</span>
+                                </label>
+                                <select v-model="shippingForm.is_inside_city" required @change="calculateCharges"
+                                    class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all bg-surface">
+                                    <option :value="true">Inside City</option>
+                                    <option :value="false">Outside City</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -118,7 +110,7 @@
                                     </div>
                                     <div v-if="method.fee_percentage || method.fee" class="text-xs text-slate-600 mt-1">
                                         <span v-if="method.fee_percentage">Processing fee: {{ method.fee_percentage
-                                            }}%</span>
+                                        }}%</span>
                                         <span v-else-if="method.fee">Processing fee: ৳{{ method.fee }}</span>
                                     </div>
                                     <!-- Show payment instructions for manual methods -->
@@ -145,7 +137,7 @@
                     </div>
 
                     <!-- bKash Payment Amount Selection -->
-                    <div v-if="selectedPaymentMethod === 'bkash'" class="bg-surface border border-white/5 p-6">
+                    <div class="bg-surface border border-white/5 p-6">
                         <h2
                             class="text-xl font-serif text-white mb-6 flex items-center gap-3 tracking-wide border-b border-white/5 pb-4">
                             <CreditCard class="w-5 h-5 text-primary" />
@@ -316,7 +308,7 @@
                                         </span>
                                     </span>
                                     <span class="font-semibold text-white">৳{{ formatPrice(charge.amount_in_bdt)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </template>
                             <div class="flex justify-between text-sm">
@@ -340,13 +332,12 @@
                                 <span>Discount</span>
                                 <span class="font-semibold">-৳{{ formatPrice(orderSummary.discount) }}</span>
                             </div>
-                            <!-- bKash Payment Breakdown -->
-                            <div v-if="selectedPaymentMethod === 'bkash' && paymentAmount === 'partial'"
-                                class="space-y-2 py-3 border-t border-white/10">
+                            <!-- Payment Amount Breakdown -->
+                            <div v-if="paymentAmount === 'partial'" class="space-y-2 py-3 border-t border-white/10">
                                 <div class="flex justify-between text-sm">
                                     <span class="text-primary font-semibold">Payment Now ({{
                                         checkoutSettings.min_payment_percentage_shop
-                                    }}%)</span>
+                                        }}%)</span>
                                     <span class="font-bold text-primary">৳{{ formatPrice(bkashPaymentAmount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
@@ -354,13 +345,13 @@
                                         checkoutSettings.min_payment_percentage_shop }}%)</span>
                                     <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total -
                                         bkashPaymentAmount)
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="border-t border-white/10 pt-3 flex justify-between">
                                 <span class="text-lg font-bold text-white">Total</span>
                                 <span class="text-lg font-bold text-primary">৳{{ formatPrice(orderSummary.total)
-                                    }}</span>
+                                }}</span>
                             </div>
                             <div v-if="orderSummary.min_payment > 0"
                                 class="text-xs text-slate-600 pt-2 border-t border-white/5">
@@ -410,10 +401,11 @@ const authStore = useAuthStore();
 const shippingForm = ref({
     name: '',
     phone: '',
-    email: '',
-    address: '',
-    city: '',
-    postal_code: '',
+    address: {
+        division: "",
+        thana: "",
+        street: ""
+    },
     is_inside_city: true,
 });
 
@@ -452,8 +444,6 @@ const checkoutSettings = ref({
 });
 
 const bkashPaymentAmount = computed(() => {
-    if (selectedPaymentMethod.value != 'bkash') return 0;
-
     // Use dynamic percentage if partial payment selected
     if (paymentAmount.value === 'partial') {
         const percentage = parseFloat(checkoutSettings.value.min_payment_percentage_shop) || 60;
@@ -489,9 +479,9 @@ const isFormValid = computed(() => {
     const baseValid = (
         shippingForm.value.name &&
         shippingForm.value.phone &&
-        shippingForm.value.email &&
-        shippingForm.value.address &&
-        shippingForm.value.city &&
+        shippingForm.value.address.division &&
+        shippingForm.value.address.thana &&
+        shippingForm.value.address.street &&
         selectedPaymentMethod.value &&
         cartStore.items.length > 0
     );
@@ -652,10 +642,9 @@ const placeOrder = async () => {
             discount: orderSummary.value.discount || 0,
             currency: 'BDT',
             payment_method: selectedPaymentMethod.value,
-            shipping_address: `${shippingForm.value.address}, ${shippingForm.value.city}${shippingForm.value.postal_code ? ', ' + shippingForm.value.postal_code : ''}`,
+            shipping_address: shippingForm.value.address,
             shipping_name: shippingForm.value.name,
             shipping_phone: shippingForm.value.phone,
-            shipping_email: shippingForm.value.email,
             notes: orderNotes.value,
         };
 
@@ -665,7 +654,7 @@ const placeOrder = async () => {
             const formData = new FormData();
             Object.keys(orderData).forEach(key => {
                 if (orderData[key] != null && orderData[key] != undefined) {
-                    if (key === 'items') {
+                    if (key === 'items' || key === 'shipping_address') {
                         formData.append(key, JSON.stringify(orderData[key]));
                     } else {
                         formData.append(key, orderData[key]);

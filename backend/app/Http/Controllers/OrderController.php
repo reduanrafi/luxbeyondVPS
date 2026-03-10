@@ -119,6 +119,12 @@ class OrderController extends Controller
         if ($request->has('items') && is_string($request->items)) {
             $request->merge(['items' => json_decode($request->items, true)]);
         }
+        if ($request->has('shipping_address') && is_string($request->shipping_address)) {
+            $addr = json_decode($request->shipping_address, true);
+            if (is_array($addr)) {
+                $request->merge(['shipping_address' => $addr]);
+            }
+        }
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -136,10 +142,12 @@ class OrderController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:3',
             'payment_method' => 'nullable|string',
-            'shipping_address' => 'nullable|string',
+            'shipping_address' => 'nullable|array',
+            'shipping_address.division' => 'nullable|string',
+            'shipping_address.thana' => 'nullable|string',
+            'shipping_address.street' => 'nullable|string',
             'shipping_name' => 'nullable|string',
             'shipping_phone' => 'nullable|string',
-            'shipping_email' => 'nullable|email',
             'notes' => 'nullable|string',
             'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120', // 5MB max
         ]);
@@ -177,7 +185,6 @@ class OrderController extends Controller
             'shipping_address' => $validated['shipping_address'] ?? null,
             'shipping_name' => $validated['shipping_name'] ?? null,
             'shipping_phone' => $validated['shipping_phone'] ?? null,
-            'shipping_email' => $validated['shipping_email'] ?? null,
             'notes' => $validated['notes'] ?? null,
         ]);
 
@@ -363,10 +370,12 @@ class OrderController extends Controller
             'status_id' => 'sometimes|exists:order_statuses,id',
             'event_id' => 'nullable|exists:events,id',
             'payment_status' => 'sometimes|in:pending,paid,failed,refunded',
-            'shipping_address' => 'nullable|string',
+            'shipping_address' => 'nullable|array',
+            'shipping_address.division' => 'nullable|string',
+            'shipping_address.thana' => 'nullable|string',
+            'shipping_address.street' => 'nullable|string',
             'shipping_name' => 'nullable|string',
             'shipping_phone' => 'nullable|string',
-            'shipping_email' => 'nullable|email',
             'notes' => 'nullable|string',
             'items' => 'nullable|array',
             'items.*.id' => 'nullable',
@@ -395,7 +404,7 @@ class OrderController extends Controller
         // 2. Update the main Order fields
         $order->update($request->only([
             'event_id', 'payment_status', 'shipping_address', 'shipping_name', 
-            'shipping_phone', 'shipping_email', 'notes'
+            'shipping_phone', 'notes'
         ]));
 
         // 3. FIXED: Sync Items (Add, Update, or Remove)

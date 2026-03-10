@@ -355,8 +355,10 @@ class ProductRequestController extends Controller
 
         $validator = Validator::make($request->all(), [
             'shipping_address' => 'required|array',
+            'shipping_address.name' => 'required|string',
+            'shipping_address.division' => 'required|string',
+            'shipping_address.thana' => 'required|string',
             'shipping_address.street' => 'required|string',
-            'shipping_address.city' => 'required|string',
             'shipping_address.phone' => 'required|string',
         ]);
 
@@ -625,7 +627,7 @@ class ProductRequestController extends Controller
             'currency' => 'BDT',
             'payment_method' => $productRequest->payment_method,
             'payment_status' => $productRequest->payment_status ?? 'unpaid',
-            'shipping_address' => json_encode($productRequest->shipping_address),
+            'shipping_address' => $productRequest->shipping_address,
             'notes' => 'Converted from Request #' . $productRequest->request_number,
         ]);
 
@@ -690,8 +692,10 @@ class ProductRequestController extends Controller
             'payment_type' => 'nullable|string|in:full,partial',
             'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
             'shipping_address' => 'required|array',
+            'shipping_address.name' => 'required|string',
+            'shipping_address.division' => 'required|string',
+            'shipping_address.thana' => 'required|string',
             'shipping_address.street' => 'required|string',
-            'shipping_address.city' => 'required|string',
             'shipping_address.phone' => 'required|string',
         ]);
 
@@ -773,8 +777,8 @@ class ProductRequestController extends Controller
                 'currency' => 'BDT',
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => 'unpaid',
-                'shipping_address' => json_encode($validated['shipping_address']),
-                'shipping_name' => Auth::user()->name,
+                'shipping_address' => $validated['shipping_address'],
+                'shipping_name' => collect($validated['shipping_address'])->get('name') ?? Auth::user()->name,
                 'shipping_phone' => $validated['shipping_address']['phone'],
                 'notes' => 'Combined Order from Requests: ' . implode(', ', $productRequests->pluck('request_number')->toArray()),
             ]);

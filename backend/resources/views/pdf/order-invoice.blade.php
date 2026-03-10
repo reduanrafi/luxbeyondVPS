@@ -92,11 +92,9 @@
                         $data = json_decode($rawAddress, true);
                         
                         $address = implode(', ', array_filter([
-                            $data['street'] ?? $data['address'] ?? null,
-                            $data['city'] ?? null,
-                            $data['state'] ?? null,
-                            $data['zip'] ?? null,
-                            $data['phone'] ?? null
+                            $data['street'] ?? null,
+                            $data['thana'] ?? null,
+                            $data['division'] ?? null,
                         ]));
                     } else {
                         $address = $rawAddress;

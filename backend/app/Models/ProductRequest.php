@@ -38,6 +38,8 @@ class ProductRequest extends Model
         'min_payment_amount',
         'charges_breakdown',
         'shipping_address',
+        'shipping_name',
+        'shipping_phone',
     ];
 
     protected $casts = [
