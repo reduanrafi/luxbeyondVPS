@@ -1,19 +1,21 @@
 <template>
     <div class="min-h-screen bg-black py-8 px-4">
-        <div class="max-w-4xl mx-auto space-y-6">
+        <div class=" mx-auto space-y-6">
             <!-- Loading State -->
-            <div v-if="loading" class="bg-slate-900 rounded-xl shadow-lg p-8 text-center border border-slate-800">
+            <div v-if="loading"
+                class="bg-slate-900 bg-surface rounded-xl shadow-lg p-8 text-center border border-white/5 hover:border-primary/30">
                 <div
-                    class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent">
+                    class="inline-block animate-spin bg-surface rounded-full h-8 w-8 border-4 border-primary border-t-transparent">
                 </div>
                 <p class="mt-4 text-sm text-slate-400">Loading request details...</p>
             </div>
 
             <!-- Error State -->
-            <div v-else-if="error" class="bg-slate-900 rounded-xl shadow-lg p-8 text-center border border-red-900">
+            <div v-else-if="error"
+                class="bg-slate-900 bg-surface rounded-xl shadow-lg p-8 text-center border border-red-900">
                 <p class="text-red-400 font-semibold mb-4">{{ error }}</p>
                 <button @click="$router.push('/dashboard/requests')"
-                    class="px-6 py-2 bg-primary text-slate-900 rounded-lg hover:bg-primary/90 transition-colors">
+                    class="px-6 py-2 bg-primary text-slate-900 bg-surface rounded-lg hover:bg-primary/90 transition-colors">
                     ← Back to Requests
                 </button>
             </div>
@@ -27,14 +29,14 @@
                         <p class="text-sm text-slate-600 mt-1">Request #{{ request.request_number || request.id }}</p>
                     </div>
                     <button @click="$router.push('/dashboard/requests')"
-                        class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700">
+                        class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-900 bg-surface rounded-lg hover:bg-slate-700 transition-colors border border-white/5 hover:border-primary/30">
                         ← Back
                     </button>
                 </div>
 
                 <!-- Status Badge -->
                 <div v-if="request.status"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold" :class="{
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-surface rounded-lg text-sm font-semibold" :class="{
                         'bg-yellow-100 text-yellow-800': request.status === 'pending',
                         'bg-green-100 text-green-800': request.status === 'request_accepted' || request.status === 'accepted',
                         'bg-blue-100 text-blue-800': request.status === 'completed',
@@ -44,13 +46,14 @@
                 </div>
 
                 <!-- Product Summary Card -->
-                <div class="bg-slate-900 rounded-xl shadow-lg overflow-hidden border border-slate-800">
+                <div
+                    class="bg-surface rounded-xl shadow-lg overflow-hidden border border-white/5 hover:border-primary/30">
                     <div class="p-6">
                         <div class="flex flex-col md:flex-row gap-6">
                             <!-- Product Image -->
                             <div v-if="request.admin_image_url" class="flex-shrink-0">
                                 <img :src="request.admin_image_url" alt="Product" referrerpolicy="no-referrer"
-                                    class="w-32 h-32 object-contain rounded-lg border border-slate-700 bg-slate-800 p-2"
+                                    class="w-32 h-32 object-contain bg-surface rounded-lg border border-white/5 hover:border-primary/30 p-2"
                                     @error="handleImageError">
                             </div>
 
@@ -59,13 +62,14 @@
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <p class="text-xs text-slate-500 mb-1">Product Name</p>
-                                        <p class="text-base font-semibold text-white">{{ request.product_name }}</p>
+                                        <p class="text-sm font-semibold text-white">{{ request.product_name ?? 'N/A'
+                                        }}</p>
                                     </div>
                                     <div v-if="request.status === 'request_accepted' || request.status === 'accepted'"
                                         class="flex gap-2">
                                         <button @click="openAddressModal"
-                                            class="px-6 py-2 bg-primary text-slate-900 text-sm font-bold rounded-lg hover:bg-white transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)] uppercase tracking-widest">
-                                            Confirm & Create Order
+                                            class="px-6 py-2 bg-primary text-slate-900 text-sm font-bold rounded-lg hover:bg-primary/70 transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)] uppercase tracking-widest">
+                                            Confirm Request
                                         </button>
                                     </div>
                                 </div>
@@ -74,31 +78,35 @@
                                     <p class="text-xs text-slate-500 mb-1">Product URL</p>
                                     <a :href="request.url" target="_blank"
                                         class="text-sm text-blue-600 hover:text-blue-700 hover:underline break-all">
-                                        {{ request.url }}
+                                        {{ request.url.substring(0, 100) + '...' }}
                                     </a>
                                 </div>
 
                                 <div class="grid grid-cols-3 gap-4">
-                                    <div class="bg-slate-800 rounded-lg p-3 border border-slate-700">
+                                    <div
+                                        class="bg-surface rounded-lg p-3 border border-white/5 hover:border-primary/30">
                                         <p class="text-xs text-slate-500 mb-1">Price</p>
                                         <p class="text-sm font-semibold text-white">{{ request.currency }} {{
                                             formatPrice(request.price) }}</p>
+                                        <p v-if="convertedUnitPrice !== null" class="text-xs text-slate-400 mt-1">≈ ৳{{
+                                            formatPrice(convertedUnitPrice) }}</p>
                                     </div>
-                                    <div class="bg-slate-800 rounded-lg p-3 border border-slate-700">
+                                    <div
+                                        class="bg-surface rounded-lg p-3 border border-white/5 hover:border-primary/30">
                                         <p class="text-xs text-slate-500 mb-2">Quantity</p>
                                         <div class="flex items-center gap-2"
                                             v-if="request.status === 'request_accepted' || request.status === 'accepted'">
                                             <button @click="decreaseQuantity"
                                                 :disabled="updatingQuantity || editableQuantity <= 1"
-                                                class="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded text-white font-bold transition-colors">
+                                                class="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed bg-surface rounded text-white font-bold transition-colors">
                                                 −
                                             </button>
                                             <input v-model.number="editableQuantity" @blur="updateQuantityIfChanged"
                                                 @keyup.enter="updateQuantityIfChanged" type="number" min="1"
                                                 :disabled="updatingQuantity"
-                                                class="w-16 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-center text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50" />
+                                                class="w-16 px-2 py-1 bg-slate-700 border border-slate-600 bg-surface rounded text-center text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50" />
                                             <button @click="increaseQuantity" :disabled="updatingQuantity"
-                                                class="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded text-white font-bold transition-colors">
+                                                class="w-7 h-7 flex items-center justify-center bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed bg-surface rounded text-white font-bold transition-colors">
                                                 +
                                             </button>
                                         </div>
@@ -106,25 +114,36 @@
                                             <p class="text-xs text-primary mt-1">{{ editableQuantity }}</p>
                                         </div>
                                     </div>
-                                    <div class="bg-slate-800 rounded-lg p-3 border border-slate-700">
+                                    <div
+                                        class="bg-surface rounded-lg p-3 border border-white/5 hover:border-primary/30">
                                         <p class="text-xs text-slate-500 mb-1">Subtotal</p>
                                         <p class="text-sm font-semibold text-white">{{ request.currency }} {{
                                             formatPrice(request.price * editableQuantity) }}</p>
+                                        <p v-if="convertedUnitPrice !== null" class="text-xs text-slate-400 mt-1">≈ ৳{{
+                                            formatPrice(convertedUnitPrice * editableQuantity) }}</p>
                                     </div>
                                 </div>
 
                                 <!-- Charges Breakdown -->
                                 <div v-if="request.charges_breakdown && request.charges_breakdown.length > 0"
-                                    class="mt-4 bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-                                    <div class="px-4 py-2 border-b border-slate-700">
+                                    class="mt-4 bg-surface rounded-lg border border-white/5 hover:border-primary/30 overflow-hidden">
+                                    <div class="px-4 py-2 border-b border-white/5 hover:border-primary/30">
                                         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Charges
                                             Breakdown</p>
                                     </div>
                                     <div class="divide-y divide-slate-700">
                                         <div v-for="(charge, index) in request.charges_breakdown" :key="index"
-                                            class="flex justify-between items-center px-4 py-2">
-                                            <span class="text-xs text-slate-400">{{ charge.name || charge.label ||
-                                                'Charge' }}</span>
+                                            class="flex justify-between items-center px-4 py-2 border border-white/5 hover:border-primary/30">
+                                            <span class="text-xs text-slate-400">{{ charge.charge }}
+                                                <span v-if="charge.calculation_type">
+                                                    <span v-if="charge.calculation_type === 'fixed'">
+                                                        (Fixed {{ charge.value }})
+                                                    </span>
+                                                    <span v-else>
+                                                        (Percentage {{ charge.value }})
+                                                    </span>
+                                                </span>
+                                            </span>
                                             <span class="text-xs font-semibold text-white">৳{{
                                                 formatPrice(charge.amount_in_bdt ?? charge.amount ?? 0) }}</span>
                                         </div>
@@ -132,14 +151,15 @@
                                 </div>
 
                                 <!-- Total Amount -->
-                                <div class="bg-slate-800 rounded-lg p-4 mt-4 border border-slate-700 space-y-2">
+                                <div
+                                    class="bg-surface rounded-lg p-4 mt-4 border border-white/5 hover:border-primary/30 space-y-2">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-semibold text-white">Total Amount (BDT)</span>
                                         <span class="text-xl font-bold text-primary">৳{{
                                             formatPrice(request.total_amount_bdt) }}</span>
                                     </div>
                                     <div v-if="request.min_payment_amount && request.min_payment_amount > 0"
-                                        class="flex justify-between items-center text-xs pt-2 border-t border-slate-700">
+                                        class="flex justify-between items-center text-xs pt-2 border-t border-white/5 hover:border-primary/30">
                                         <span class="text-slate-400">Minimum Payment (60%)</span>
                                         <span class="font-semibold text-yellow-400">৳{{
                                             formatPrice(request.min_payment_amount) }}</span>
@@ -174,6 +194,15 @@ const confirmingOrder = ref(false);
 const showAddressModal = ref(false);
 const editableQuantity = ref(1);
 const updatingQuantity = ref(false);
+const currencies = ref([]);
+
+const convertedUnitPrice = computed(() => {
+    if (!request.value || !currencies.value.length) return null;
+    const currency = currencies.value.find(c => c.code === request.value.currency);
+    if (!currency) return null;
+    if (currency.is_base) return request.value.price;
+    return request.value.price * currency.rate_to_base;
+});
 
 const shippingAddress = ref({
     name: '',
@@ -216,39 +245,35 @@ const openAddressModal = () => {
 const handleConfirmOrder = async (orderPayload) => {
     confirmingOrder.value = true;
     try {
-        let payload = orderPayload;
+        let payload;
         let config = {};
 
-        // If there's a payment slip, we must send FormData
         if (orderPayload.payment_slip) {
+            // Bank transfer with slip — use FormData
             payload = new FormData();
-
+            payload.append('request_id', request.value.request_number || request.value.id);
             payload.append('payment_method', orderPayload.payment_method);
             if (orderPayload.payment_type) {
                 payload.append('payment_type', orderPayload.payment_type);
             }
-
             Object.keys(orderPayload.shipping_address).forEach(key => {
                 payload.append(`shipping_address[${key}]`, orderPayload.shipping_address[key]);
             });
-
-            orderPayload.request_items.forEach((item, index) => {
-                payload.append(`request_items[${index}][id]`, item.id);
-                payload.append(`request_items[${index}][quantity]`, item.quantity);
-            });
-
             payload.append('payment_slip', orderPayload.payment_slip);
-
-            config = {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+            config = { headers: { 'Content-Type': 'multipart/form-data' } };
+        } else {
+            // JSON payload
+            payload = {
+                request_id: request.value.request_number || request.value.id,
+                payment_method: orderPayload.payment_method,
+                payment_type: orderPayload.payment_type,
+                shipping_address: orderPayload.shipping_address,
             };
         }
 
         const response = await axios.post('/product-requests/create-order', payload, config);
 
-        showAddressModal.value = false;
+        // showAddressModal.value = false;
 
         // Handle bKash redirection
         if (response.data.initiate_bkash && response.data.order_id) {
@@ -321,7 +346,7 @@ const updateQuantityIfChanged = async () => {
 };
 
 const handleImageError = (event) => {
-    event.target.src = '/placeholder-product.png';
+    event.target.src = '/assets/placeholder.webp';
 };
 
 const formatPrice = (value) => {
@@ -329,7 +354,17 @@ const formatPrice = (value) => {
     return parseFloat(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
+const fetchCurrencies = async () => {
+    try {
+        const response = await axios.get('/currencies');
+        currencies.value = response.data.data || response.data || [];
+    } catch (err) {
+        console.error('Error fetching currencies:', err);
+    }
+};
+
 onMounted(() => {
+    fetchCurrencies();
     fetchRequest();
 });
 </script>

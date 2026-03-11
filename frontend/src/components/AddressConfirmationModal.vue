@@ -1,7 +1,7 @@
 <template>
     <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md px-4">
         <div
-            class="bg-slate-900 p-8 rounded-3xl shadow-2xl max-w-2xl w-full border border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+            class="bg-black p-8 rounded-3xl shadow-2xl max-w-2xl w-full border border-primary overflow-hidden flex flex-col max-h-[90vh]">
             <div class="mb-6">
                 <h3 class="text-2xl font-serif text-white uppercase tracking-widest mb-2">Review Your Order</h3>
                 <p class="text-xs text-slate-400">Review your selected items and confirm shipping details.</p>
@@ -10,13 +10,13 @@
             <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                 <!-- Selected Items Summary -->
                 <div class="mb-8 space-y-4">
-                    <h4 class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-4">Selected Items</h4>
+                    <h4 class="text-sm font-bold text-primary uppercase tracking-[0.2em] mb-4">Selected Items</h4>
                     <div class="space-y-3">
                         <div v-for="item in editableItems" :key="item.id"
                             class="bg-white/5 border border-white/5 rounded-2xl p-4 flex gap-4 hover:border-primary/20 transition-colors">
                             <div
                                 class="w-16 h-16 bg-background rounded-xl overflow-hidden flex-shrink-0 border border-white/5">
-                                <img :src="item.admin_image_url || item.url"
+                                <img :src="item.admin_image_url ? item.admin_image_url : '/assets/placeholder.webp'"
                                     class="w-full h-full object-cover opacity-80" alt="Product">
                             </div>
                             <div class="flex-1 min-w-0">
@@ -28,12 +28,12 @@
                                         <button @click="updateQty(item.id, -1)"
                                             class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors">-</button>
                                         <span class="w-8 text-center text-xs font-mono text-white">{{ item.quantity
-                                            }}</span>
+                                        }}</span>
                                         <button @click="updateQty(item.id, 1)"
                                             class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors">+</button>
                                     </div>
                                     <span class="text-sm font-serif text-white">৳{{ formatPrice(getItemTotal(item))
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +133,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-2">
                             <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Name</label>
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Full
+                                Name</label>
                             <input v-model="form.name" type="text" placeholder="John Doe"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
@@ -151,7 +152,7 @@
                         </div>
                         <div class="col-span-2">
                             <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Street
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Full
                                 Address</label>
                             <input v-model="form.street" type="text" placeholder="e.g. 123 Luxury Lane"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
@@ -283,10 +284,6 @@ const submit = () => {
 
     emit('confirm', {
         shipping_address: form.value,
-        request_items: editableItems.value.map(item => ({
-            id: item.id,
-            quantity: item.quantity
-        })),
         payment_method: paymentMethod.value,
         payment_type: paymentType.value,
         payment_slip: paymentSlip.value

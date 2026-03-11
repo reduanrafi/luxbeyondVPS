@@ -171,8 +171,10 @@ class ProductRequestController extends Controller
                 $additionalChargesTotal += $chargeAmountBDT;
                 
                 $chargesBreakdown[] = [
-                    'charge' => $charge->name,
                     'currency' => $currency->code, // The charge is associated with this currency
+                    'charge' => $charge->name,
+                    'calculation_type' => $charge->calculation_type,
+                    'value' => $charge->value,
                     'amount_in_currency' => $charge->calculation_type === 'fixed' ? $charge->value : ($productSubtotal * $charge->value / 100),
                     'amount_in_bdt' => $chargeAmountBDT
                 ];
@@ -200,6 +202,9 @@ class ProductRequestController extends Controller
         
         $grandTotal = $productTotalBDT + $defaultDeliveryCharge + $tax + $finalAdditionalCharges + $processingFee + $shippingCost;
 
+        $minPaymentAmountPercent =\App\Models\Setting::get('min_payment_percentage_request', 100);
+        $minPaymentAmount = ($grandTotal * $minPaymentAmountPercent) / 100;
+
         $productRequest = ProductRequest::create([
             'user_id' => Auth::id(),
             'url' => $request->url,
@@ -218,6 +223,7 @@ class ProductRequestController extends Controller
             'payment_processing_fee' => $processingFee,
             'additional_charges' => $finalAdditionalCharges,
             'charges_breakdown' => $chargesBreakdown,
+            'min_payment_amount' => $minPaymentAmount,
         ]);
 
         $productRequest->refresh();
@@ -262,7 +268,9 @@ class ProductRequestController extends Controller
             'payment_type' => 'nullable|string|in:full,partial',
         ]);
 
-        $productRequest = ProductRequest::findOrFail($validated['request_id']);
+        $productRequest = ProductRequest::where(function($query) use ($validated){
+            $query->where('id', $validated['request_id'])->orWhere('request_number', $validated['request_id']);
+        })->firstOrFail();
 
         if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -316,7 +324,9 @@ class ProductRequestController extends Controller
 
     public function submitPaymentDetails(Request $request, $id)
     {
-        $productRequest = ProductRequest::findOrFail($id);
+        $productRequest = ProductRequest::where(function($query) use ($id){
+            $query->where('id', $id)->orWhere('request_number', $id);
+        })->firstOrFail();
 
         if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -347,7 +357,9 @@ class ProductRequestController extends Controller
 
     public function confirmOrder(Request $request, $id)
     {
-        $productRequest = ProductRequest::findOrFail($id);
+        $productRequest = ProductRequest::where(function($query) use ($id){
+            $query->where('id', $id)->orWhere('request_number', $id);
+        })->firstOrFail();
 
         if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -385,7 +397,10 @@ class ProductRequestController extends Controller
     
     public function updateQuantity(Request $request, $id)
     {
-        $productRequest = ProductRequest::findOrFail($id);
+        $productRequest = ProductRequest::where(function($query) use ($id) {
+            $query->where('id', $id)
+                ->orWhere('request_number', $id);
+        })->first();
 
         if ($productRequest->user_id != Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -473,7 +488,11 @@ class ProductRequestController extends Controller
     }
     public function show($id)
     {
-        $productRequest = ProductRequest::with(['user', 'orderStatus', 'timeline.creator'])->findOrFail($id);
+       
+        $productRequest = ProductRequest::with(['user', 'orderStatus', 'timeline.creator'])->where(function($query) use ($id){
+            $query->where('id', $id)->orWhere('request_number', $id);
+        })->firstOrFail();
+        
         if ($productRequest->user_id != Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -483,7 +502,9 @@ class ProductRequestController extends Controller
     // Admin approves and updates image
     public function update(Request $request, $id)
     {
-        $productRequest = ProductRequest::findOrFail($id);
+        $productRequest = ProductRequest::where(function($query) use ($id){
+            $query->where('id', $id)->orWhere('request_number', $id);
+        })->firstOrFail();
         
         // Check permission (simple check for now, better to use Policies)
         if (!Auth::user()->hasRole('Admin')) {
@@ -584,7 +605,9 @@ class ProductRequestController extends Controller
 
     public function convertToOrder(Request $request, $id)
     {
-        $productRequest = ProductRequest::with('user')->findOrFail($id);
+        $productRequest = ProductRequest::with('user')->where(function($query) use ($id){
+            $query->where('id', $id)->orWhere('request_number', $id);
+        })->firstOrFail();
         
         // Admin only
         if (!Auth::user()->hasRole('Admin')) {
@@ -674,7 +697,9 @@ class ProductRequestController extends Controller
 
     public function destroy($id)
     {
-        $productRequest = ProductRequest::findOrFail($id);
+        $productRequest = ProductRequest::where(function($query) use ($id){
+            $query->where('id', $id)->orWhere('request_number', $id);
+        })->firstOrFail();
         if ($productRequest->user_id != Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -685,192 +710,139 @@ class ProductRequestController extends Controller
     public function createOrderFromRequests(Request $request)
     {
         $validated = $request->validate([
-            'request_items' => 'required|array|min:1',
-            'request_items.*.id' => 'required|exists:product_requests,id',
-            'request_items.*.quantity' => 'required|integer|min:1',
+            'request_id'     => 'required',
             'payment_method' => 'required|string|in:bkash,bank_transfer',
-            'payment_type' => 'nullable|string|in:full,partial',
-            'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
-            'shipping_address' => 'required|array',
-            'shipping_address.name' => 'required|string',
+            'payment_type'   => 'nullable|string|in:full,partial',
+            'payment_slip'   => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
+            'shipping_address'          => 'required|array',
+            'shipping_address.name'     => 'required|string',
             'shipping_address.division' => 'required|string',
-            'shipping_address.thana' => 'required|string',
-            'shipping_address.street' => 'required|string',
-            'shipping_address.phone' => 'required|string',
+            'shipping_address.thana'    => 'required|string',
+            'shipping_address.street'   => 'required|string',
+            'shipping_address.phone'    => 'required|string',
         ]);
 
         $userId = Auth::id();
-        $requestItems = $validated['request_items'];
-        $requestIds = collect($requestItems)->pluck('id')->toArray();
-        $quantitiesMap = collect($requestItems)->pluck('quantity', 'id')->toArray();
-        
-        // Fetch valid requests
-        $productRequests = ProductRequest::whereIn('id', $requestIds)
-            ->where('user_id', $userId)
-            ->whereIn('status', ['request_accepted', 'accepted'])
-            ->whereNull('shipping_address') // Ensure not already confirmed/ordered
-            ->get();
 
-        if ($productRequests->isEmpty()) {
-            return response()->json(['message' => 'No valid requests found or allowed for order creation.'], 422);
-        }
+        // Support both numeric ID and request_number
+        $productRequest = ProductRequest::where(function ($q) use ($validated) {
+            $q->where('id', $validated['request_id'])
+              ->orWhere('request_number', $validated['request_id']);
+        })
+        ->where('user_id', $userId)
+        ->whereIn('status', ['request_accepted', 'accepted'])
+        ->first();
 
-        if ($productRequests->count() != count($requestIds)) {
-             return response()->json(['message' => 'Some selected requests are invalid or already processed.'], 422);
+        if (!$productRequest) {
+            return response()->json(['message' => 'Request not found, not yours, or not eligible for order creation.'], 422);
         }
 
         try {
             DB::beginTransaction();
 
-            // Calculate Totals
-            $subtotal = 0;
-            $tax = 0;
-            $shipping = 0; // Declared shipping cost
-            $additionalCharges = 0;
-            $totalAmount = 0;
-            $minPaymentAmount = 0; // If any has min payment, handling logic? Usually sum.
+            // Use pre-calculated totals stored on the request by admin
+            $totalAmount      = $productRequest->total_amount_bdt ?? 0;
+            $minPaymentAmount = $request->payment_type == 'partial' && $productRequest->min_payment_amount == 0 ? \App\Models\Setting::get('min_payment_percentage_request', 60) * $totalAmount / 100 : $productRequest->min_payment_amount;
+            $tax              = $productRequest->tax ?? 0;
+            $shipping         = ($productRequest->declared_shipping_cost ?? 0) + ($productRequest->delivery_charge ?? 0);
+            $currency = App\Models\Currency::where('code', $productRequest->currency)->first();
+            $price = $productRequest->price * $currency->rate_to_base;
+            $subtotal         = $price * $productRequest->quantity;
 
-            foreach ($productRequests as $req) {
-                 // Update quantity if changed
-                 $newQty = $quantitiesMap[$req->id] ?? $req->quantity;
-                 if ($newQty != $req->quantity) {
-                     $req->quantity = $newQty;
-                     
-                     // Recalculate Total BDT (following logic in updateQuantity)
-                     $currency = \App\Models\Currency::where('code', $req->currency)->first();
-                     $rate = ($currency && !$currency->is_base) ? $currency->rate_to_base : 1;
-                     $productTotalBDT = $req->price * $req->quantity * $rate;
-                     
-                     $breakdownTotal = 0;
-                     if (!empty($req->charges_breakdown)) {
-                          foreach ($req->charges_breakdown as $charge) {
-                              $breakdownTotal += ($charge['amount_in_bdt'] ?? 0);
-                          }
-                     }
-                     
-                     $req->total_amount_bdt = $productTotalBDT + ($req->declared_shipping_cost ?? 0) + $breakdownTotal;
-                     $req->save();
-                 }
+            // Determine default order status
+            $defaultStatus = OrderStatus::where('name', 'pending')->first();
 
-                 // Sum up the totals for the order
-                 $subtotal += ($req->price * $req->quantity);
-                 $totalAmount += $req->total_amount_bdt;
-                 $tax += $req->tax ?? 0;
-                 $shipping += ($req->declared_shipping_cost ?? 0) + ($req->delivery_charge ?? 0);
-                 $additionalCharges += ($req->additional_charges ?? 0) + ($req->payment_processing_fee ?? 0);
-                 $minPaymentAmount += $req->min_payment_amount ?? 0;
-            }
-
-            // Determine Status
-            $defaultStatus = OrderStatus::where('name', 'pending')->first(); // Or 'Awaiting Payment'
-            
             // Create Order
             $order = Order::create([
-                'user_id' => $userId,
-                'status_id' => $defaultStatus?->id,
-                'status' => $defaultStatus?->name ?? 'pending',
-                'subtotal' => $subtotal,
-                'tax' => $tax,
-                'shipping' => $shipping,
-                'total' => $totalAmount,
+                'user_id'          => $userId,
+                'status_id'        => $defaultStatus?->id,
+                'status'           => $defaultStatus?->name ?? 'pending',
+                'subtotal'         => $subtotal,
+                'tax'              => $tax,
+                'shipping'         => $shipping,
+                'total'            => $totalAmount,
                 'min_payment_amount' => $minPaymentAmount,
-                'currency' => 'BDT',
-                'payment_method' => $validated['payment_method'],
-                'payment_status' => 'unpaid',
+                'currency'         => 'BDT',
+                'payment_method'   => $validated['payment_method'],
+                'payment_status'   => 'unpaid',
                 'shipping_address' => $validated['shipping_address'],
-                'shipping_name' => collect($validated['shipping_address'])->get('name') ?? Auth::user()->name,
-                'shipping_phone' => $validated['shipping_address']['phone'],
-                'notes' => 'Combined Order from Requests: ' . implode(', ', $productRequests->pluck('request_number')->toArray()),
+                'shipping_name'    => $validated['shipping_address']['name'] ?? Auth::user()->name,
+                'shipping_phone'   => $validated['shipping_address']['phone'],
+                'notes'            => 'Order from Request #' . $productRequest->request_number,
             ]);
 
-            // Handle Payslip upload
+            // Handle payment slip upload (bank transfer)
             if ($request->hasFile('payment_slip')) {
-                $file = $request->file('payment_slip');
-               $folder = 'payment_slips';
+                $file     = $request->file('payment_slip');
+                $folder   = 'payment_slips';
                 $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
-                
                 $file->storeAs($folder, $filename, 'public');
-                $newPath = $folder . '/' . $filename;
-                
                 $order->update([
-                    'payment_slip' => $newPath,
-                    'payment_status' => 'pending', 
+                    'payment_slip'   => $folder . '/' . $filename,
+                    'payment_status' => 'pending',
                 ]);
             }
 
-            // Create Order Items and Update Requests
-            foreach ($productRequests as $req) {
-                \App\Models\OrderItem::create([
-                    'request_id' => $req->id,
-                    'order_id' => $order->id,
-                    'product_name' => $req->product_name ?? 'Product Request #' . $req->request_number,
-                    'price' => $req->price,
-                    'quantity' => $req->quantity,
-                    'subtotal' => $req->total_amount_bdt, // Storing line total provided in request
-                    'image' => $req->admin_image_url ?? $req->url, 
-                    'variant_data' => [
-                        'request_url' => $req->url,
-                        'request_number' => $req->request_number,
-                        'request_id' => $req->id
-                    ],
-                ]);
+            // Create Order Item from request data
+            \App\Models\OrderItem::create([
+                'request_id'   => $productRequest->id,
+                'order_id'     => $order->id,
+                'product_name' => $productRequest->product_name ?? 'Product Request #' . $productRequest->request_number,
+                'price'        => $price,
+                'quantity'     => $productRequest->quantity,
+                'subtotal'     => $totalAmount,
+                'image'        => $productRequest->admin_image_url ?? $productRequest->url,
+                'variant_data' => [
+                    'request_url'    => $productRequest->url,
+                    'request_number' => $productRequest->request_number,
+                    'request_id'     => $productRequest->id,
+                ],
+            ]);
 
-                // Update Request
-                $req->update([
-                    'status' => 'completed', // Or a dedicated 'converted' status
-                    'shipping_address' => $validated['shipping_address']
-                ]);
-                
-                // Add Timeline
-                 \App\Models\ProductRequestTimeline::create([
-                    'product_request_id' => $req->id,
-                    'status' => 'completed',
-                    'note' => 'Converted to Order #' . $order->order_number,
-                    'created_by' => $userId,
-                ]);
-            }
-            
-            // Initial Order Status History
-            $order->updateStatus($defaultStatus->id, 'Created from Product Requests', $userId);
-            
-            // Notify User
+            // Mark request as completed and save shipping address
+            $productRequest->update([
+                'status'           => 'completed',
+                'shipping_address' => $validated['shipping_address'],
+            ]);
+
+            // Timeline entry
+            \App\Models\ProductRequestTimeline::create([
+                'product_request_id' => $productRequest->id,
+                'status'             => 'completed',
+                'note'               => 'Converted to Order #' . $order->order_number,
+                'created_by'         => $userId,
+            ]);
+
+            // Initial order status history
+            $order->updateStatus($defaultStatus->id, 'Created from Request #' . $productRequest->request_number, $userId);
+
+            // Notify user
             try {
                 Auth::user()->notify(new \App\Notifications\OrderPlacedNotification($order));
             } catch (\Exception $e) {}
 
             DB::commit();
 
-            // Handle bKash redirection if selected
+            // bKash: return flag for frontend to initiate payment
             if ($validated['payment_method'] === 'bkash') {
-                $payAmount = ($validated['payment_type'] ?? 'partial') === 'full' 
-                    ? $order->total 
+                $payAmount = ($validated['payment_type'] ?? 'partial') === 'full'
+                    ? $order->total
                     : $order->min_payment_amount;
 
-                // Create a request with same data as initiateBkashOrderPayment
-                $paymentRequest = new Request([
-                    'order_id' => $order->id,
-                    'amount' => $payAmount,
-                    'payment_type' => $validated['payment_type'] ?? 'partial'
-                ]);
-
-                // Call PaymentController@initiateBkashOrderPayment logic
-                // For simplicity, we can just return the order info and let frontend initiate
-                // OR instantiate controller and call it.
-                // Better: Return order AND a flag that bkash is needed.
                 return response()->json([
-                    'message' => 'Order created. Redirecting to bKash...',
-                    'order_id' => $order->id,
-                    'order_number' => $order->order_number,
+                    'message'       => 'Order created. Redirecting to bKash...',
+                    'order_id'      => $order->id,
+                    'order_number'  => $order->order_number,
                     'initiate_bkash' => true,
-                    'pay_amount' => $payAmount,
-                    'payment_type' => $validated['payment_type'] ?? 'partial'
+                    'pay_amount'    => $payAmount,
+                    'payment_type'  => $validated['payment_type'] ?? 'partial',
                 ]);
             }
 
             return response()->json([
-                'message' => 'Order created successfully',
-                'order_id' => $order->id,
-                'order_number' => $order->order_number
+                'message'      => 'Order created successfully',
+                'order_id'     => $order->id,
+                'order_number' => $order->order_number,
             ]);
 
         } catch (\Exception $e) {

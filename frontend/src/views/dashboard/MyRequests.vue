@@ -77,7 +77,7 @@
                             </td>
                             <td class="p-4">
                                 <div class="flex items-center gap-2">
-                                    <router-link :to="`/dashboard/requests/${request.id}`"
+                                    <router-link :to="`/dashboard/requests/${request.request_number}`"
                                         class="text-xs font-bold uppercase tracking-wider text-primary hover:text-white hover:underline transition-all">
                                         View
                                     </router-link>

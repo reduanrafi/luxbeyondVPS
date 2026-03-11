@@ -67,7 +67,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                    Street Address <span class="text-red-500">*</span>
+                                    Full Address <span class="text-red-500">*</span>
                                 </label>
                                 <textarea v-model="shippingForm.address.street" rows="2" required
                                     class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
@@ -704,7 +704,7 @@ const placeOrder = async () => {
             // For manual payment methods, clear cart and redirect
             trackPurchase(order);
             cartStore.clearCart();
-            uploadPaymentSlip()
+            // uploadPaymentSlip()
 
             // Redirect to order confirmation
             let id = order.order_number ?? order.request_number

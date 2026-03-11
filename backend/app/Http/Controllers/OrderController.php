@@ -216,14 +216,14 @@ class OrderController extends Controller
             $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
     
             $file->storeAs($folder, $filename, 'public');
-            $newPath = $folder . '/' . $filename;
+            $paymentSlipPath = $folder . '/' . $filename;
 
             // Create payment record with pending status for bank transfer
             OrderPayment::create([
                 'order_id' => $order->id,
                 'payment_method' => 'bank_transfer',
                 'amount' => $total,
-                'payment_slip' => $newPath,
+                'payment_slip' => $paymentSlipPath,
                 'status' => 'pending', // Pending admin verification
             ]);
 
