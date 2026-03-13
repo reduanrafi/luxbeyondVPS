@@ -50,7 +50,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-semibold text-slate-300 mb-2">
-                                        Division <span class="text-red-500">*</span>
+                                        District <span class="text-red-500">*</span>
                                     </label>
                                     <input v-model="shippingForm.address.division" type="text" required
                                         class="w-full px-4 py-3 border bg-background border border-white/10 text-white placeholder-slate-600 rounded-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition-all outline-none"
@@ -696,7 +696,7 @@ const placeOrder = async () => {
                 }
             } catch (error) {
                 console.error('Error initiating bKash payment:', error);
-                alert('Failed to initiate payment. Please try again.');
+                toast.error('Failed to initiate payment. Please try again.');
                 processing.value = false;
                 return;
             }
@@ -713,7 +713,7 @@ const placeOrder = async () => {
         }
     } catch (error) {
         console.error('Error placing order:', error);
-        alert(error.response?.data?.message || 'Failed to place order. Please try again.');
+        toast.error(error.response?.data?.message || 'Failed to place order. Please try again.');
         processing.value = false;
     }
 };
@@ -722,7 +722,7 @@ const handlePaymentSlipUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
         if (file.size > 5 * 1024 * 1024) {
-            alert('File size must be less than 5MB');
+            toast.error('File size must be less than 5MB');
             return;
         }
         paymentSlipFile.value = file;
@@ -772,7 +772,7 @@ const uploadPaymentSlip = async () => {
         }, 2000);
     } catch (error) {
         console.error('Error uploading payment slip:', error);
-        alert(error.response?.data?.message || 'Failed to upload payment slip. Please try again.');
+        toast.error(error.response?.data?.message || 'Failed to upload payment slip. Please try again.');
     } finally {
         uploadingSlip.value = false;
     }

@@ -249,7 +249,9 @@ import { Star, ShoppingCart, Heart, CheckCircle, Minus, Plus, Package } from 'lu
 import axios from '../axios';
 import ProductCard from '../components/ProductCard.vue';
 import { trackViewItem, trackAddToCart as trackAddToCartGA4 } from '../utils/analytics';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const route = useRoute();
 const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
@@ -394,7 +396,7 @@ const addToCart = () => {
 
     // Check if variant is required but not selected
     if (product.value.has_variants && !selectedVariant.value) {
-        alert('Please select a variant');
+        toast.error('Please select a variant');
         return;
     }
 

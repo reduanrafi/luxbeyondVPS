@@ -113,7 +113,7 @@
                                                     <span v-if="key === 'request_url'">
                                                         URL: <a :href="val" target="_blank"
                                                             class="text-primary hover:underline break-all"
-                                                            @click.stop>{{ val }}</a>
+                                                            @click.stop>{{ val.substring(0, 50) + '...' }}</a>
                                                     </span>
                                                     <span v-else>{{ key }}: {{ val }}</span>
                                                 </div>
@@ -348,7 +348,9 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from '../../axios';
 import PaymentModal from '../../components/PaymentModal.vue';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const order = ref(null);
@@ -386,11 +388,11 @@ const initiateBkash = async () => {
         if (response.data.bkashURL) {
             window.location.href = response.data.bkashURL;
         } else {
-            alert('Failed to get payment URL');
+            toast.error('Failed to get payment URL');
         }
     } catch (err) {
         console.error('Bkash Error:', err);
-        alert(err.response?.data?.message || 'Payment initiation failed');
+        toast.error(err.response?.data?.message || 'Payment initiation failed');
     } finally {
         processingBkash.value = false;
     }
@@ -430,11 +432,11 @@ const handleBankTransfer = async (data) => {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         showPayment.value = false;
-        alert('Payment slip uploaded successfully! Waiting for admin approval.');
+        toast.success('Payment slip uploaded successfully! Waiting for admin approval.');
         fetchOrder();
     } catch (err) {
         console.error('Bank Transfer Error:', err);
-        alert(err.response?.data?.message || 'Failed to upload payment slip');
+        toast.error(err.response?.data?.message || 'Failed to upload payment slip');
     }
 };
 

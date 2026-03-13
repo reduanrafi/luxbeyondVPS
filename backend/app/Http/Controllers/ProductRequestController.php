@@ -51,7 +51,8 @@ class ProductRequestController extends Controller
 
     public function adminIndex(Request $request)
     {
-        $query = ProductRequest::with(['user', 'orderStatus', 'timeline']);
+        $query = ProductRequest::with(['user', 'orderStatus', 'timeline'])
+            ->whereDoesntHave('orderItem');
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;
@@ -415,71 +416,45 @@ class ProductRequestController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $productRequest->quantity = $validated['quantity'];
-        
-        // Recalculate Total
-        // Base Formula: (Price * Qty * Rate) + Tax + Delivery + Additional + Processing + Ship
-        // We assume Delivery/Tax/Additional/Processing/Ship are fixed amounts set by Admin
-        // However, if charges are percentage-based, they SHOULD be recalculated.
-        // For simplicity and safety (not knowing exact charge rules per request), we will update the Product Subtotal component of the Total.
-        // But wait, Total Amount BDT is stored as a single value.
-        // We need to re-derive it.
-        
-        $currency = \App\Models\Currency::where('code', $productRequest->currency)->first();
-        $rate = ($currency && !$currency->is_base) ? $currency->rate_to_base : 1;
-        
-        $productTotalBDT = $productRequest->price * $productRequest->quantity * $rate;
-        
-        // We must re-sum the charges from breakdown if possible, or use the stored fields?
-        // Stored fields (tax, delivery, etc) are flat amounts.
-        // Assuming they are fixed for now.
-        
-        // Charges Breakdown: 'amount_in_bdt' might need update if it was % based on product total.
-        // If we don't update them, we might be wrong.
-        // But we don't know the rule (fixed vs %) from just the array.
-        // Ideally we should re-run Charge::calculate().
-        // BUT, admin might have customized them.
-        
-        // Compromise:
-        // Update product total.
-        // Leave charges as is (User is just changing quantity, admin usually sets per-order charges (delivery, tax etc might be fixed)).
-        // Warn user? Or just do it.
-        // Let's just update the product component of total.
-        
-        $chargesTotal = ($productRequest->tax ?? 0) +
-                        ($productRequest->delivery_charge ?? 0) +
-                        ($productRequest->additional_charges ?? 0) +
-                        ($productRequest->payment_processing_fee ?? 0) +
-                        ($productRequest->declared_shipping_cost ?? 0);
-                        
-        // Also add breakdown items sum in case they aren't in the explicit fields (since we refactored)
-        // Wait, did we refactor backend to NOT use explicit fields?
-        // Admin edits sets them to 0 and puts everything in breakdown.
-        // So we MUST sum breakdown.
-        
-        $breakdownTotal = 0;
-        if (!empty($productRequest->charges_breakdown)) {
-             foreach ($productRequest->charges_breakdown as $charge) {
-                 $breakdownTotal += ($charge['amount_in_bdt'] ?? 0);
-             }
-        }
-        
-        // Avoid double counting if migration happened partially or not at all.
-        // If breakdown exists, rely on it?
-        // Admin controller 'update' sums them all?
-        // Let's look at EditProductRequest.vue: calculates total as ProductTotal + Breakdown + Shipping.
-        // It IGNORES tax/delivery/etc if breakdown exists (or adds them if migrated).
-        // So: Total = ProductTotalBDT + DeclaredShipping + BreakdownSum.
-        
-        $newTotal = $productTotalBDT + ($productRequest->declared_shipping_cost ?? 0) + $breakdownTotal;
-        
-        // Fallback for legacy (if breakdown empty)
-        if (empty($productRequest->charges_breakdown)) {
-             $newTotal = $productTotalBDT + $chargesTotal;
-        }
+        $oldQuantity = $productRequest->quantity;
+        $newQuantity = $validated['quantity'];
 
-        $productRequest->total_amount_bdt = $newTotal;
-        $productRequest->save();
+        if ($oldQuantity != $newQuantity && $oldQuantity > 0) {
+            $ratio = $newQuantity / $oldQuantity;
+
+            // Scale explicit fields
+            $productRequest->tax = ($productRequest->tax ?? 0) * $ratio;
+            $productRequest->delivery_charge = ($productRequest->delivery_charge ?? 0) * $ratio;
+            $productRequest->additional_charges = ($productRequest->additional_charges ?? 0) * $ratio;
+            $productRequest->payment_processing_fee = ($productRequest->payment_processing_fee ?? 0) * $ratio;
+            $productRequest->declared_shipping_cost = ($productRequest->declared_shipping_cost ?? 0) * $ratio;
+
+            // Scale charges breakdown
+            $updatedBreakdown = [];
+            if (!empty($productRequest->charges_breakdown)) {
+                foreach ($productRequest->charges_breakdown as $charge) {
+                    if (isset($charge['amount_in_currency'])) {
+                        $charge['amount_in_currency'] *= $ratio;
+                    }
+                    if (isset($charge['amount_in_bdt'])) {
+                        $charge['amount_in_bdt'] *= $ratio;
+                    }
+                    if (isset($charge['amount'])) {
+                        $charge['amount'] *= $ratio;
+                    }
+                    $updatedBreakdown[] = $charge;
+                }
+                $productRequest->charges_breakdown = $updatedBreakdown;
+            }
+
+            // Scale total and min payment
+            $productRequest->total_amount_bdt = $productRequest->total_amount_bdt * $ratio;
+            $minPaymentAmountPercent = \App\Models\Setting::get('min_payment_percentage_request', 100);
+            $productRequest->min_payment_amount = ($productRequest->total_amount_bdt * $minPaymentAmountPercent) / 100;
+
+            $productRequest->quantity = $newQuantity;
+            $productRequest->save();
+        }
 
         return response()->json([
             'message' => 'Quantity updated successfully',
@@ -716,8 +691,8 @@ class ProductRequestController extends Controller
             'payment_slip'   => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120',
             'shipping_address'          => 'required|array',
             'shipping_address.name'     => 'required|string',
-            'shipping_address.division' => 'required|string',
-            'shipping_address.thana'    => 'required|string',
+            'shipping_address.division' => 'nullable|string',
+            'shipping_address.thana'    => 'nullable|string',
             'shipping_address.street'   => 'required|string',
             'shipping_address.phone'    => 'required|string',
         ]);
@@ -745,7 +720,7 @@ class ProductRequestController extends Controller
             $minPaymentAmount = $request->payment_type == 'partial' && $productRequest->min_payment_amount == 0 ? \App\Models\Setting::get('min_payment_percentage_request', 60) * $totalAmount / 100 : $productRequest->min_payment_amount;
             $tax              = $productRequest->tax ?? 0;
             $shipping         = ($productRequest->declared_shipping_cost ?? 0) + ($productRequest->delivery_charge ?? 0);
-            $currency = App\Models\Currency::where('code', $productRequest->currency)->first();
+            $currency = \App\Models\Currency::where('code', $productRequest->currency)->first();
             $price = $productRequest->price * $currency->rate_to_base;
             $subtotal         = $price * $productRequest->quantity;
 

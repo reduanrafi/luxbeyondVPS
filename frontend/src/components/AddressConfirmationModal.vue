@@ -138,9 +138,16 @@
                             <input v-model="form.name" type="text" placeholder="John Doe"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
+                        <div class="col-span-2">
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Full
+                                Address</label>
+                            <input v-model="form.street" type="text" placeholder="e.g. 123 Luxury Lane"
+                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
+                        </div>
                         <div>
                             <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Division</label>
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">District</label>
                             <input v-model="form.division" type="text" placeholder="Dhaka"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
@@ -148,13 +155,6 @@
                             <label
                                 class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Thana</label>
                             <input v-model="form.thana" type="text" placeholder="Dhanmondi"
-                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
-                        </div>
-                        <div class="col-span-2">
-                            <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Full
-                                Address</label>
-                            <input v-model="form.street" type="text" placeholder="e.g. 123 Luxury Lane"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
                         <div class="col-span-2">
@@ -185,6 +185,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const props = defineProps({
     isOpen: Boolean,
@@ -227,7 +230,7 @@ const form = ref({
 });
 
 const isFormValid = computed(() => {
-    if (!form.value.name || !form.value.division || !form.value.thana || !form.value.street || !form.value.phone) return false;
+    if (!form.value.name || !form.value.street || !form.value.phone) return false;
     if (paymentMethod.value === 'bank_transfer' && !paymentSlip.value) return false;
     return true;
 });
@@ -278,7 +281,7 @@ const formatPrice = (price) => {
 
 const submit = () => {
     if (!isFormValid.value) {
-        alert('Please fill in required fields correctly.');
+        toast.error('Please fill in required fields correctly.');
         return;
     }
 

@@ -85,20 +85,13 @@
                     Phone: {{ $order->shipping_phone }}<br>
                     Email: {{ $order->shipping_email }}<br>
                     @php
-                    $rawAddress = $order->shipping_address;
-                    
+                     $data = $order->shipping_address;
                     // Check if it's JSON (starts with { )
-                    if (is_string($rawAddress) && str_starts_with(trim($rawAddress), '{')) {
-                        $data = json_decode($rawAddress, true);
-                        
                         $address = implode(', ', array_filter([
                             $data['street'] ?? null,
                             $data['thana'] ?? null,
                             $data['division'] ?? null,
                         ]));
-                    } else {
-                        $address = $rawAddress;
-                    }
                 @endphp
                 Address: {{ $address }}
                 </td>
@@ -152,18 +145,24 @@
                 <td style="text-align: right;">-{{ $currency }} {{ number_format($order->discount, 2) }}</td>
             </tr>
             @endif
+            @if($order->delivery_fee > 0)
             <tr>
                 <td>Shipping</td>
                 <td style="text-align: right;">{{ $currency }} {{ number_format($order->delivery_fee ?? 0, 2) }}</td>
             </tr>
+            @endif
+            @if($order->tax > 0)
             <tr>
                 <td>Tax</td>
                 <td style="text-align: right;">{{ $currency }} {{ number_format($order->tax ?? 0, 2) }}</td>
             </tr>
+            @endif
+            @if($order->discount > 0)
             <tr>
                 <td>Discount</td>
                 <td style="text-align: right;">{{ $currency }} {{ number_format($order->discount ?? 0, 2) }}</td>
             </tr>
+            @endif
             <tr class="grand-total">
                 <td>Total Payable</td>
                 <td style="text-align: right;">{{ $currency }} {{ number_format($order->total, 2) }}</td>

@@ -370,6 +370,7 @@ class OrderController extends Controller
             'status_id' => 'sometimes|exists:order_statuses,id',
             'event_id' => 'nullable|exists:events,id',
             'payment_status' => 'sometimes|in:pending,paid,failed,refunded',
+            'total' => 'sometimes|numeric|min:0',
             'shipping_address' => 'nullable|array',
             'shipping_address.division' => 'nullable|string',
             'shipping_address.thana' => 'nullable|string',
@@ -379,7 +380,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
             'items' => 'nullable|array',
             'items.*.id' => 'nullable',
-            'items.*.product_id' => 'required_with:items|exists:products,id',
+            'items.*.product_id' => 'nullable',
             'items.*.product_name' => 'nullable|string',
             'items.*.price' => 'nullable|numeric|min:0',
             'items.*.quantity' => 'nullable|integer|min:1',
@@ -403,8 +404,8 @@ class OrderController extends Controller
 
         // 2. Update the main Order fields
         $order->update($request->only([
-            'event_id', 'payment_status', 'shipping_address', 'shipping_name', 
-            'shipping_phone', 'notes'
+            'event_id', 'payment_status', 'shipping_address', 'shipping_name',
+            'shipping_phone', 'notes', 'total'
         ]));
 
         // 3. FIXED: Sync Items (Add, Update, or Remove)

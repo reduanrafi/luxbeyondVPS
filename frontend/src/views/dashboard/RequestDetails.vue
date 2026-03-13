@@ -63,7 +63,7 @@
                                     <div>
                                         <p class="text-xs text-slate-500 mb-1">Product Name</p>
                                         <p class="text-sm font-semibold text-white">{{ request.product_name ?? 'N/A'
-                                        }}</p>
+                                            }}</p>
                                     </div>
                                     <div v-if="request.status === 'request_accepted' || request.status === 'accepted'"
                                         class="flex gap-2">
@@ -145,7 +145,8 @@
                                                 </span>
                                             </span>
                                             <span class="text-xs font-semibold text-white">৳{{
-                                                formatPrice(charge.amount_in_bdt ?? charge.amount ?? 0) }}</span>
+                                                formatPrice(((charge.amount_in_bdt ?? charge.amount ?? 0) /
+                                                    (request.quantity || 1)) * editableQuantity) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -156,13 +157,15 @@
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-semibold text-white">Total Amount (BDT)</span>
                                         <span class="text-xl font-bold text-primary">৳{{
-                                            formatPrice(request.total_amount_bdt) }}</span>
+                                            formatPrice((request.total_amount_bdt / (request.quantity || 1)) *
+                                                editableQuantity) }}</span>
                                     </div>
                                     <div v-if="request.min_payment_amount && request.min_payment_amount > 0"
                                         class="flex justify-between items-center text-xs pt-2 border-t border-white/5 hover:border-primary/30">
                                         <span class="text-slate-400">Minimum Payment (60%)</span>
                                         <span class="font-semibold text-yellow-400">৳{{
-                                            formatPrice(request.min_payment_amount) }}</span>
+                                            formatPrice((request.min_payment_amount / (request.quantity || 1)) *
+                                                editableQuantity) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -182,7 +185,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from '../../axios';
 import AddressConfirmationModal from '../../components/AddressConfirmationModal.vue';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const requestId = route.params.id;
@@ -290,10 +295,10 @@ const handleConfirmOrder = async (orderPayload) => {
                 }
             } catch (bkashErr) {
                 console.error('bKash Initiation Error:', bkashErr);
-                alert('Order created, but bKash initiation failed. Please pay from Order Details.');
+                toast.error('Order created, but bKash initiation failed. Please pay from Order Details.');
             }
         } else {
-            alert('Order created successfully!');
+            toast.success('Order created successfully!');
         }
 
         // Redirect to the new order
@@ -304,7 +309,7 @@ const handleConfirmOrder = async (orderPayload) => {
         }
     } catch (err) {
         console.error('Error creating order:', err);
-        alert(err.response?.data?.message || 'Failed to create order');
+        toast.error(err.response?.data?.message || 'Failed to create order');
     } finally {
         confirmingOrder.value = false;
     }
@@ -338,7 +343,7 @@ const updateQuantityIfChanged = async () => {
         await fetchRequest();
     } catch (err) {
         console.error('Error updating quantity:', err);
-        alert(err.response?.data?.message || 'Failed to update quantity');
+        toast.error(err.response?.data?.message || 'Failed to update quantity');
         editableQuantity.value = request.value.quantity; // Reset on error
     } finally {
         updatingQuantity.value = false;

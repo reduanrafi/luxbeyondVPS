@@ -26,7 +26,8 @@
                 <h1 class="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">{{ post.title }}</h1>
                 <div class="flex flex-wrap items-center gap-6 text-sm text-zinc-400">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-500 font-bold">
+                        <div
+                            class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary-500 font-bold">
                             {{ getInitials(post.author?.name) }}
                         </div>
                         <span class="text-white">{{ post.author?.name || 'Admin' }}</span>
@@ -37,20 +38,21 @@
             </div>
 
             <!-- Featured Image -->
-            <div class="relative w-full aspect-video rounded-2xl overflow-hidden mb-12 border border-white/10 shadow-2xl">
-                <img :src="post.image_url || '/assets/blog-placeholder.jpg'" 
-                    :alt="post.title"
+            <div
+                class="relative w-full aspect-video rounded-2xl overflow-hidden mb-12 border border-white/10 shadow-2xl">
+                <img :src="post.image_url || '/assets/blog-placeholder.jpg'" :alt="post.title"
                     class="w-full h-full object-contain">
             </div>
 
             <!-- Content -->
-            <div class="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-primary prose-a:text-primary hover:prose-a:text-white mb-12">
+            <div
+                class="prose prose-invert prose-lg max-w-none prose-headings:font-serif prose-headings:text-primary prose-a:text-primary hover:prose-a:text-white mb-12">
                 <div v-html="renderMarkdown(post.content)"></div>
             </div>
 
             <!-- Tags -->
             <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2 mb-12">
-                <span v-for="tag in post.tags" :key="tag" 
+                <span v-for="tag in post.tags" :key="tag"
                     class="px-3 py-1 bg-zinc-900 border border-white/10 rounded-full text-sm text-zinc-400">
                     #{{ tag }}
                 </span>
@@ -60,7 +62,8 @@
             <div class="border-t border-white/10 pt-8 mt-8">
                 <h3 class="text-lg font-bold text-white mb-4">Share this article</h3>
                 <div class="flex gap-4">
-                    <button @click="copyLink" class="px-4 py-2 bg-white/5 rounded-lg text-white hover:bg-white/10 transition-colors flex items-center gap-2">
+                    <button @click="copyLink"
+                        class="px-4 py-2 bg-white/5 rounded-lg text-white hover:bg-white/10 transition-colors flex items-center gap-2">
                         <Link class="w-4 h-4" />
                         Copy Link
                     </button>
@@ -83,7 +86,10 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { Link } from 'lucide-vue-next';
 import axios from '../axios';
-import { marked } from 'marked'; 
+import { marked } from 'marked';
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 // Assuming marked is installed, if not we will use a simple whitespace converter or install it. 
 // For now, I'll use a simple computed for v-html if markdown is complex, 
 // but since the admin saves generic text/html, direct injection works if sanitized.
@@ -125,7 +131,7 @@ const renderMarkdown = (text) => {
 
 const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert('Link copied to clipboard!');
+    toast.success('Link copied to clipboard!');
 };
 
 onMounted(() => {

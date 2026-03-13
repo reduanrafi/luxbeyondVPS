@@ -111,7 +111,9 @@ import axios from '../../axios';
 import PaymentModal from '../../components/PaymentModal.vue';
 import AddressConfirmationModal from '../../components/AddressConfirmationModal.vue';
 import { trackPurchase } from '../../utils/analytics';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const router = useRouter(); // Initialize router
 const requests = ref([]);
 const loading = ref(false);
@@ -194,9 +196,9 @@ const handlePayment = async (paymentData) => {
         await axios.post(`/requests/${paymentData.requestId}/confirm`, paymentData);
         await fetchRequests();
         showPayment.value = false;
-        alert('Payment submitted successfully!');
+        toast.success('Payment submitted successfully!');
     } catch (error) {
-        alert('Payment failed: ' + (error.response?.data?.message || 'Unknown error'));
+        toast.error('Payment failed: ' + (error.response?.data?.message || 'Unknown error'));
     }
 };
 
@@ -263,7 +265,7 @@ const createOrder = async (orderPayload) => {
                 }
             } catch (bkashErr) {
                 console.error('bKash Initiation Error:', bkashErr);
-                alert('Order created, but bKash initiation failed. Please pay from Order Details.');
+                toast.error('Order created, but bKash initiation failed. Please pay from Order Details.');
             }
         } else {
             // Track purchase for manual payment
@@ -284,7 +286,7 @@ const createOrder = async (orderPayload) => {
                     };
                 })
             });
-            alert('Order created successfully!');
+            toast.success('Request confirmed successfully!. It is now an order. Order id is ' + response.data.order_number);
         }
 
         // Redirect to the new order
@@ -296,7 +298,7 @@ const createOrder = async (orderPayload) => {
 
     } catch (err) {
         console.error('Create Order Error:', err);
-        alert(err.response?.data?.message || 'Failed to create order');
+        toast.error(err.response?.data?.message || 'Failed to create order');
     } finally {
         creatingOrder.value = false;
     }
