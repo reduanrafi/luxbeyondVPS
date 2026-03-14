@@ -74,7 +74,9 @@
 import { ref, onMounted } from 'vue';
 import { Ticket } from 'lucide-vue-next';
 import axios from '../../axios';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const coupons = ref([]);
 const loading = ref(false);
 
@@ -122,9 +124,9 @@ const isActive = (coupon) => {
 
 const copyCode = (code) => {
     navigator.clipboard.writeText(code).then(() => {
-        alert(`Coupon code "${code}" copied to clipboard!`);
+        toast.success(`Coupon code "${code}" copied to clipboard!`);
     }).catch(() => {
-        alert('Failed to copy code');
+        toast.error('Failed to copy code');
     });
 };
 

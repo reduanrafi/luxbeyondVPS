@@ -175,6 +175,9 @@ import { Eye, Edit, X, Search, RotateCcw, Ghost, FileText, CheckCircle, Clock } 
 import { Link2 } from 'lucide-vue-next';
 import axios from '../axios';
 import { debounce } from 'lodash';
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const loading = ref(false);
 const updatingStatus = ref(null);
@@ -275,7 +278,7 @@ const updateRequestStatus = async (requestId, statusId) => {
         await fetchRequests();
     } catch (error) {
         console.error('Error updating request status:', error);
-        alert(error.response?.data?.message || 'Error updating request status');
+        toast.error(error.response?.data?.message || 'Error updating request status');
         await fetchRequests();
     } finally {
         updatingStatus.value = null;

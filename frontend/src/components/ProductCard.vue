@@ -17,7 +17,7 @@
       <!-- Discount Badge (Minimalist) -->
       <div
         v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-        class="absolute top-0 right-0 bg-primary text-slate-900 text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+        class="absolute top-0 right-0 bg-gold-gradient text-slate-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
         {{ calculateDiscount(
           product.event_price ? product.original_price : product.price,
           product.event_price || product.sellable_price || product.price
@@ -37,15 +37,12 @@
       <!-- Name -->
       <router-link :to="`/shop/${product.slug || product.id}`" class="group/link">
         <h3
-          class="font-serif text-xl text-white uppercase tracking-widest mb-2 group-hover/link:text-primary transition-colors">
-          {{ product.name }}
+          class="font-serif text-xl text-gold-gradient uppercase tracking-widest mb-2 group-hover/link:text-primary transition-colors">
+          {{ product.name.length > 35 ? product.name.substring(0, 35) + ' ...' : product.name }}
         </h3>
       </router-link>
 
       <!-- Subtitle/Description -->
-      <p class="text-xs text-slate-500 uppercase tracking-wide mb-4 line-clamp-1">
-        {{ product.short_description || 'Precision Engineered' }}
-      </p>
 
       <!-- Price -->
       <div class="mb-4" v-if="!product.has_variants">
@@ -67,7 +64,7 @@
 
       <!-- Rating -->
       <div class="flex items-center gap-1 mb-6">
-        <Star v-for="i in 5" :key="i" class="w-3 h-3 text-primary fill-primary" />
+        <Star v-for="i in 5" :key="i" class="w-3 h-3 text-gold-gradient fill-primary" />
       </div>
 
       <!-- Add to Cart / Out of Stock -->

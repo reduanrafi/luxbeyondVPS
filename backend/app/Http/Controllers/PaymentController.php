@@ -162,7 +162,6 @@ class PaymentController extends Controller
             }
 
             try {
-                $this->configureBkashFromPaymentMethod();
                 $response = Bkash::executePayment($paymentID);
 
                 if (isset($response['transactionStatus']) && $response['transactionStatus'] === 'Completed') {
@@ -173,20 +172,20 @@ class PaymentController extends Controller
                         'payment_method' => 'bkash'
                     ]);
 
-                    return redirect($frontendUrl . '/dashboard/requests/' . $productRequest->id . '?payment=success');
+                    return redirect($frontendUrl . '/thank-you?type=request&id='.$requestId.'&payment=success');
                 } else {
                     Log::warning('bKash Payment Not Completed (Product Reqeust)', [
                         'request_id' => $productRequest->id,
                         'status' => $response['transactionStatus'] ?? 'unknown',
                     ]);
-                    return redirect($frontendUrl . '/dashboard/requests/' . $productRequest->id . '?payment=failed');
+                    return redirect($frontendUrl . '/thank-you?type=request&id='.$requestId.'&payment=failed');
                 }
             } catch (\Exception $e) {
                 Log::error('bKash Callback Error (Product Request)', [
                     'error' => $e->getMessage(),
                     'request_id' => $requestId
                 ]);
-                return redirect($frontendUrl . '/dashboard/requests/' . $requestId . '?payment=error');
+                return redirect($frontendUrl . '/thank-you?type=request&id='.$requestId.'&payment=error');
             }
         }
 
@@ -196,12 +195,10 @@ class PaymentController extends Controller
 
         if (!$order) {
             Log::warning('bKash Callback: Order not found', ['paymentID' => $paymentID]);
-            return redirect($frontendUrl . '/checkout?payment=error');
+            return redirect($frontendUrl . '/thank-you?type=order&id='.$order->id.'&payment=error');
         }
 
         try {
-            // Configure bKash with credentials from database
-            $this->configureBkashFromPaymentMethod();
 
             // Execute payment to verify and complete
             $response = Bkash::executePayment($paymentID);
@@ -233,7 +230,7 @@ class PaymentController extends Controller
                     'amount' => $paymentAmount,
                 ]);
 
-                return redirect($frontendUrl . '/checkout?payment=success&order_id=' . $order->id);
+                return redirect($frontendUrl . '/thank-you?type=order&id='.$order->id.'&payment=success');
             } else {
                 Log::warning('bKash Payment Not Completed', [
                     'order_id' => $order->id,
@@ -241,7 +238,7 @@ class PaymentController extends Controller
                     'status' => $response['transactionStatus'] ?? 'unknown',
                 ]);
 
-                return redirect($frontendUrl . '/checkout?payment=failed');
+                return redirect($frontendUrl . '/thank-you?type=order&id='.$order->id.'&payment=failed');
             }
 
         } catch (PaymentExecutionException $e) {
@@ -251,7 +248,7 @@ class PaymentController extends Controller
                 'order_id' => $order->id ?? null,
             ]);
 
-            return redirect($frontendUrl . '/checkout?payment=error');
+            return redirect($frontendUrl . '/thank-you?type=order&id='.$order->id.'&payment=error');
         } catch (\Exception $e) {
             Log::error('bKash Callback Error', [
                 'error' => $e->getMessage(),
@@ -259,7 +256,7 @@ class PaymentController extends Controller
                 'order_id' => $order->id ?? null,
             ]);
 
-            return redirect($frontendUrl . '/checkout?payment=error');
+            return redirect($frontendUrl . '/thank-you?type=order&id='.$order->id.'&payment=error');
         }
     }
 
@@ -300,6 +297,17 @@ class PaymentController extends Controller
                 'payment_reference' => $validated['transaction_id'] ?? null,
                 'payment_status' => 'pending', // Admin will verify
             ]);
+
+            // Create an OrderPayment record so it shows in order.payments
+            OrderPayment::updateOrCreate(
+                ['order_id' => $order->id, 'payment_method' => 'bank_transfer'],
+                [
+                    'amount' => $order->total,
+                    'payment_reference' => $validated['transaction_id'] ?? null,
+                    'payment_slip' => $filename,
+                    'status' => 'pending',
+                ]
+            );
 
             return response()->json([
                 'message' => 'Payment slip uploaded successfully',

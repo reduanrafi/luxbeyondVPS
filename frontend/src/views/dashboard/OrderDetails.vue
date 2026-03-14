@@ -47,7 +47,18 @@
                 </div>
                 <div class="bg-surface rounded-none border border-white/10 p-4">
                     <p class="text-xs text-slate-500 mb-1">Payment Status</p>
-                    <p class="text-sm font-semibold text-white">{{ order.payment_status || 'Pending' }}</p>
+                    <p class="text-sm font-semibold text-white mb-2">{{ order.payment_status || 'Pending' }}</p>
+                    <div v-if="order.payment_method" class="space-y-1">
+                        <p class="text-xs text-slate-400 capitalize">Method: <span class="text-white">{{
+                            order.payment_method.replace('_', ' ') }}</span></p>
+                        <p v-if="order.payment_reference" class="text-xs text-slate-400">TrxID: <span
+                                class="text-white font-mono">{{ order.payment_reference }}</span></p>
+                        <p v-if="order.bkash_trx_id && !order.payment_reference" class="text-xs text-slate-400">TrxID:
+                            <span class="text-white font-mono">{{ order.bkash_trx_id }}</span>
+                        </p>
+                        <a v-if="order.payment_slip_url" :href="order.payment_slip_url" target="_blank"
+                            class="text-xs text-primary hover:underline block mt-1">View Payment Slip</a>
+                    </div>
                 </div>
             </div>
 
@@ -74,13 +85,13 @@
                                         <div
                                             class="w-16 h-16 bg-white/5 rounded-none overflow-hidden border border-white/10 group-hover:border-primary/50 transition-colors">
                                             <div v-if="item.request">
-                                                <img :src="item.request.admin_image_url"
+                                                <img :src="item.request.admin_image_url ?? '/assets/placeholder.webp'"
                                                     :alt="item.request.product_name"
                                                     class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
                                             </div>
                                             <div v-else-if="item.product">
                                                 <img v-if="item.image || (item.product && item.product.image)"
-                                                    :src="item.image || (item.product ? item.product.image_url : null)"
+                                                    :src="item.image || (item.product ? item.product.image_url : '/assets/placeholder.webp')"
                                                     :alt="item.product_name"
                                                     class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
                                             </div>
@@ -90,13 +101,24 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <p
+                                            <a :href="`${item?.product?.slug ? '/shop/' + item?.product?.slug : item?.request?.url}`"
+                                                target="_blank"
                                                 class="text-sm font-bold text-white group-hover:text-primary transition-colors">
-                                                {{ item.request?.product_name || item.product?.name }}</p>
+                                                {{ item.request?.product_name || item.product?.name }}</a>
                                             <p v-if="item.product_sku" class="text-xs text-slate-400 mt-1">SKU: {{
                                                 item.product_sku }}</p>
-                                            <p v-if="item.variant_data" class="text-xs text-slate-500 mt-1">{{
-                                                formatVariantData(item.variant_data) }}</p>
+                                            <div v-if="item.variant_data"
+                                                class="text-xs text-slate-500 mt-1 space-y-0.5">
+                                                <div v-for="(val, key) in getParsedVariantData(item.variant_data)"
+                                                    :key="key">
+                                                    <span v-if="key === 'request_url'">
+                                                        URL: <a :href="val" target="_blank"
+                                                            class="text-primary hover:underline break-all"
+                                                            @click.stop>{{ val.substring(0, 50) + '...' }}</a>
+                                                    </span>
+                                                    <span v-else>{{ key !== 'request_id' }}: {{ val }}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -107,6 +129,38 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Charges Summary -->
+            <div v-if="hasAppliedCharges" class="bg-surface border border-white/5 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-background/50">
+                    <h3 class="text-sm font-serif text-white uppercase tracking-widest">Applied Charges Summary</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div v-for="item in order.items" :key="`charges-${item.id}`">
+                        <ul v-if="item.request && item.request.charges_breakdown">
+                            <li v-for="charge in item.request.charges_breakdown" :key="charge.charge">
+                                <div class="flex justify-between items-center text-sm">
+                                    <div class="space-y-1">
+                                        <p class="text-white font-medium">{{ charge.charge }}</p>
+                                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">
+                                            {{ formatPrice((charge.amount_in_bdt ?? charge.amount ?? 0) /
+                                                (item.request.quantity || 1)) }} x {{ item.quantity }}
+                                        </p>
+                                    </div>
+                                    <span class="font-bold text-white">{{
+                                        formatPrice(((charge.amount_in_bdt ?? charge.amount ?? 0) /
+                                            (item.request.quantity || 1)) * item.quantity) }}</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-white/5 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-serif text-slate-400 uppercase tracking-widest">Total Applied
+                        Charges</span>
+                    <span class="text-lg font-bold text-primary">{{ formatPrice(getTotalCharges) }}</span>
                 </div>
             </div>
 
@@ -125,8 +179,7 @@
                         <p><span class="font-semibold text-slate-300">Phone:</span> <span class="text-slate-400">{{
                             order.shipping_phone || 'N/A' }}</span></p>
                         <p><span class="font-semibold text-slate-300">Address:</span> <span class="text-slate-400">{{
-                            JSON.parse(order.shipping_address).street + ', ' +
-                            JSON.parse(order.shipping_address).city || 'N/A' }}</span>
+                            formatAddress(order.shipping_address) }}</span>
                         </p>
                     </div>
                 </div>
@@ -149,6 +202,10 @@
                             <span class="text-slate-400">Shipping:</span>
                             <span class="font-semibold text-white">{{ formatPrice(order.shipping) }}</span>
                         </div>
+                        <div v-if="hasAppliedCharges" class="flex justify-between">
+                            <span class="text-slate-400">Charges:</span>
+                            <span class="font-semibold text-white">{{ formatPrice(getTotalCharges) }}</span>
+                        </div>
                         <div v-if="order.discount > 0" class="flex justify-between">
                             <span class="text-slate-400">Discount:</span>
                             <span class="font-semibold text-green-600">-{{ formatPrice(order.discount) }}</span>
@@ -163,13 +220,13 @@
                             <div class="flex justify-between">
                                 <span class="text-xs text-slate-400">Paid:</span>
                                 <span class="text-xs font-bold text-green-500">{{ formatPrice(order.paid_amount || 0)
-                                }}</span>
+                                    }}</span>
                             </div>
                             <!-- Due Amount -->
                             <div class="flex justify-between">
                                 <span class="text-xs text-slate-400">Due:</span>
                                 <span class="text-xs font-bold text-red-500">{{ formatPrice(order.due_amount || 0)
-                                }}</span>
+                                    }}</span>
                             </div>
                         </div>
                     </div>
@@ -198,89 +255,88 @@
                 </div>
             </div>
 
-            <!-- Payment History -->
-            <div v-if="order.payments && order.payments.length > 0"
-                class="bg-surface border border-white/5 overflow-hidden">
+            <!-- Payment Information -->
+            <div class="bg-surface border border-white/5 overflow-hidden">
                 <div class="p-4 border-b border-white/5 bg-background/50">
-                    <h3 class="text-sm font-serif text-white uppercase tracking-widest">Payment History</h3>
+                    <h3 class="text-sm font-serif text-white uppercase tracking-widest">Payment Information</h3>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-white/5 border-b border-white/5">
-                            <tr>
-                                <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">Method</th>
-                                <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">Amount</th>
-                                <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">TrxID/Ref</th>
-                                <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">Date</th>
-                                <th class="p-3 text-right text-xs font-semibold text-slate-400 uppercase">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            <tr v-for="payment in order.payments" :key="payment.id"
-                                class="hover:bg-white/5 transition-colors">
-                                <td class="p-3 text-xs text-white capitalize">{{
-                                    formatPaymentMethod(payment.payment_method) }}</td>
-                                <td class="p-3 text-xs font-semibold text-white">{{ formatPrice(payment.amount) }}</td>
-                                <td class="p-3 text-xs text-slate-400 font-mono">
-                                    {{ payment.payment_reference || '-' }}
-                                    <a v-if="payment.payment_slip" :href="payment.payment_slip_url || '#'"
-                                        target="_blank" class="text-primary hover:underline ml-2" @click.stop>
-                                        [View Slip]
-                                    </a>
-                                </td>
-                                <td class="p-3 text-xs text-slate-400">{{ formatDate(payment.paid_at ||
-                                    payment.created_at) }}</td>
-                                <td class="p-3 text-right">
-                                    <span :class="{
-                                        'bg-green-500/20 text-green-500': payment.status === 'completed',
-                                        'bg-yellow-500/20 text-yellow-500': payment.status === 'pending',
-                                        'bg-red-500/20 text-red-500': payment.status === 'failed' || payment.status === 'refunded',
-                                    }" class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
-                                        {{ payment.status }}
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Pending Payment Slip (if exists but no payment record yet) -->
-            <div v-if="order.payment_slip && (!order.payments || order.payments.length === 0)"
-                class="bg-surface border border-white/5 p-6">
-                <h3 class="text-sm font-serif text-white uppercase tracking-widest mb-4 border-b border-white/5 pb-3">
-                    Payment Slip (Pending Verification)
-                </h3>
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-white/5 rounded border border-white/10">
-                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
+                <div class="p-4">
+                    <!-- From payments relation -->
+                    <div v-if="order.payments && order.payments.length > 0" class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-white/5 border-b border-white/5">
+                                <tr>
+                                    <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">Method</th>
+                                    <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">Amount</th>
+                                    <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">TrxID/Ref
+                                    </th>
+                                    <th class="p-3 text-left text-xs font-semibold text-slate-400 uppercase">Date</th>
+                                    <th class="p-3 text-right text-xs font-semibold text-slate-400 uppercase">Status
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                <tr v-for="payment in order.payments" :key="payment.id"
+                                    class="hover:bg-white/5 transition-colors">
+                                    <td class="p-3 text-xs text-white capitalize">{{
+                                        formatPaymentMethod(payment.payment_method) }}</td>
+                                    <td class="p-3 text-xs font-semibold text-white">{{ formatPrice(payment.amount) }}
+                                    </td>
+                                    <td class="p-3 text-xs text-slate-400 font-mono">
+                                        {{ payment.payment_reference || '-' }}
+                                        <a v-if="payment.payment_slip_url" :href="payment.payment_slip_url"
+                                            target="_blank" class="text-primary hover:underline ml-2" @click.stop>
+                                            [View Slip]
+                                        </a>
+                                    </td>
+                                    <td class="p-3 text-xs text-slate-400">{{ formatDate(payment.paid_at ||
+                                        payment.created_at) }}</td>
+                                    <td class="p-3 text-right">
+                                        <span :class="{
+                                            'bg-green-500/20 text-green-500': payment.status === 'completed',
+                                            'bg-yellow-500/20 text-yellow-500': payment.status === 'pending',
+                                            'bg-red-500/20 text-red-500': payment.status === 'failed' || payment.status === 'refunded',
+                                        }" class="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
+                                            {{ payment.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div>
-                        <p class="text-sm text-slate-300 mb-1">
-                            <span class="font-semibold">Payment Method</span>
-                            <span class="font-mono text-slate-400 ml-2">{{
-                                order.payment_method?.replace('_', ' ').toUpperCase() ||
-                                'N/A' }}</span>
-                        </p>
-                        <a :href="order.payment_slip_url" target="_blank"
-                            class="text-xs font-bold text-primary hover:underline uppercase tracking-wide"
-                            v-if="order.payment_method === 'bank_transfer'">
-                            View Slip →
-                        </a>
-                        <span v-else>
-                            Transaction Id: {{ order.payment_reference }}
-                        </span>
+                    <!-- Fallback: show from order fields if no payment records -->
+                    <div v-else-if="order.payment_method" class="flex items-start gap-4">
+                        <div class="p-3 bg-white/5 rounded border border-white/10 flex-shrink-0">
+                            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 space-y-1">
+                            <p class="text-sm text-slate-300">
+                                <span class="font-semibold">Method:</span>
+                                <span class="ml-2 capitalize">{{ order.payment_method.replace('_', ' ') }}</span>
+                            </p>
+                            <p v-if="order.bkash_trx_id" class="text-xs text-slate-400">TrxID: <span
+                                    class="font-mono text-white">{{ order.bkash_trx_id }}</span></p>
+                            <p v-else-if="order.payment_reference" class="text-xs text-slate-400">Reference: <span
+                                    class="font-mono text-white">{{ order.payment_reference }}</span></p>
+                            <a v-if="order.payment_slip_url" :href="order.payment_slip_url" target="_blank"
+                                class="text-xs font-bold text-primary hover:underline uppercase tracking-wide inline-block mt-1">
+                                View Slip →
+                            </a>
+                            <p v-if="!order.bkash_trx_id && !order.payment_reference && !order.payment_slip_url"
+                                class="text-xs text-slate-500 italic mt-1">Awaiting payment details.</p>
+                        </div>
+                        <div v-if="order.payment_status === 'pending'" class="ml-auto flex-shrink-0">
+                            <span
+                                class="px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs font-bold uppercase tracking-wider">
+                                Pending Review
+                            </span>
+                        </div>
                     </div>
-                    <div class="ml-auto">
-                        <span
-                            class="px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-xs font-bold uppercase tracking-wider">
-                            Pending Review
-                        </span>
-                    </div>
+                    <p v-else class="text-xs text-slate-500 italic">No payment information available.</p>
                 </div>
             </div>
 
@@ -305,7 +361,7 @@
                             </div>
                             <div class="mb-1">
                                 <span class="font-bold text-white">{{ history.status?.label || 'Status Changed'
-                                    }}</span>
+                                }}</span>
                                 <span class="text-xs text-slate-400 ml-2">{{ formatDate(history.created_at) }}</span>
                             </div>
                             <p v-if="history.note" class="text-xs text-slate-400 opacity-80 mb-1">{{ history.note }}</p>
@@ -325,11 +381,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from '../../axios';
 import PaymentModal from '../../components/PaymentModal.vue';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const route = useRoute();
 const router = useRouter();
 const order = ref(null);
@@ -339,6 +397,30 @@ const error = ref(null);
 // Payment States
 const showPayment = ref(false);
 const processingBkash = ref(false);
+
+const hasAppliedCharges = computed(() => {
+    if (!order.value?.items) return false;
+    return order.value.items.some(item =>
+        item.request &&
+        item.request.charges_breakdown &&
+        item.request.charges_breakdown.length > 0
+    );
+});
+
+const getTotalCharges = computed(() => {
+    let total = 0;
+    if (!order.value?.items) return 0;
+    order.value.items.forEach(item => {
+        if (item.request?.charges_breakdown) {
+            item.request.charges_breakdown.forEach(charge => {
+                const baseAmount = charge.amount_in_bdt ?? charge.amount ?? 0;
+                const calculatedCharge = (baseAmount / (item.request.quantity || 1)) * (item.quantity || 1);
+                total += calculatedCharge;
+            });
+        }
+    });
+    return total;
+});
 
 const fetchOrder = async () => {
     loading.value = true;
@@ -367,14 +449,30 @@ const initiateBkash = async () => {
         if (response.data.bkashURL) {
             window.location.href = response.data.bkashURL;
         } else {
-            alert('Failed to get payment URL');
+            toast.error('Failed to get payment URL');
         }
     } catch (err) {
         console.error('Bkash Error:', err);
-        alert(err.response?.data?.message || 'Payment initiation failed');
+        toast.error(err.response?.data?.message || 'Payment initiation failed');
     } finally {
         processingBkash.value = false;
     }
+};
+const formatAddress = (address) => {
+    if (!address) return 'N/A';
+
+    // Convert JSON string to object if needed
+    if (typeof address === 'string' && address.startsWith('{')) {
+        try {
+            address = JSON.parse(address);
+        } catch (e) {
+            return address;
+        }
+    }
+
+    return [address.street, address.thana, address.division]
+        .filter(Boolean)
+        .join(', ');
 };
 
 const handleBankTransfer = async (data) => {
@@ -395,11 +493,11 @@ const handleBankTransfer = async (data) => {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         showPayment.value = false;
-        alert('Payment slip uploaded successfully! Waiting for admin approval.');
+        toast.success('Payment slip uploaded successfully! Waiting for admin approval.');
         fetchOrder();
     } catch (err) {
         console.error('Bank Transfer Error:', err);
-        alert(err.response?.data?.message || 'Failed to upload payment slip');
+        toast.error(err.response?.data?.message || 'Failed to upload payment slip');
     }
 };
 
@@ -420,19 +518,20 @@ const formatPrice = (price) => {
     return `৳${numPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-const formatVariantData = (variantData) => {
-    if (!variantData) return '';
+const getParsedVariantData = (variantData) => {
+    if (!variantData) return {};
+    let data = variantData;
     if (typeof variantData === 'string') {
         try {
-            variantData = JSON.parse(variantData);
+            data = JSON.parse(variantData);
         } catch {
-            return variantData;
+            return { raw: variantData };
         }
     }
-    if (typeof variantData === 'object') {
-        return Object.entries(variantData).map(([key, value]) => `${key}: ${value}`).join(', ');
+    if (typeof data === 'object') {
+        return data.attributes || data;
     }
-    return '';
+    return {};
 };
 
 const formatPaymentMethod = (method) => {

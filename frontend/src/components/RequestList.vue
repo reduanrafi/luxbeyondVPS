@@ -41,6 +41,9 @@ import { ref, onMounted } from 'vue';
 import { useRequestStore } from '../stores/request';
 import PaymentModal from './PaymentModal.vue';
 import axios from '../axios';
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const requestStore = useRequestStore();
 const showPayment = ref(false);
@@ -68,9 +71,9 @@ const handlePayment = async (paymentData) => {
             requestStore.requests[index].status = 'paid';
         }
         showPayment.value = false;
-        alert('Payment submitted successfully!');
+        toast.success('Payment submitted successfully!');
     } catch (error) {
-        alert('Payment failed');
+        toast.error('Payment failed');
     }
 };
 </script>

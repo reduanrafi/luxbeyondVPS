@@ -101,7 +101,7 @@
                     <div>
                         <label
                             class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">State/Province</label>
-                        <input v-model="shippingAddress.state" type="text" placeholder="Dhaka Division"
+                        <input v-model="shippingAddress.state" type="text" placeholder="Dhaka"
                             class="w-full px-4 py-3 bg-background/50 border border-white/10 text-white rounded-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder-slate-600">
                     </div>
                     <div>
@@ -126,7 +126,7 @@
                 <div class="mt-8 flex justify-end relative z-10 gap-4 items-center">
                     <p v-if="shippingMessage"
                         class="text-xs font-bold text-green-500 uppercase tracking-wider animate-pulse">{{
-                        shippingMessage }}</p>
+                            shippingMessage }}</p>
                     <button @click="saveShippingAddress" :disabled="savingShipping"
                         class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all text-xs disabled:opacity-50">
                         {{ savingShipping ? 'Saving...' : 'Save Address' }}
@@ -198,7 +198,7 @@
                 <div v-if="!sameAsShipping" class="mt-8 flex justify-end gap-4 items-center">
                     <p v-if="billingMessage"
                         class="text-xs font-bold text-green-500 uppercase tracking-wider animate-pulse">{{
-                        billingMessage }}</p>
+                            billingMessage }}</p>
                     <button @click="saveBillingAddress" :disabled="savingBilling"
                         class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all text-xs disabled:opacity-50">
                         {{ savingBilling ? 'Saving...' : 'Save Billing' }}
@@ -231,7 +231,7 @@
                 <div class="mt-8 flex justify-end relative z-10 gap-4 items-center">
                     <p v-if="notificationMessage"
                         class="text-xs font-bold text-green-500 uppercase tracking-wider animate-pulse">{{
-                        notificationMessage }}</p>
+                            notificationMessage }}</p>
                     <button @click="saveNotifications" :disabled="savingNotifications"
                         class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all text-xs disabled:opacity-50">
                         {{ savingNotifications ? 'Saving...' : 'Save Preferences' }}
@@ -264,7 +264,9 @@ import { useRouter } from 'vue-router';
 import { User, Truck, CreditCard, Bell, AlertTriangle, CheckCircle } from 'lucide-vue-next';
 import axios from '../../axios';
 import NotificationToggle from '../../components/NotificationToggle.vue';
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const authStore = useAuthStore();
 const router = useRouter();
 const user = computed(() => authStore.user);
@@ -445,7 +447,7 @@ const deleteAccount = async () => {
         router.push('/');
     } catch (error) {
         console.error('Delete account error:', error);
-        alert('Failed to delete account. Please try again.');
+        toast.error('Failed to delete account. Please try again.');
     }
 };
 </script>

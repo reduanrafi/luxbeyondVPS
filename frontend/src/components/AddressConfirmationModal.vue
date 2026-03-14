@@ -1,7 +1,7 @@
 <template>
     <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md px-4">
         <div
-            class="bg-slate-900 p-8 rounded-3xl shadow-2xl max-w-2xl w-full border border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+            class="bg-black p-8 rounded-3xl shadow-2xl max-w-2xl w-full border border-primary overflow-hidden flex flex-col max-h-[90vh]">
             <div class="mb-6">
                 <h3 class="text-2xl font-serif text-white uppercase tracking-widest mb-2">Review Your Order</h3>
                 <p class="text-xs text-slate-400">Review your selected items and confirm shipping details.</p>
@@ -10,13 +10,13 @@
             <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                 <!-- Selected Items Summary -->
                 <div class="mb-8 space-y-4">
-                    <h4 class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-4">Selected Items</h4>
+                    <h4 class="text-sm font-bold text-primary uppercase tracking-[0.2em] mb-4">Selected Items</h4>
                     <div class="space-y-3">
                         <div v-for="item in editableItems" :key="item.id"
                             class="bg-white/5 border border-white/5 rounded-2xl p-4 flex gap-4 hover:border-primary/20 transition-colors">
                             <div
                                 class="w-16 h-16 bg-background rounded-xl overflow-hidden flex-shrink-0 border border-white/5">
-                                <img :src="item.admin_image_url || item.url"
+                                <img :src="item.admin_image_url ? item.admin_image_url : '/assets/placeholder.webp'"
                                     class="w-full h-full object-cover opacity-80" alt="Product">
                             </div>
                             <div class="flex-1 min-w-0">
@@ -28,12 +28,12 @@
                                         <button @click="updateQty(item.id, -1)"
                                             class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors">-</button>
                                         <span class="w-8 text-center text-xs font-mono text-white">{{ item.quantity
-                                            }}</span>
+                                        }}</span>
                                         <button @click="updateQty(item.id, 1)"
                                             class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-white transition-colors">+</button>
                                     </div>
                                     <span class="text-sm font-serif text-white">৳{{ formatPrice(getItemTotal(item))
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -84,9 +84,8 @@
                         </label>
                     </div>
 
-                    <!-- BKash Payment Options -->
-                    <div v-if="paymentMethod === 'bkash'"
-                        class="mt-4 space-y-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <!-- Payment Type Options (Partial/Full) -->
+                    <div class="mt-4 space-y-3 p-4 bg-white/5 rounded-2xl border border-white/5">
                         <div class="flex gap-4">
                             <label class="flex-1 flex items-center gap-3 cursor-pointer group">
                                 <input type="radio" v-model="paymentType" value="partial" class="sr-only">
@@ -134,18 +133,31 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-2">
                             <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Street
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Full
+                                Name</label>
+                            <input v-model="form.name" type="text" placeholder="John Doe"
+                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
+                        </div>
+                        <div class="col-span-2">
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Full
                                 Address</label>
                             <input v-model="form.street" type="text" placeholder="e.g. 123 Luxury Lane"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
                         <div>
                             <label
-                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">City</label>
-                            <input v-model="form.city" type="text" placeholder="City"
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">District</label>
+                            <input v-model="form.division" type="text" placeholder="Dhaka"
                                 class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
                         </div>
                         <div>
+                            <label
+                                class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Thana</label>
+                            <input v-model="form.thana" type="text" placeholder="Dhanmondi"
+                                class="w-full px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-white focus:outline-none focus:border-primary transition-all text-sm placeholder:text-slate-600">
+                        </div>
+                        <div class="col-span-2">
                             <label
                                 class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Phone</label>
                             <input v-model="form.phone" type="text" placeholder="+880..."
@@ -160,8 +172,8 @@
                     class="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-white transition-colors disabled:opacity-50">
                     Cancel
                 </button>
-                <button @click="submit" :disabled="loading"
-                    class="px-8 py-3 bg-primary text-slate-900 text-[10px] font-bold rounded-xl hover:bg-white transition-all disabled:opacity-50 flex items-center gap-3 uppercase tracking-widest">
+                <button @click="submit" :disabled="loading || !isFormValid"
+                    class="px-8 py-3 bg-primary text-slate-900 text-[10px] font-bold rounded-xl hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 uppercase tracking-widest">
                     <span v-if="loading"
                         class="animate-spin h-3 w-3 border-2 border-slate-900 border-t-transparent rounded-full"></span>
                     {{ loading ? 'Processing...' : (paymentMethod === 'bkash' ? 'Proceed to bKash' : 'Confirm Order') }}
@@ -173,6 +185,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const props = defineProps({
     isOpen: Boolean,
@@ -207,12 +222,17 @@ const handleFileUpload = (event) => {
 };
 
 const form = ref({
+    name: '',
+    division: '',
+    thana: '',
     street: '',
-    city: '',
-    state: '',
-    postal_code: '',
     phone: '',
-    country: 'Bangladesh'
+});
+
+const isFormValid = computed(() => {
+    if (!form.value.name || !form.value.street || !form.value.phone) return false;
+    if (paymentMethod.value === 'bank_transfer' && !paymentSlip.value) return false;
+    return true;
 });
 
 watch(() => props.isOpen, (newVal) => {
@@ -235,7 +255,10 @@ watch(() => props.isOpen, (newVal) => {
 const updateQty = (id, delta) => {
     const item = editableItems.value.find(i => i.id === id);
     if (item) {
-        const newQty = Math.max(1, item.quantity + delta);
+        const currentQty = Number(item.quantity);
+        const change = Number(delta);
+
+        const newQty = Math.max(1, currentQty + change);
         item.quantity = newQty;
     }
 };
@@ -260,17 +283,13 @@ const formatPrice = (price) => {
 };
 
 const submit = () => {
-    if (!form.value.street || !form.value.city || !form.value.phone || !paymentSlip.value) {
-        alert('Please fill in required fields (Street, City, Phone) and upload payment slip');
+    if (!isFormValid.value) {
+        toast.error('Please fill in required fields correctly.');
         return;
     }
 
     emit('confirm', {
         shipping_address: form.value,
-        request_items: editableItems.value.map(item => ({
-            id: item.id,
-            quantity: item.quantity
-        })),
         payment_method: paymentMethod.value,
         payment_type: paymentType.value,
         payment_slip: paymentSlip.value
