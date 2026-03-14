@@ -34,7 +34,10 @@ class Order extends Model
         'shipped_at',
         'delivered_at',
         'paid_at',
-        'request_id'
+        'request_id',
+        'paid_amount',
+        'due_amount',
+        'is_fully_paid',
     ];
 
     protected $casts = [
@@ -48,6 +51,9 @@ class Order extends Model
         'delivered_at' => 'datetime',
         'paid_at' => 'datetime',
         'shipping_address' => 'array',
+        'paid_amount' => 'decimal:2',
+        'due_amount' => 'decimal:2',
+        'is_fully_paid' => 'boolean',
     ];
 
     protected $appends = [
@@ -104,31 +110,45 @@ class Order extends Model
     }
 
     public function productRequests()
-{
-    return $this->belongsToMany(ProductRequest::class, 'order_product_request');
-}
+    {
+        return $this->belongsToMany(ProductRequest::class, 'order_product_request');
+    }
+
+    public function request()
+    {
+        return $this->belongsTo(ProductRequest::class);
+    }
 
     /**
      * Get the total amount paid (sum of completed payments)
      */
-    public function getPaidAmountAttribute()
+    public function getPaidAmountAttribute($value)
     {
+        if ($value !== null) {
+            return (float)$value;
+        }
         return $this->payments()->where('status', 'completed')->sum('amount');
     }
 
     /**
      * Get the remaining unpaid amount
      */
-    public function getDueAmountAttribute()
+    public function getDueAmountAttribute($value)
     {
+        if ($value !== null) {
+            return (float)$value;
+        }
         return max(0, $this->total - $this->paid_amount);
     }
 
     /**
      * Check if order is fully paid
      */
-    public function getIsFullyPaidAttribute()
+    public function getIsFullyPaidAttribute($value)
     {
+        if ($value !== null) {
+            return (bool)$value;
+        }
         return $this->due_amount <= 0;
     }
 

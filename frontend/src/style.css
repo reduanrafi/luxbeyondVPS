@@ -3,32 +3,73 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: 'Inter', sans-serif;
-  --font-serif: 'Cinzel', serif;
-  
-  /* Brand Palette (Luxury Muted Gold & Black) */
-  --color-primary: #C8AE7D; /* Premium Metallic Gold */
-  --color-primary-hover: #B09460; /* Darker Antique Gold */
-  --color-secondary: #D4BC8B; /* Champagne Gold */
-  --color-accent: #C8AE7D; /* Consistent Gold Accents */
-  
-  --color-surface: #121212; /* Dark Grey Surface */
-  --color-background: #050505; /* Black Background */
-  --color-text-main: #ffffff; /* White for headings */
-  --color-text-muted: #94a3b8; /* Slate 400 for body */
-  --color-on-primary: #050505; /* Black text on Gold */
+  /* Font Families */
+  --font-sans: "Inter", ui-sans-serif, system-ui;
+  --font-serif: "Cinzel", serif;
+
+  /* Classic Gold Brand Palette */
+  --color-primary: #c8ae7d;
+  /* Premium Metallic Gold */
+  --color-primary-hover: #b09460;
+  /* Darker Antique Gold */
+  --color-secondary: #d4bc8b;
+  /* Champagne Gold */
+  --color-accent: #c8ae7d;
+  /* Consistent Gold Accents */
+
+  /* UI Surfaces & Backgrounds */
+  --color-surface: #121212;
+  /* Dark Grey Surface (Cards) */
+  --color-background: #050505;
+  /* Deep Black Background */
+
+  /* Text Colors */
+  --color-text-main: #ffffff;
+  /* Heading White */
+  --color-text-muted: #94a3b8;
+  /* Slate 400 Body */
+  --color-on-primary: #050505;
+  /* Black text for Gold buttons */
+
+  /* Custom Gradient for "Classic Gold" look */
+  --background-image-gold-gradient: linear-gradient(135deg, #c8ae7d 0%, #d4bc8b 50%, #b09460 100%);
+}
+
+@utility text-gold-gradient {
+  background-image: var(--background-image-gold-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  /* Ensures the gradient wraps correctly to the text */
+}
+
+@utility fill-gold-gradient {
+  background-image: var(--background-image-gold-gradient);
+  /* This masks the background into the shape of the icon/element */
+  mask-image: linear-gradient(#fff, #fff);
+  -webkit-mask-composite: destination-in;
+  mask-composite: exclude;
+
+  /* Fallback for most modern browsers */
+  background-clip: padding-box;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    @apply bg-background text-slate-300 antialiased;
+  font-family: 'Inter', sans-serif;
+  @apply bg-background text-slate-300 antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight text-primary font-serif uppercase;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply tracking-tight text-primary font-serif uppercase;
 }
 
-h1{
+h1 {
   @apply text-[20px] font-semibold;
 }
 
@@ -36,16 +77,17 @@ h2 {
   @apply text-[18px] font-semibold;
 }
 
-h3{
+h3 {
   @apply text-[15px] font-semibold;
 }
+
 [v-cloak] {
   display: none;
 }
 
 
 button:hover {
-  cursor: pointer !important;  
+  cursor: pointer !important;
 }
 
 button:disabled {

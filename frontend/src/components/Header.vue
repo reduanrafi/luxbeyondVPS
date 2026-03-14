@@ -65,7 +65,7 @@
                                 We are working on it.
                             </p>
                             <router-link to="request-product"
-                                class="bg-primary rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
+                                class="bg-gold-gradient rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
                                 Request Product
                             </router-link>
                         </div>
@@ -105,7 +105,7 @@
                         Blog
                     </router-link> -->
                     <router-link to="/request-product"
-                        class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-primary hover:bg-primary/90 rounded-full transition-colors shadow-sm">
+                        class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-gold-gradient hover:bg-gold-gradient/80 rounded-full transition-colors shadow-sm">
                         Request Product
                     </router-link>
                 </div>
@@ -279,7 +279,7 @@
                     Blog
                 </router-link>
                 <router-link to="/request-product" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-900 bg-primary hover:bg-primary/90 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-900 bg-gold-gradient hover:bg-gold-gradient/90 transition-colors">
                     Request Order
                 </router-link>
                 <div class="border-t border-white/10 my-2"></div>

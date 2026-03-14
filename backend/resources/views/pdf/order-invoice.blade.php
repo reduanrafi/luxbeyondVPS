@@ -59,7 +59,6 @@
                 <td class="invoice-label">INVOICE</td>
             </tr>
         </table>
-
         <table class="meta-bar">
             <tr>
                 <td><strong>ORDER ID:</strong> #{{ $order->order_number ?? $order->id }}</td>
@@ -134,21 +133,41 @@
             </tbody>
         </table>
 
+        @php
+            $totalCharges = 0;
+            foreach ($order->items as $item) {
+                if ($item->request && $item->request->charges_breakdown) {
+                    $breakdown = is_string($item->request->charges_breakdown) 
+                        ? json_decode($item->request->charges_breakdown, true) 
+                        : $item->request->charges_breakdown;
+                    
+                    if (is_array($breakdown)) {
+                        foreach ($breakdown as $charge) {
+                            $baseAmount = $charge['amount_in_bdt'] ?? $charge['amount'] ?? 0;
+                            $itemQty = $item->quantity ?: 1;
+                            $requestQty = $item->request->quantity ?: 1;
+                            $totalCharges += ($baseAmount / $requestQty) * $itemQty;
+                        }
+                    }
+                }
+            }
+        @endphp
+
         <table class="totals-table">
             <tr>
                 <td>Subtotal</td>
                 <td style="text-align: right;">{{ $currency }} {{ number_format($order->subtotal, 2) }}</td>
             </tr>
-            @if($order->discount > 0)
+            @if($totalCharges > 0)
             <tr>
-                <td>Discount</td>
-                <td style="text-align: right;">-{{ $currency }} {{ number_format($order->discount, 2) }}</td>
+                <td>Charges</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($totalCharges, 2) }}</td>
             </tr>
             @endif
-            @if($order->delivery_fee > 0)
+            @if($order->shipping > 0)
             <tr>
                 <td>Shipping</td>
-                <td style="text-align: right;">{{ $currency }} {{ number_format($order->delivery_fee ?? 0, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->shipping ?? 0, 2) }}</td>
             </tr>
             @endif
             @if($order->tax > 0)
@@ -160,12 +179,22 @@
             @if($order->discount > 0)
             <tr>
                 <td>Discount</td>
-                <td style="text-align: right;">{{ $currency }} {{ number_format($order->discount ?? 0, 2) }}</td>
+                <td style="text-align: right;">-{{ $currency }} {{ number_format($order->discount ?? 0, 2) }}</td>
+            </tr>
+            @endif
+            <tr>
+                <td><strong>Total amount</strong></td>
+                <td style="text-align: right;"><strong>{{ $currency }} {{ number_format($order->total, 2) }}</strong></td>
+            </tr>
+            @if($order->paid_amount > 0)
+            <tr>
+                <td>Paid amount</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->paid_amount, 2) }}</td>
             </tr>
             @endif
             <tr class="grand-total">
                 <td>Total Payable</td>
-                <td style="text-align: right;">{{ $currency }} {{ number_format($order->total, 2) }}</td>
+                <td style="text-align: right;">{{ $currency }} {{ number_format($order->total - $order->paid_amount, 2) }}</td>
             </tr>
         </table>
 

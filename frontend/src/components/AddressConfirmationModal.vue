@@ -255,7 +255,10 @@ watch(() => props.isOpen, (newVal) => {
 const updateQty = (id, delta) => {
     const item = editableItems.value.find(i => i.id === id);
     if (item) {
-        const newQty = Math.max(1, item.quantity + delta);
+        const currentQty = Number(item.quantity);
+        const change = Number(delta);
+
+        const newQty = Math.max(1, currentQty + change);
         item.quantity = newQty;
     }
 };

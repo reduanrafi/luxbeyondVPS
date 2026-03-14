@@ -131,6 +131,37 @@
                 </div>
             </div>
 
+            <!-- Charges Summary -->
+            <div v-if="hasAppliedCharges" class="bg-surface border border-white/5 overflow-hidden">
+                <div class="p-4 border-b border-white/10 bg-background/50">
+                    <h3 class="text-sm font-serif text-white uppercase tracking-widest">Applied Charges Summary</h3>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div v-for="item in order.items" :key="`charges-${item.id}`">
+                        <ul v-if="item.request && item.request.charges_breakdown">
+                            <li v-for="charge in item.request.charges_breakdown" :key="charge.charge">
+                                <div class="flex justify-between items-center text-sm">
+                                    <div class="space-y-1">
+                                        <p class="text-white font-medium">{{ charge.charge }}</p>
+                                        <p class="text-[10px] text-slate-500 uppercase tracking-wider">
+                                            {{ formatPrice((charge.amount_in_bdt ?? charge.amount ?? 0) /
+                                                (item.request.quantity || 1)) }} x {{ item.quantity }}
+                                        </p>
+                                    </div>
+                                    <span class="font-bold text-white">{{
+                                        formatPrice(((charge.amount_in_bdt ?? charge.amount ?? 0) /
+                                            (item.request.quantity || 1)) * item.quantity) }}</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-white/5 border-t border-white/10 flex justify-between items-center">
+                    <span class="text-xs font-serif text-slate-400 uppercase tracking-widest">Total Applied Charges</span>
+                    <span class="text-lg font-bold text-primary">{{ formatPrice(getTotalCharges) }}</span>
+                </div>
+            </div>
+
             <!-- Order Summary -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Shipping Information -->
@@ -168,6 +199,10 @@
                         <div v-if="order.shipping > 0" class="flex justify-between">
                             <span class="text-slate-400">Shipping:</span>
                             <span class="font-semibold text-white">{{ formatPrice(order.shipping) }}</span>
+                        </div>
+                        <div v-if="hasAppliedCharges" class="flex justify-between">
+                            <span class="text-slate-400">Charges:</span>
+                            <span class="font-semibold text-white">{{ formatPrice(getTotalCharges) }}</span>
                         </div>
                         <div v-if="order.discount > 0" class="flex justify-between">
                             <span class="text-slate-400">Discount:</span>
@@ -344,7 +379,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from '../../axios';
 import PaymentModal from '../../components/PaymentModal.vue';
@@ -360,6 +395,30 @@ const error = ref(null);
 // Payment States
 const showPayment = ref(false);
 const processingBkash = ref(false);
+
+const hasAppliedCharges = computed(() => {
+    if (!order.value?.items) return false;
+    return order.value.items.some(item =>
+        item.request &&
+        item.request.charges_breakdown &&
+        item.request.charges_breakdown.length > 0
+    );
+});
+
+const getTotalCharges = computed(() => {
+    let total = 0;
+    if (!order.value?.items) return 0;
+    order.value.items.forEach(item => {
+        if (item.request?.charges_breakdown) {
+            item.request.charges_breakdown.forEach(charge => {
+                const baseAmount = charge.amount_in_bdt ?? charge.amount ?? 0;
+                const calculatedCharge = (baseAmount / (item.request.quantity || 1)) * (item.quantity || 1);
+                total += calculatedCharge;
+            });
+        }
+    });
+    return total;
+});
 
 const fetchOrder = async () => {
     loading.value = true;
