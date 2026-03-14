@@ -183,7 +183,7 @@
                                             Earnings</span>
                                         <span class="text-2xl font-serif text-primary">{{ calculatedEarnings }}</span>
                                     </div>
-                                    <p class="text-xs text-slate-500">*Based on standard rewards ($500/bag)</p>
+                                    <p class="text-xs text-slate-500">*Based on standard rewards (upto $500/bag)</p>
                                 </div>
                                 <button @click="openRegisterModal"
                                     class="w-full py-4 bg-primary text-slate-900 font-bold rounded-none hover:bg-primary-hover transition-colors cursor-pointer uppercase tracking-widest text-sm">
@@ -380,7 +380,7 @@
                             <p v-if="error"
                                 class="text-red-500 text-sm text-center mt-4 bg-red-500/10 border border-red-500/20 p-3 rounded-sm">
                                 {{
-                                error }}</p>
+                                    error }}</p>
                         </div>
                     </div>
                 </div>
@@ -456,7 +456,7 @@ const validateForm = () => {
         errors.value.passport_no = "Passport Number is required";
         isValid = false;
     }
-    
+
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.value.trim()) {
@@ -515,7 +515,7 @@ const handleRegister = async () => {
     if (!validateForm()) {
         return;
     }
-    
+
     loading.value = true;
     error.value = ''; // Clear previous generic errors
 
@@ -544,18 +544,18 @@ const handleRegister = async () => {
             // Map backend errors to local error object if possible, or simple show generic
             // Here we prioritize local display, but backend validation is ultimate source of truth
             // Ideally authStore populates its own errors, we can use that too
-             if (authStore.errors) {
-                 // Sync generic store errors to our local error display if keys match
-                 // But authStore might give errors differently. 
-                 // We will rely on existing error display pattern for backend errors logic in the template if authStore.errors is used
-                 // but here we used local 'errors' object for JS validation. 
-                 // The template currently checks `authStore.errors.name` AND `errors.name`? 
-                 // No, I replaced `authStore.errors` binding with `errors` binding in this rewrite.
-                 // So I need to map backend errors to `errors.value`!
-                 Object.assign(errors.value, authStore.errors);
-             }
+            if (authStore.errors) {
+                // Sync generic store errors to our local error display if keys match
+                // But authStore might give errors differently. 
+                // We will rely on existing error display pattern for backend errors logic in the template if authStore.errors is used
+                // but here we used local 'errors' object for JS validation. 
+                // The template currently checks `authStore.errors.name` AND `errors.name`? 
+                // No, I replaced `authStore.errors` binding with `errors` binding in this rewrite.
+                // So I need to map backend errors to `errors.value`!
+                Object.assign(errors.value, authStore.errors);
+            }
         } else {
-             error.value = 'Registration failed. Please check your inputs.';
+            error.value = 'Registration failed. Please check your inputs.';
         }
     } finally {
         loading.value = false;
