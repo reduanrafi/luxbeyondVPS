@@ -85,13 +85,13 @@
                                         <div
                                             class="w-16 h-16 bg-white/5 rounded-none overflow-hidden border border-white/10 group-hover:border-primary/50 transition-colors">
                                             <div v-if="item.request">
-                                                <img :src="item.request.admin_image_url"
+                                                <img :src="item.request.admin_image_url ?? '/assets/placeholder.webp'"
                                                     :alt="item.request.product_name"
                                                     class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
                                             </div>
                                             <div v-else-if="item.product">
                                                 <img v-if="item.image || (item.product && item.product.image)"
-                                                    :src="item.image || (item.product ? item.product.image_url : null)"
+                                                    :src="item.image || (item.product ? item.product.image_url : '/assets/placeholder.webp')"
                                                     :alt="item.product_name"
                                                     class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500">
                                             </div>
@@ -101,9 +101,10 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <p
+                                            <a :href="`${item?.product?.slug ? '/shop/' + item?.product?.slug : item?.request?.url}`"
+                                                target="_blank"
                                                 class="text-sm font-bold text-white group-hover:text-primary transition-colors">
-                                                {{ item.request?.product_name || item.product?.name }}</p>
+                                                {{ item.request?.product_name || item.product?.name }}</a>
                                             <p v-if="item.product_sku" class="text-xs text-slate-400 mt-1">SKU: {{
                                                 item.product_sku }}</p>
                                             <div v-if="item.variant_data"
@@ -115,7 +116,7 @@
                                                             class="text-primary hover:underline break-all"
                                                             @click.stop>{{ val.substring(0, 50) + '...' }}</a>
                                                     </span>
-                                                    <span v-else>{{ key }}: {{ val }}</span>
+                                                    <span v-else>{{ key !== 'request_id' }}: {{ val }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -157,7 +158,8 @@
                     </div>
                 </div>
                 <div class="px-6 py-4 bg-white/5 border-t border-white/10 flex justify-between items-center">
-                    <span class="text-xs font-serif text-slate-400 uppercase tracking-widest">Total Applied Charges</span>
+                    <span class="text-xs font-serif text-slate-400 uppercase tracking-widest">Total Applied
+                        Charges</span>
                     <span class="text-lg font-bold text-primary">{{ formatPrice(getTotalCharges) }}</span>
                 </div>
             </div>

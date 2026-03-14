@@ -306,8 +306,6 @@ class OrderController extends Controller
             'is_fully_paid' => 'nullable|boolean',
         ]);
 
-        \Log::info($validated);
-
         // 1. FIXED: Handle status update ONLY if it changed
         if (isset($validated['status_id']) && (int)$validated['status_id'] !== (int)$order->status_id) {
             $newStatus = OrderStatus::findOrFail($validated['status_id']);
