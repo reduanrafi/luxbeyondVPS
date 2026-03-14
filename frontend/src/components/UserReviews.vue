@@ -4,16 +4,16 @@
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-serif text-primary sm:text-4xl mb-4 uppercase tracking-widest">What Our
                     Customers Say</h2>
-                <p class="text-xl text-slate-400 max-w-2xl mx-auto">Trusted by thousands of happy shoppers.</p>
+                <p class="text-xl text-[#00ffff] max-w-2xl mx-auto">Trusted by thousands of happy shoppers.</p>
             </div>
 
             <swiper :modules="modules" :slides-per-view="1" :space-between="32" :loop="true" :autoplay="{
                 delay: 3000,
                 disableOnInteraction: false,
             }" :pagination="{
-                    clickable: true,
-                    dynamicBullets: true,
-                }" :breakpoints="{
+                clickable: true,
+                dynamicBullets: true,
+            }" :breakpoints="{
                     '640': {
                         slidesPerView: 1,
                         spaceBetween: 20,

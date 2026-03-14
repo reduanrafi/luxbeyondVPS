@@ -10,7 +10,7 @@
         <div v-else-if="error" class="bg-surface border border-red-500/30 p-8 text-center">
             <p class="text-red-400 font-semibold">{{ error }}</p>
             <button @click="$router.push('/dashboard/orders')"
-                class="mt-4 px-6 py-2 bg-primary text-slate-900 font-bold uppercase tracking-widest rounded-none hover:bg-primary-hover transition-colors">
+                class="mt-4 px-6 py-2 bg-primary text-white font-bold uppercase tracking-widest rounded-none hover:bg-primary-hover transition-colors">
                 Back to Orders
             </button>
         </div>
@@ -249,7 +249,7 @@
 
                     <!-- Bank Transfer -->
                     <button @click="showPayment = true"
-                        class="px-6 py-3 bg-white text-slate-900 border border-slate-300 font-bold rounded-lg hover:bg-slate-50 transition-colors">
+                        class="px-6 py-3 bg-white text-white border border-slate-300 font-bold rounded-lg hover:bg-slate-50 transition-colors">
                         Bank Transfer / Manual
                     </button>
                 </div>

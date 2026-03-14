@@ -59,7 +59,7 @@
                                     </p>
                                     <p class="text-slate-400 text-xs mt-1 leading-relaxed text-wrap">{{
                                         notification.data.message
-                                        }}
+                                    }}
                                     </p>
                                     <p class="text-slate-600 text-[10px] mt-2 uppercase tracking-wider">{{
                                         formatTime(notification.created_at) }}</p>
@@ -78,7 +78,7 @@
                     <!-- Footer -->
                     <div class="p-4 border-t border-white/10 bg-background">
                         <button @click="markAllAsRead"
-                            class="w-full py-3 bg-primary text-slate-900 font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-colors shadow-[0_0_20px_rgba(200,174,125,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                            class="w-full py-3 bg-primary text-white font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-colors shadow-[0_0_20px_rgba(200,174,125,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
                             Mark All as Read
                         </button>
                     </div>

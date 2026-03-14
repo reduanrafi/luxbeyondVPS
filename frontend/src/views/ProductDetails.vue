@@ -145,7 +145,7 @@
 
                         <div class="flex gap-4">
                             <button @click="addToCart" :disabled="(product.total_stock || 0) === 0"
-                                class="flex-1 bg-primary text-slate-900 h-14 uppercase tracking-[0.15em] font-bold text-sm hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(200,174,125,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                                class="flex-1 bg-primary text-white h-14 uppercase tracking-[0.15em] font-bold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(200,174,125,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]">
                                 {{ (product.total_stock || 0) > 0 ? 'Add to Cart' : 'Sold Out' }}
                             </button>
                             <button @click="toggleWishlist"
@@ -233,7 +233,7 @@
             <h3 class="text-xl font-bold text-white mb-2">Product Not Found</h3>
             <p class="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
             <router-link to="/shop"
-                class="inline-block px-6 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark transition-all">
+                class="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all">
                 Back to Shop
             </router-link>
         </div>

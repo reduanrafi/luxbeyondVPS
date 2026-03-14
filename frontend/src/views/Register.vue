@@ -27,7 +27,7 @@
                             class="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
                             :class="{ 'border-red-500': authStore.errors.email }" placeholder="Email address">
                         <p v-if="authStore.errors.email" class="text-red-500 text-xs mt-1">{{ authStore.errors.email[0]
-                            }}</p>
+                        }}</p>
                     </div>
                     <div class="relative">
                         <label for="password" class="sr-only">Password</label>
@@ -60,7 +60,7 @@
 
                 <div>
                     <button type="submit" :disabled="loading"
-                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-slate-900 bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed">
                         <span v-if="loading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
                         <span v-else>Create Account</span>
                     </button>

@@ -282,7 +282,7 @@
 
                             <!-- Step 3: Submit Button -->
                             <button v-if="currentStep === 3" @click="submitRequest" :disabled="submitting"
-                                class="px-8 py-3 bg-primary text-slate-900 font-bold rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                class="px-8 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                                 <span v-if="submitting"
                                     class="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-900"></span>
                                 {{ submitting ? 'Submitting...' : 'Place Order' }}
@@ -509,8 +509,8 @@ const getStepLabel = (step) => {
 };
 
 const getStepCircleClass = (step) => {
-    if (step < currentStep.value) return 'bg-primary text-slate-900 border-primary';
-    if (step === currentStep.value) return 'bg-primary text-slate-900 border-primary ring-4 ring-primary/20';
+    if (step < currentStep.value) return 'bg-primary text-white border-primary';
+    if (step === currentStep.value) return 'bg-primary text-white border-primary ring-4 ring-primary/20';
     return 'bg-transparent text-slate-500 border-white/10';
 };
 

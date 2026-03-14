@@ -122,7 +122,7 @@
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Upload
                             Payment Slip (Optional)</label>
                         <input type="file" accept="image/*,application/pdf" @change="handleFileUpload"
-                            class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-slate-900 hover:file:bg-white transition-all cursor-pointer">
+                            class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-white transition-all cursor-pointer">
                         <p class="text-xs text-slate-500 mt-2">Accepted formats: JPG, PNG, PDF. Max size: 5MB.</p>
                     </div>
                 </div>
@@ -173,7 +173,7 @@
                     Cancel
                 </button>
                 <button @click="submit" :disabled="loading || !isFormValid"
-                    class="px-8 py-3 bg-primary text-slate-900 text-[10px] font-bold rounded-xl hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 uppercase tracking-widest">
+                    class="px-8 py-3 bg-primary text-white text-[10px] font-bold rounded-xl hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 uppercase tracking-widest">
                     <span v-if="loading"
                         class="animate-spin h-3 w-3 border-2 border-slate-900 border-t-transparent rounded-full"></span>
                     {{ loading ? 'Processing...' : (paymentMethod === 'bkash' ? 'Proceed to bKash' : 'Confirm Order') }}

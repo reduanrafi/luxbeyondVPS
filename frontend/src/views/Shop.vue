@@ -16,7 +16,7 @@
                                         class="block rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
                                         :style="event.image_url
                                             ? {}
-    : { backgroundColor: event.bg_color || '#7c3aed' }">
+                                            : { backgroundColor: event.bg_color || '#7c3aed' }">
                                         <img v-if="event.image_url || event.banner_image_url"
                                             :src="event.image_url || event.banner_image_url" :alt="event.name"
                                             class="w-full h-20 object-contain" />
@@ -163,13 +163,13 @@
                             <div class="flex items-center gap-1 bg-surface border border-white/10 p-1">
                                 <button @click="viewMode = 'grid'" :class="[
                                     'p-2 transition-colors rounded-sm',
-                                    viewMode === 'grid' ? 'bg-primary text-slate-900' : 'text-slate-500 hover:text-primary'
+                                    viewMode === 'grid' ? 'bg-primary text-white' : 'text-slate-500 hover:text-primary'
                                 ]">
                                     <Grid class="w-4 h-4" />
                                 </button>
                                 <button @click="viewMode = 'list'" :class="[
                                     'p-2 transition-colors rounded-sm',
-                                    viewMode === 'list' ? 'bg-primary text-slate-900' : 'text-slate-500 hover:text-primary'
+                                    viewMode === 'list' ? 'bg-primary text-white' : 'text-slate-500 hover:text-primary'
                                 ]">
                                     <List class="w-4 h-4" />
                                 </button>
@@ -211,13 +211,13 @@
                         <h3 class="text-xl font-bold text-white mb-2">No products found</h3>
                         <p class="text-slate-400 mb-6">Try adjusting your filters or search query</p>
                         <button @click="clearFilters"
-                            class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-full hover:bg-primary-hover hover:rounded-full transition-all">
+                            class="px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-hover hover:rounded-full transition-all">
                             Clear Filters
                         </button>
 
                         or
                         <router-link to="/request-product"
-                            class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-full hover:bg-primary-hover hover:rounded-full transition-all">
+                            class="px-6 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-hover hover:rounded-full transition-all">
                             Request a Product
                         </router-link>
                     </div>
@@ -232,7 +232,7 @@
                         <button v-for="page in visiblePages" :key="page" @click="goToPage(page)" :class="[
                             'px-4 py-2 border transition-all text-sm font-medium rounded-none',
                             page === currentPage
-                                ? 'bg-primary border-primary text-slate-900 font-bold'
+                                ? 'bg-primary border-primary text-white font-bold'
                                 : 'border-white/10 text-slate-500 hover:border-primary hover:text-primary'
                         ]">
                             {{ page }}

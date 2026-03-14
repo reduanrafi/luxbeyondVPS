@@ -15,9 +15,8 @@
                         <Search
                             class="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500 group-hover:text-primary transition-colors" />
                         <input type="text" v-model="searchQuery" @input="handleSearch"
-                            @focus="showSearchDropdown = true" @blur="handleSearchBlur"
-                            placeholder="SEARCH ENTIRE STORE..."
-                            class="w-full pl-12 pr-4 py-3 border-b border-white/20 hover:border-primary/50 focus:outline-none focus:border-primary transition-all bg-transparent text-white placeholder-slate-600 text-sm font-medium tracking-wide rounded-none" />
+                            @focus="showSearchDropdown = true" @blur="handleSearchBlur" placeholder="SEARCH PRODUCTS..."
+                            class="w-full pl-12 pr-4 py-3 border-b border-white/20 hover:border-primary/50 focus:outline-none focus:border-primary transition-all bg-transparent text-white placeholder-[#00ffff]/60 text-sm font-medium tracking-wide rounded-none" />
                         <button v-if="searchQuery" @click="clearSearch"
                             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
                             <X class="h-4 w-4" />
@@ -78,7 +77,7 @@
                             <div class="flex flex-wrap gap-2 mt-2">
                                 <button v-for="suggestion in popularSearches" :key="suggestion"
                                     @click="searchQuery = suggestion; handleSearch()"
-                                    class="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-slate-300">
+                                    class="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-full transition-colors ">
                                     {{ suggestion }}
                                 </button>
                             </div>
@@ -89,23 +88,23 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
                     <router-link to="/shop"
-                        class="px-4 py-2 text-sm font-medium text-slate-300  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-[#00FFFF]  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
                         Shop
                     </router-link>
                     <router-link to="/travellers"
-                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-[#00FFFF] hover:text-white  hover:bg-primary/10 rounded-full transition-colors">
                         Travellers
                     </router-link>
                     <router-link to="/track-order"
-                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-[#00FFFF] hover:text-white  hover:bg-primary/10 rounded-full transition-colors">
                         Track Order
                     </router-link>
                     <!-- <router-link to="/blogs"
-                        class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
+                        class="px-4 py-2 text-sm font-medium  hover:text-primary  hover:bg-primary/10 rounded-full transition-colors">
                         Blog
                     </router-link> -->
                     <router-link to="/request-product"
-                        class="ml-2 px-4 py-2 text-sm font-semibold text-slate-900 bg-gold-gradient hover:bg-gold-gradient/80 rounded-full transition-colors shadow-sm">
+                        class="ml-2 px-4 py-2 text-sm font-semibold text-white bg-gold-gradient hover:bg-gold-gradient/80 rounded-full transition-colors shadow-sm">
                         Request Product
                     </router-link>
                 </div>
@@ -113,7 +112,7 @@
                 <!-- Action Icons (Desktop) -->
                 <div class="hidden lg:flex items-center space-x-3 ml-6 pl-6 border-l border-white/10">
                     <button @click="handleWishlistClick"
-                        class="relative p-2 text-slate-300  hover:text-primary hover:bg-white/10 rounded-full transition-colors"
+                        class="relative p-2 text-[#00FFFF]  hover:text-white hover:bg-white/10 rounded-full transition-colors"
                         title="Wishlist">
                         <Heart class="h-6 w-6" />
                         <span v-if="wishlistStore.totalItems > 0"
@@ -122,16 +121,16 @@
                         </span>
                     </button>
                     <button @click="handleCartClick"
-                        class="relative p-2 text-slate-300  hover:text-primary hover:bg-white/10 rounded-full transition-colors"
+                        class="relative p-2 text-[#00FFFF] hover:text-white hover:bg-white/10 rounded-full transition-colors"
                         title="Cart">
                         <ShoppingCart class="h-6 w-6" />
                         <span v-if="cartStore.totalItems > 0"
-                            class="absolute -top-1 -right-1 bg-primary text-slate-900 text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                            class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
                             {{ cartStore.totalItems }}
                         </span>
                     </button>
                     <button v-if="authStore.isAuthenticated" @click="isNotificationOpen = true"
-                        class="relative p-2 text-slate-300 hover:text-primary  hover:bg-white/10 rounded-full transition-colors"
+                        class="relative p-2 text-[#00FFFF] hover:text-white  hover:bg-white/10 rounded-full transition-colors"
                         title="Notifications">
                         <Bell class="h-6 w-6" />
                         <span v-if="unreadCount > 0"
@@ -148,7 +147,7 @@
                         <div class="text-left">
                             <div class="text-sm font-semibold text-white group-hover:text-primary transition-colors">
                                 Hello, User</div>
-                            <div class="text-xs text-slate-400">Account & Orders</div>
+                            <div class="text-xs text-[#00ffff]">Account & Orders</div>
                         </div>
                     </button>
                     <router-link v-if="authStore.isAuthenticated" to="/dashboard"
@@ -161,7 +160,7 @@
                             <div class="text-sm font-semibold text-white group-hover:text-primary transition-colors">
                                 Hello, {{ authStore.user && authStore.user.name ? authStore.user.name : 'User' }}
                             </div>
-                            <div class="text-xs text-slate-400">Account & Orders</div>
+                            <div class="text-xs text-[#00ffff]">Account & Orders</div>
                         </div>
                     </router-link>
                 </div>
@@ -170,13 +169,13 @@
                 <div class="lg:hidden flex items-center space-x-2">
                     <!-- Mobile Search Button -->
                     <button @click="isMobileSearchOpen = !isMobileSearchOpen"
-                        class="p-2 text-slate-300 hover:text-primary rounded-lg transition-colors">
+                        class="p-2 text-[#00ffff] hover:text-primary rounded-lg transition-colors">
                         <Search class="h-6 w-6" />
                     </button>
 
                     <!-- Mobile Icons -->
                     <button @click="handleWishlistClick"
-                        class="relative p-2 text-slate-300 hover:text-primary transition-colors">
+                        class="relative p-2 text-[#00ffff] hover:text-primary transition-colors">
                         <Heart class="h-6 w-6" />
                         <span v-if="wishlistStore.totalItems > 0"
                             class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
@@ -184,15 +183,15 @@
                         </span>
                     </button>
                     <button @click="handleCartClick"
-                        class="relative p-2 text-slate-300 hover:text-primary transition-colors">
+                        class="relative p-2 text-[#00ffff] hover:text-primary transition-colors">
                         <ShoppingCart class="h-6 w-6" />
                         <span v-if="cartStore.totalItems > 0"
-                            class="absolute -top-1 -right-1 bg-primary text-slate-900 text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                            class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
                             {{ cartStore.totalItems }}
                         </span>
                     </button>
                     <button v-if="authStore.isAuthenticated" @click="isNotificationOpen = true"
-                        class="relative p-2 text-slate-300 hover:text-primary transition-colors">
+                        class="relative p-2 text-[#00ffff] hover:text-primary transition-colors">
                         <Bell class="h-6 w-6" />
                         <span v-if="unreadCount > 0"
                             class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
@@ -202,7 +201,7 @@
 
                     <!-- Mobile Menu Button -->
                     <button @click="isOpen = !isOpen"
-                        class="p-2 text-slate-300 hover:text-primary rounded-lg transition-colors">
+                        class="p-2 text-[#00ffff] hover:text-primary rounded-lg transition-colors">
                         <Menu v-if="!isOpen" class="h-6 w-6" />
                         <X v-else class="h-6 w-6" />
                     </button>
@@ -259,27 +258,27 @@
         <div v-if="isOpen" class="lg:hidden bg-surface border-t border-white/10 shadow-lg">
             <div class="px-4 py-3 space-y-1">
                 <router-link to="/" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium  hover:text-primary hover:bg-white/5 transition-colors">
                     Home
                 </router-link>
                 <router-link to="/shop" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium  hover:text-primary hover:bg-white/5 transition-colors">
                     Shop
                 </router-link>
                 <router-link to="/travellers" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium  hover:text-primary hover:bg-white/5 transition-colors">
                     Travellers
                 </router-link>
                 <router-link to="/track-order" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium  hover:text-primary hover:bg-white/5 transition-colors">
                     Track Order
                 </router-link>
                 <router-link to="/blogs" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-300 hover:text-primary hover:bg-white/5 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium  hover:text-primary hover:bg-white/5 transition-colors">
                     Blog
                 </router-link>
                 <router-link to="/request-product" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-slate-900 bg-gold-gradient hover:bg-gold-gradient/90 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium text-white bg-gold-gradient hover:bg-gold-gradient/90 transition-colors">
                     Request Order
                 </router-link>
                 <div class="border-t border-white/10 my-2"></div>
@@ -290,15 +289,15 @@
                     </div>
                     <div class="text-left">
                         <div class="text-sm font-semibold text-white">Hello, User</div>
-                        <div class="text-xs text-slate-400">Account & Orders</div>
+                        <div class="text-xs text-[#00ffff]">Account & Orders</div>
                     </div>
                 </button>
                 <button v-if="!authStore.isAuthenticated" @click="modalStore.openModal('register'); isOpen = false"
-                    class="block w-full text-left px-3 py-2 rounded-lg text-base font-medium text-primary hover:bg-white/5 transition-colors mt-2">
+                    class="block w-full text-left px-3 py-2 rounded-lg text-[#00ffff] font-medium text-[#00ffff] hover:bg-white/5 transition-colors mt-2">
                     Register
                 </button>
                 <router-link v-if="authStore.isAuthenticated" to="/dashboard" @click="isOpen = false"
-                    class="block px-3 py-2 rounded-lg text-base font-medium text-primary hover:bg-white/5 transition-colors">
+                    class="block px-3 py-2 rounded-lg text-[#00ffff] font-medium text-[#00ffff] hover:bg-white/5 transition-colors">
                     Dashboard
                 </router-link>
             </div>

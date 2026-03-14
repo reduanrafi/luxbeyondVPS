@@ -2,12 +2,13 @@
     <section id="blogs" class="py-24 bg-surface">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl mb-4">Latest News</h2>
-                <p class="text-xl text-slate-500 max-w-2xl mx-auto">Insights, trends, and updates from our team.</p>
+                <h2 class="text-3xl font-bold text-white sm:text-4xl mb-4">Latest News</h2>
+                <p class="text-xl text-[#00ffff] max-w-2xl mx-auto">Insights, trends, and updates from our team.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <template v-if="loading">
-                    <div v-for="i in 3" :key="i" class="bg-surface rounded-lg overflow-hidden animate-pulse border border-white/5">
+                    <div v-for="i in 3" :key="i"
+                        class="bg-surface rounded-lg overflow-hidden animate-pulse border border-white/5">
                         <div class="h-48 bg-white/5 w-full"></div>
                         <div class="p-6">
                             <div class="h-6 bg-white/5 rounded w-3/4 mb-4"></div>
@@ -20,7 +21,7 @@
                         </div>
                     </div>
                 </template>
-                
+
                 <Card v-else v-for="blog in blogs" :key="blog.id" bodyClass="p-0"
                     class="group h-full flex flex-col cursor-pointer hover:-translate-y-1 transition-transform duration-300">
                     <template #header>
@@ -29,7 +30,7 @@
                                 class="w-full h-full object-contain transform group-hover:scale-105 transition duration-500">
                             <div class="absolute top-0 right-0">
                                 <span
-                                    class="bg-primary text-slate-900 text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
+                                    class="bg-primary text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
                                     {{ blog.category || 'News' }}
                                 </span>
                             </div>
@@ -39,7 +40,9 @@
                         <h3
                             class="text-xl font-serif text-white uppercase tracking-wider mb-3 group-hover:text-primary transition-colors">
                             {{ blog.title }}</h3>
-                        <p class="text-slate-400 text-sm line-clamp-3 mb-6 flex-1" v-html="blog.excerpt || blog.content?.substring(0, 100) + '...'"></p>
+                        <p class="text-sm line-clamp-3 mb-6 flex-1"
+                            v-html="blog.excerpt || blog.content?.substring(0, 100) + '...'">
+                        </p>
                         <div class="mt-auto">
                             <router-link :to="`/blogs/${blog.slug}`"
                                 class="flex items-center gap-2 text-sm text-white font-bold uppercase tracking-widest hover:text-primary transition-colors group/btn">

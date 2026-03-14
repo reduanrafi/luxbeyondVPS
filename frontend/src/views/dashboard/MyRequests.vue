@@ -2,7 +2,7 @@
     <div>
         <div class="flex justify-between items-center mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900">My Requests</h2>
+                <h2 class="text-2xl font-bold text-white">My Requests</h2>
                 <p class="text-xs text-slate-500 mt-1">Track and manage your product requests</p>
             </div>
             <div class="flex gap-3">
@@ -11,7 +11,7 @@
                     <span>Create Order ({{ selectedRequests.length }})</span>
                 </button>
                 <router-link to="/request-product"
-                    class="bg-primary text-slate-900 px-4 py-2 rounded-lg text-xs font-semibold hover:bg-primary-hover transition-colors">
+                    class="bg-primary text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-primary-hover transition-colors">
                     + New Request
                 </router-link>
             </div>

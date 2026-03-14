@@ -69,7 +69,7 @@
                             {{ message }}
                         </p>
                         <button type="submit" :disabled="loading"
-                            class="px-8 py-3 bg-primary text-slate-900 font-bold uppercase tracking-widest hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs">
+                            class="px-8 py-3 bg-primary text-white font-bold uppercase tracking-widest hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-xs">
                             {{ loading ? 'Updating...' : 'Save Changes' }}
                         </button>
                     </div>
@@ -128,7 +128,7 @@
                         class="text-xs font-bold text-green-500 uppercase tracking-wider animate-pulse">{{
                             shippingMessage }}</p>
                     <button @click="saveShippingAddress" :disabled="savingShipping"
-                        class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all text-xs disabled:opacity-50">
+                        class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all text-xs disabled:opacity-50">
                         {{ savingShipping ? 'Saving...' : 'Save Address' }}
                     </button>
                 </div>
@@ -200,7 +200,7 @@
                         class="text-xs font-bold text-green-500 uppercase tracking-wider animate-pulse">{{
                             billingMessage }}</p>
                     <button @click="saveBillingAddress" :disabled="savingBilling"
-                        class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all text-xs disabled:opacity-50">
+                        class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all text-xs disabled:opacity-50">
                         {{ savingBilling ? 'Saving...' : 'Save Billing' }}
                     </button>
                 </div>
@@ -233,7 +233,7 @@
                         class="text-xs font-bold text-green-500 uppercase tracking-wider animate-pulse">{{
                             notificationMessage }}</p>
                     <button @click="saveNotifications" :disabled="savingNotifications"
-                        class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-slate-900 transition-all text-xs disabled:opacity-50">
+                        class="px-8 py-3 border border-white/10 text-white font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all text-xs disabled:opacity-50">
                         {{ savingNotifications ? 'Saving...' : 'Save Preferences' }}
                     </button>
                 </div>

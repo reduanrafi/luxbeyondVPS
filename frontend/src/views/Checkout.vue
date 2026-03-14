@@ -13,7 +13,7 @@
                 <h3 class="text-xl font-serif text-white mb-2 tracking-wide">Your cart is empty</h3>
                 <p class="text-slate-500 mb-6 font-light">Add some products to your cart to continue</p>
                 <router-link to="/shop"
-                    class="inline-block px-8 py-3 bg-primary text-slate-900 font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
+                    class="inline-block px-8 py-3 bg-primary text-white font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
                     Continue Shopping
                 </router-link>
             </div>
@@ -110,7 +110,7 @@
                                     </div>
                                     <div v-if="method.fee_percentage || method.fee" class="text-xs text-slate-600 mt-1">
                                         <span v-if="method.fee_percentage">Processing fee: {{ method.fee_percentage
-                                        }}%</span>
+                                            }}%</span>
                                         <span v-else-if="method.fee">Processing fee: ৳{{ method.fee }}</span>
                                     </div>
                                     <!-- Show payment instructions for manual methods -->
@@ -203,7 +203,7 @@
                                 <p class="text-xs text-slate-500 mb-4">Required before placing order • JPG, PNG, GIF
                                     (Max 5MB)</p>
                                 <button @click="$refs.paymentSlipInput?.click()"
-                                    class="px-6 py-2 bg-primary text-slate-900 font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
+                                    class="px-6 py-2 bg-primary text-white font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
                                     Choose File
                                 </button>
                             </div>
@@ -265,7 +265,7 @@
                                         class="flex-1 px-4 py-2 border border-primary/50 rounded-none focus:outline-none focus:ring-2 focus:ring-primary/20 outline-none"
                                         @keyup.enter="applyCoupon" />
                                     <button @click="applyCoupon" :disabled="applyingCoupon || !couponCode.trim()"
-                                        class="px-6 py-2 bg-primary text-slate-900 font-semibold rounded-none hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                                        class="px-6 py-2 bg-primary text-white font-semibold rounded-none hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                                         <span v-if="applyingCoupon">Applying...</span>
                                         <span v-else>Apply</span>
                                     </button>
@@ -308,7 +308,7 @@
                                         </span>
                                     </span>
                                     <span class="font-semibold text-white">৳{{ formatPrice(charge.amount_in_bdt)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </template>
                             <div class="flex justify-between text-sm">
@@ -337,7 +337,7 @@
                                 <div class="flex justify-between text-sm">
                                     <span class="text-primary font-semibold">Payment Now ({{
                                         checkoutSettings.min_payment_percentage_shop
-                                        }}%)</span>
+                                    }}%)</span>
                                     <span class="font-bold text-primary">৳{{ formatPrice(bkashPaymentAmount) }}</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
@@ -345,13 +345,13 @@
                                         checkoutSettings.min_payment_percentage_shop }}%)</span>
                                     <span class="font-semibold text-slate-400">৳{{ formatPrice(orderSummary.total -
                                         bkashPaymentAmount)
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="border-t border-white/10 pt-3 flex justify-between">
                                 <span class="text-lg font-bold text-white">Total</span>
                                 <span class="text-lg font-bold text-primary">৳{{ formatPrice(orderSummary.total)
-                                }}</span>
+                                    }}</span>
                             </div>
                             <div v-if="orderSummary.min_payment > 0"
                                 class="text-xs text-slate-600 pt-2 border-t border-white/5">
@@ -361,7 +361,7 @@
 
                         <!-- Place Order Button -->
                         <button @click="placeOrder" :disabled="!isFormValid || processing"
-                            class="w-full py-4 bg-primary text-slate-900 font-semibold rounded-none hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                            class="w-full py-4 bg-primary text-white font-semibold rounded-none hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
                             <span v-if="processing" class="flex items-center gap-2">
                                 <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                                 Processing...
