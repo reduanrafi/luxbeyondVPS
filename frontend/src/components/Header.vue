@@ -88,7 +88,7 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
                     <router-link to="/shop"
-                        class="px-4 py-2 text-sm font-medium text-[#00FFFF]  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-[#00FFFF]  hover:text-white hover:bg-primary/10 rounded-full transition-colors">
                         Shop
                     </router-link>
                     <router-link to="/travellers"

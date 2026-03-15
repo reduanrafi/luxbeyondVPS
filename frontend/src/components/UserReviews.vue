@@ -40,7 +40,7 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="text-slate-300 italic leading-relaxed text-lg">"{{ review.comment }}"</p>
+                        <p class="text-[#00ffff] italic leading-relaxed text-lg opacity-80">"{{ review.comment }}"</p>
                     </Card>
                 </swiper-slide>
             </swiper>

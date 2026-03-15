@@ -17,7 +17,7 @@
       <!-- Discount Badge (Minimalist) -->
       <div
         v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-        class="absolute top-0 right-0 bg-gold-gradient text-slate-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+        class="absolute top-0 right-0 bg-[#00ffff] text-slate-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
         {{ calculateDiscount(
           product.event_price ? product.original_price : product.price,
           product.event_price || product.sellable_price || product.price
@@ -48,7 +48,7 @@
       <div class="mb-4" v-if="!product.has_variants">
         <span
           v-if="(product.event_price && product.original_price) || (product.sellable_price && parseFloat(product.price) > parseFloat(product.sellable_price))"
-          class="text-sm text-slate-600 line-through mr-2">
+          class="text-sm text-[#00ffff] opacity-80 line-through mr-2">
           ৳{{ formatPrice(product.event_price ? product.original_price : product.price) }}
         </span>
         <span class="text-xl font-serif text-primary font-bold">

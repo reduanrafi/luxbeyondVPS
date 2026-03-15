@@ -30,7 +30,7 @@
                                 class="w-full h-full object-contain transform group-hover:scale-105 transition duration-500">
                             <div class="absolute top-0 right-0">
                                 <span
-                                    class="bg-primary text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
+                                    class="bg-[#00ffff] text-black shadow text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
                                     {{ blog.category || 'News' }}
                                 </span>
                             </div>
