@@ -11,7 +11,7 @@
                 <h2 class="text-4xl font-bold text-primary sm:text-5xl mb-4">
                     Handpicked for You
                 </h2>
-                <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+                <p class="text-sm text-[#00ffff] max-w-2xl mx-auto  opacity-80">
                     Discover our curated selection of premium products, ready for immediate delivery
                 </p>
             </div>

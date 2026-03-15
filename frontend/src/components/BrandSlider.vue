@@ -9,12 +9,13 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-primary/80"></span>
                     <span class="h-px w-12 bg-gradient-to-l from-transparent to-primary/50"></span>
                 </div>
-                <p class="text-slate-400 font-light tracking-widest text-xs uppercase opacity-80">Curated excellence
+                <p class="text-[#00ffff] font-light tracking-widest text-[12px] uppercase opacity-80">Curated excellence
                     from the world's finest houses</p>
             </div>
 
             <!-- Skeleton Loader -->
-            <div v-if="loading" class="flex justify-center items-center gap-12 overflow-hidden py-4 animate-pulse opacity-50">
+            <div v-if="loading"
+                class="flex justify-center items-center gap-12 overflow-hidden py-4 animate-pulse opacity-50">
                 <div v-for="i in 5" :key="i" class="h-16 w-32 bg-zinc-800/50 rounded-lg"></div>
             </div>
 
@@ -24,8 +25,7 @@
                     <!-- Image Logo with Gold Hover -->
                     <div v-if="brand.image_url" class="relative group/brand transition-all duration-300">
                         <!-- Ghost Image (Preserves Aspect Ratio) -->
-                        <img :src="brand.image_url" :alt="brand.name" class="h-16 w-auto"
-                            aria-hidden="true" />
+                        <img :src="brand.image_url" :alt="brand.name" class="h-16 w-auto" aria-hidden="true" />
 
                         <!-- Color Layer (Masked by Logo) -->
                         <div class="absolute inset-0 bg-slate-500 group-hover/brand:bg-primary transition-colors duration-300"

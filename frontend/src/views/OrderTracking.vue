@@ -4,27 +4,23 @@
             <!-- Header -->
             <div class="text-center space-y-4">
                 <h1 class="text-4xl md:text-5xl font-bold font-serif text-primary">Track Your Order</h1>
-                <p class="text-zinc-400 max-w-lg mx-auto">
-                    Enter your Order Number (e.g., ORD-1234) or Request Number (e.g., REQ-5678) to see the current status.
+                <p class="text-[#00ffff] max-w-lg mx-auto">
+                    Enter your Order Number (e.g., ORD-1234) or Request Number (e.g., REQ-5678) to see the current
+                    status.
                 </p>
             </div>
 
             <!-- Search Form -->
             <div class="max-w-md mx-auto relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div
+                    class="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary/20 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000">
+                </div>
                 <div class="relative flex gap-2">
-                    <input 
-                        v-model="trackingNumber" 
-                        @keyup.enter="trackOrder"
-                        type="text" 
-                        placeholder="Enter Tracking Number..." 
-                        class="w-full bg-[#111111] border border-white/10 rounded-xl px-6 py-4 text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 transition-colors"
-                    >
-                    <button 
-                        @click="trackOrder"
-                        :disabled="loading"
-                        class="bg-primary text-black font-bold px-8 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2"
-                    >
+                    <input v-model="trackingNumber" @keyup.enter="trackOrder" type="text"
+                        placeholder="Enter Tracking Number..."
+                        class="w-full bg-[#111111] border border-white/10 rounded-xl px-6 py-4 text-white placeholder:text-[#00ffff]/70 focus:outline-none focus:border-primary/50 transition-colors">
+                    <button @click="trackOrder" :disabled="loading"
+                        class="bg-primary text-white font-bold px-8 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2">
                         <Search v-if="!loading" class="w-5 h-5" />
                         <Loader2 v-else class="w-5 h-5 animate-spin" />
                         <span class="hidden md:inline">Track</span>
@@ -34,16 +30,21 @@
             </div>
 
             <!-- Result -->
-            <div v-if="result" class="bg-[#111111] border border-white/10 rounded-2xl p-6 md:p-10 space-y-8 animate-fade-in-up">
+            <div v-if="result"
+                class="bg-[#111111] border border-white/10 rounded-2xl p-6 md:p-10 space-y-8 animate-fade-in-up">
                 <!-- Status Header -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-6">
                     <div>
-                        <p class="text-zinc-400 text-sm mb-1">{{ result.type === 'order' ? 'Shop Order' : 'Product Request' }}</p>
-                        <h2 class="text-2xl font-bold text-white">{{ result.order_number || result.request_number }}</h2>
+                        <p class="text-[#00ffff] text-sm mb-1">{{ result.type === 'order' ? 'Shop Order' : `Product
+                            Request` }}</p>
+                        <h2 class="text-2xl font-bold text-white">{{ result.order_number || result.request_number }}
+                        </h2>
                         <p class="text-zinc-500 text-sm mt-1">Placed on {{ result.date }}</p>
                     </div>
                     <div class="flex items-center gap-3">
-                         <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20">
+                        <span
+                            class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20">
                             {{ result.status }}
                         </span>
                         <span class="text-xl font-bold text-white">
@@ -56,15 +57,16 @@
                 <div class="py-4">
                     <div class="relative">
                         <!-- Progress Line -->
-                        <div class="absolute top-1/2 left-0 w-full h-1 bg-white/5 -translate-y-1/2 hidden md:block"></div>
+                        <div class="absolute top-1/2 left-0 w-full h-1 bg-white/5 -translate-y-1/2 hidden md:block">
+                        </div>
                         <div class="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-primary to-primary/50 -translate-y-1/2 hidden md:block transition-all duration-1000"
-                             :style="{ width: getProgressWidth(result.current_status_step) }"></div>
+                            :style="{ width: getProgressWidth(result.current_status_step) }"></div>
 
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-4 relative z-10">
                             <!-- Step 1: Pending -->
                             <div class="flex flex-row md:flex-col items-center gap-4 md:text-center">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300"
-                                     :class="getStepClass(1, result.current_status_step)">
+                                    :class="getStepClass(1, result.current_status_step)">
                                     <ClipboardList class="w-5 h-5" />
                                 </div>
                                 <div>
@@ -76,7 +78,7 @@
                             <!-- Step 2: Processing -->
                             <div class="flex flex-row md:flex-col items-center gap-4 md:text-center">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300"
-                                     :class="getStepClass(2, result.current_status_step)">
+                                    :class="getStepClass(2, result.current_status_step)">
                                     <Package class="w-5 h-5" />
                                 </div>
                                 <div>
@@ -88,7 +90,7 @@
                             <!-- Step 3: Shipped -->
                             <div class="flex flex-row md:flex-col items-center gap-4 md:text-center">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300"
-                                     :class="getStepClass(3, result.current_status_step)">
+                                    :class="getStepClass(3, result.current_status_step)">
                                     <Truck class="w-5 h-5" />
                                 </div>
                                 <div>
@@ -100,7 +102,7 @@
                             <!-- Step 4: Delivered -->
                             <div class="flex flex-row md:flex-col items-center gap-4 md:text-center">
                                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors duration-300"
-                                     :class="getStepClass(4, result.current_status_step)">
+                                    :class="getStepClass(4, result.current_status_step)">
                                     <CheckCircle2 class="w-5 h-5" />
                                 </div>
                                 <div>
@@ -117,8 +119,10 @@
                     <h3 class="font-bold text-white mb-4">Items in Order</h3>
                     <div class="space-y-4">
                         <div v-for="(item, index) in result.items" :key="index" class="flex items-center gap-4">
-                            <div class="w-16 h-16 bg-[#111111] rounded-lg border border-white/10 overflow-hidden flex-shrink-0">
-                                <img v-if="item.image" :src="item.image" :alt="item.name" class="w-full h-full object-contain">
+                            <div
+                                class="w-16 h-16 bg-[#111111] rounded-lg border border-white/10 overflow-hidden flex-shrink-0">
+                                <img v-if="item.image" :src="item.image" :alt="item.name"
+                                    class="w-full h-full object-contain">
                                 <div v-else class="w-full h-full flex items-center justify-center text-zinc-600">
                                     <Package class="w-6 h-6" />
                                 </div>
@@ -133,16 +137,18 @@
                         </div>
                     </div>
                 </div>
-                
-                 <!-- Timeline Details -->
+
+                <!-- Timeline Details -->
                 <div v-if="result.timeline && result.timeline.length > 0" class="border-t border-white/10 pt-6">
                     <h3 class="font-bold text-white mb-4">Tracking History</h3>
                     <div class="space-y-4 pl-4 border-l border-white/10 ml-2">
                         <div v-for="(log, idx) in result.timeline" :key="idx" class="relative pl-6 pb-2">
-                             <div class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-[#111111]"></div>
-                             <p class="text-white font-medium">{{ log.status }}</p>
-                             <p v-if="log.note" class="text-zinc-400 text-sm italic">"{{ log.note }}"</p>
-                             <p class="text-zinc-500 text-xs mt-1">{{ log.date }}</p>
+                            <div
+                                class="absolute -left-[5px] top-2 w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-[#111111]">
+                            </div>
+                            <p class="text-white font-medium">{{ log.status }}</p>
+                            <p v-if="log.note" class="text-[#00ffff] text-sm italic">"{{ log.note }}"</p>
+                            <p class="text-zinc-500 text-xs mt-1">{{ log.date }}</p>
                         </div>
                     </div>
                 </div>
@@ -201,7 +207,7 @@ const getProgressWidth = (step) => {
 const getStepClass = (stepNumber, currentStep) => {
     // 0 is cancelled/failed
     if (currentStep === 0) return 'border-red-500/50 bg-red-500/10 text-red-500';
-    
+
     if (stepNumber <= currentStep) {
         return 'border-primary bg-primary text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]';
     }
@@ -219,6 +225,7 @@ const getStepClass = (stepNumber, currentStep) => {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

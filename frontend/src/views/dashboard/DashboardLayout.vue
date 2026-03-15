@@ -23,11 +23,11 @@
                         class="flex items-center gap-4 px-5 py-3.5 text-sm font-semibold transition-all duration-200 group rounded-lg"
                         :class="[
                             isActive(item.href)
-        ? 'bg-primary text-slate-900 font-bold shadow-md'
-        : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                                ? 'bg-primary text-white font-bold shadow-md'
+                                : 'text-slate-400 hover:bg-white/5 hover:text-white'
                         ]" @click="isSidebarOpen = false">
                         <component :is="item.icon" class="w-5 h-5 transition-transform group-hover:scale-110"
-                            :class="isActive(item.href) ? 'text-slate-900' : 'text-current'" />
+                            :class="isActive(item.href) ? 'text-white' : 'text-current'" />
                         <span>{{ item.name }}</span>
                         <span v-if="item.name === 'Notifications' && unreadCount > 0"
                             class="ml-auto bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -41,11 +41,11 @@
                             class="w-5 h-5 transition-transform group-hover:scale-110 text-current" />
                         <span>{{ item.name }}</span>
                         <span v-if="item.action === 'cart' && cartStore.totalItems > 0"
-                            class="ml-auto bg-primary text-slate-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            class="ml-auto bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                             {{ cartStore.totalItems }}
                         </span>
                         <span v-if="item.action === 'wishlist' && wishlistStore.items.length > 0"
-                            class="ml-auto bg-primary text-slate-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            class="ml-auto bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                             {{ wishlistStore.items.length }}
                         </span>
                     </button>
@@ -91,7 +91,7 @@
                 class="hidden lg:block bg-surface/80 backdrop-blur-md border-b border-white/10  shadow-sm fixed top-0 right-0 left-0 lg:left-72 z-30">
                 <div class="flex items-center justify-between px-8 h-20">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900">{{ currentPageTitle }}</h1>
+                        <h1 class="text-2xl font-bold text-white">{{ currentPageTitle }}</h1>
                         <p class="text-sm text-slate-500 mt-0.5">Welcome back, {{ user?.name?.split(' ')[0] }}!</p>
                     </div>
                     <div class="flex items-center gap-4">
@@ -128,7 +128,9 @@
                     <span class="font-bold text-lg text-primary">{{ currentPageTitle }}</span>
                     <button class="relative p-2 text-slate-400 hover:text-primary transition-colors">
                         <Bell class="w-5 h-5" />
-                        <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">{{ unreadCount }}</span>
+                        <span v-if="unreadCount > 0"
+                            class="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">{{
+                                unreadCount }}</span>
                     </button>
                 </div>
             </header>

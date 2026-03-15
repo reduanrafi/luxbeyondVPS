@@ -49,7 +49,7 @@
                                     <li v-if="cartStore.items.length === 0" class="py-12 text-center">
                                         <div
                                             class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
-                                            <ShoppingCart class="w-8 h-8 text-slate-500" />
+                                            <ShoppingCart class="w-8 h-8 text-[#00ffff]" />
                                         </div>
                                         <p class="text-slate-400 text-lg font-light">Your cart is empty.</p>
                                         <button @click="$emit('close')"
@@ -84,7 +84,7 @@
                                                     </h3>
                                                     <div class="ml-4 text-right">
                                                         <p class="font-bold text-sm"
-                                                            :class="isOutOfStock(item) ? 'text-slate-500' : 'text-primary'">
+                                                            :class="isOutOfStock(item) ? 'text-[#00ffff]' : 'text-primary'">
                                                             {{ item.price }}</p>
                                                         <!-- <p v-if="item.original_price"
                                                             class="text-xs text-slate-600 line-through">
@@ -94,11 +94,11 @@
                                                 </div>
                                                 <!-- Variant Information -->
                                                 <p v-if="item.variant && item.variant.attributes"
-                                                    class="mt-1 text-xs text-slate-500 uppercase tracking-wider">
+                                                    class="mt-1 text-xs text-[#00ffff] uppercase tracking-wider">
                                                     {{ formatVariantAttributes(item.variant.attributes) }}
                                                 </p>
                                                 <!-- <p v-else-if="item.color"
-                                                    class="mt-1 text-xs text-slate-500 uppercase tracking-wider">{{
+                                                    class="mt-1 text-xs text-[#00ffff] uppercase tracking-wider">{{
                                                         item.color }}</p> -->
 
                                                 <!-- Stock Error Message -->
@@ -124,8 +124,8 @@
                                                 <div class="flex">
                                                     <button type="button"
                                                         @click="cartStore.removeItem(item.id, item.variant)"
-                                                        class="font-medium transition-colors uppercase text-xs tracking-wider"
-                                                        :class="isOutOfStock(item) ? 'text-red-500 hover:text-red-400' : 'text-slate-500 hover:text-red-500'">Remove</button>
+                                                        class="font-medium transition-colors uppercase text-xs tracking-wider text-[#00ffff]"
+                                                        :class="isOutOfStock(item) ? 'text-red-500 hover:text-red-400' : 'text-[#00ffff] hover:text-red-500'">Remove</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -138,19 +138,19 @@
                     <div class="border-t border-white/10 py-6 px-4 sm:px-6 bg-background">
                         <div class="flex justify-between text-base font-medium">
                             <p class="text-white font-serif">Subtotal</p>
-                            <p class="text-primary font-serif text-xl">{{ cartStore.formattedSubtotal }}</p>
+                            <p class="text-[#00ffff] font-serif text-xl">{{ cartStore.formattedSubtotal }}</p>
                         </div>
-                        <p class="mt-1 text-xs text-slate-500 font-light">Shipping and taxes calculated at checkout.</p>
+                        <p class="mt-1 text-xs text-[#00ffff] font-light">Shipping and taxes calculated at checkout.</p>
                         <div class="mt-6">
                             <button @click="handleCheckout"
-                                class="w-full flex justify-center items-center px-6 py-4 border border-transparent rounded-none shadow-sm text-sm font-bold text-slate-900 transition-all duration-200 uppercase tracking-widest"
-                                :class="hasStockIssues || cartStore.items.length === 0 ? 'bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-hover'"
+                                class="w-full flex justify-center items-center px-6 py-4 border border-transparent rounded-none shadow-sm text-sm font-bold text-white transition-all duration-200 uppercase tracking-widest"
+                                :class="hasStockIssues || cartStore.items.length === 0 ? 'bg-slate-700 text-[#00ffff] cursor-not-allowed' : 'bg-primary hover:bg-primary-hover'"
                                 :disabled="hasStockIssues || cartStore.items.length === 0">
                                 <span v-if="hasStockIssues">Remove Unavailable Items</span>
                                 <span v-else>Checkout</span>
                             </button>
                         </div>
-                        <div class="mt-6 flex justify-center text-sm text-center text-slate-500">
+                        <div class="mt-6 flex justify-center text-sm text-center text-[#00ffff]">
                             <p>
                                 or <button type="button"
                                     class="text-primary font-bold hover:text-primary-hover transition-colors uppercase tracking-wider text-xs ml-1"

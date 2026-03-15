@@ -45,7 +45,7 @@
                         *</label>
                     <div class="relative">
                         <input type="file" @change="handleFileChange" accept="image/*" required
-                            class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-slate-900 hover:file:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary">
+                            class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary">
                     </div>
                     <p v-if="fileName" class="mt-2 text-xs text-green-400">✓ {{ fileName }}</p>
                 </div>
@@ -56,7 +56,7 @@
                         Cancel
                     </button>
                     <button type="submit" :disabled="submitting"
-                        class="px-6 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                         <span v-if="submitting">Submitting...</span>
                         <span v-else>Submit Payment</span>
                     </button>

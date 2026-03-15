@@ -31,7 +31,7 @@
                         <!-- Add All to Cart Button -->
                         <div v-if="wishlistStore.items.some(item => item.total_stock > 0)" class="mt-6 mb-4">
                             <button @click="addAllToCart"
-                                class="w-full px-4 py-3 bg-primary text-slate-900 font-semibold rounded-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+                                class="w-full px-4 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
                                 <ShoppingCart class="w-5 h-5" />
                                 Add Available to Cart
                             </button>
@@ -51,9 +51,9 @@
                                         </div>
                                         <div class="ml-4 flex-1 flex flex-col">
                                             <div>
-                                                <div class="flex justify-between text-base font-medium text-slate-900">
+                                                <div class="flex justify-between text-base font-medium text-white">
                                                     <h3><router-link :to="`/shop/${item.slug || item.id}`">{{
-                                                            item.name
+                                                        item.name
                                                             }}</router-link></h3>
                                                     <p class="ml-4 text-primary font-bold">
                                                         <template
@@ -62,10 +62,10 @@
                                                         </template>
                                                         <template v-else>
                                                             ৳{{ typeof item.price === 'number' ?
-                                                            item.price.toLocaleString('en-US', {
-                                                            minimumFractionDigits:
-                                                            2, maximumFractionDigits: 2
-                                                            }) : item.price }}
+                                                                item.price.toLocaleString('en-US', {
+                                                                    minimumFractionDigits:
+                                                                        2, maximumFractionDigits: 2
+                                                                }) : item.price }}
                                                         </template>
                                                     </p>
                                                 </div>
@@ -133,10 +133,10 @@ function addAllToCart() {
     const availableItems = wishlistStore.items.filter(item => item.total_stock > 0);
 
     if (availableItems.length === 0) return;
-    
+
     // Create a copy of items array to avoid mutation during iteration
     const itemsToAdd = [...availableItems];
-    
+
     // Add all available items to cart with ensured slugs
     itemsToAdd.forEach(item => {
         const productWithSlug = {
@@ -145,12 +145,12 @@ function addAllToCart() {
         };
         cartStore.addItem(productWithSlug);
     });
-    
+
     // Clear only added items from wishlist
     itemsToAdd.forEach(item => {
         wishlistStore.removeItem(item.id);
     });
-    
+
     // Open cart drawer to show added items
     cartStore.shouldOpenDrawer = true;
 }

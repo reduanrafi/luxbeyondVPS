@@ -15,7 +15,7 @@
                 class="bg-slate-900 bg-surface rounded-xl shadow-lg p-8 text-center border border-red-900">
                 <p class="text-red-400 font-semibold mb-4">{{ error }}</p>
                 <button @click="$router.push('/dashboard/requests')"
-                    class="px-6 py-2 bg-primary text-slate-900 bg-surface rounded-lg hover:bg-primary/90 transition-colors">
+                    class="px-6 py-2 bg-primary text-white bg-surface rounded-lg hover:bg-primary/90 transition-colors">
                     ← Back to Requests
                 </button>
             </div>
@@ -25,7 +25,7 @@
                 <!-- Header -->
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-slate-900">Confirm Your Request</h1>
+                        <h1 class="text-2xl font-bold text-white">Confirm Your Request</h1>
                         <p class="text-sm text-slate-600 mt-1">Request #{{ request.request_number || request.id }}</p>
                     </div>
                     <button @click="$router.push('/dashboard/requests')"
@@ -68,7 +68,7 @@
                                     <div v-if="request.status === 'request_accepted' || request.status === 'accepted'"
                                         class="flex gap-2">
                                         <button @click="openAddressModal"
-                                            class="px-6 py-2 bg-primary text-slate-900 text-sm font-bold rounded-lg hover:bg-primary/70 transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)] uppercase tracking-widest">
+                                            class="px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/70 transition-all shadow-[0_0_20px_rgba(255,215,0,0.2)] uppercase tracking-widest">
                                             Confirm Request
                                         </button>
                                     </div>

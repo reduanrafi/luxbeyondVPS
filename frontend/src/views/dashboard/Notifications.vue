@@ -14,11 +14,12 @@
             No notifications
         </div>
         <div v-else class="space-y-4">
-            <div v-for="notification in notifications" :key="notification.id" 
+            <div v-for="notification in notifications" :key="notification.id"
                 class="bg-surface p-4 border border-white/5 flex gap-4 transition-all hover:bg-white/5 group"
                 :class="{ 'border-l-2 border-l-primary': !notification.read_at, 'border-l-transparent': notification.read_at }">
                 <div class="flex-shrink-0 mt-1">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-slate-900">
+                    <div
+                        class="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                         <component :is="getIcon(notification.data?.type || notification.type)" class="w-5 h-5" />
                     </div>
                 </div>

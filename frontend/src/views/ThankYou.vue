@@ -81,7 +81,7 @@ onMounted(() => {
 
         <template v-else>
           <router-link :to="isOrder ? `/dashboard/orders/${id}` : `/dashboard/requests/${id}`"
-            class="px-8 py-3 bg-primary text-slate-900 font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
+            class="px-8 py-3 bg-primary text-white font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
             View Details
           </router-link>
 

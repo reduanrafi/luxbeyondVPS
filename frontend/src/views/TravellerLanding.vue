@@ -25,7 +25,7 @@
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <button @click="openRegisterModal"
-                            class="inline-flex justify-center items-center gap-2 bg-primary text-slate-900 font-bold py-4 px-8 rounded-none hover:bg-primary-hover transition-all uppercase tracking-widest text-sm">
+                            class="inline-flex justify-center items-center gap-2 bg-primary text-white font-bold py-4 px-8 rounded-none hover:bg-primary-hover transition-all uppercase tracking-widest text-sm">
                             Start Earning
                             <ArrowRight class="w-5 h-5" />
                         </button>
@@ -67,7 +67,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl md:text-4xl font-serif text-white mb-4">Simple Steps to Start Earning</h2>
-                    <p class="text-xl text-slate-400 max-w-2xl mx-auto font-light">We've made the process seamless and
+                    <p class="text-xl text-[#00ffff] max-w-2xl mx-auto font-light">We've made the process seamless and
                         secure, so
                         you can focus on your journey.</p>
                 </div>
@@ -87,7 +87,7 @@
                         <div
                             class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-colors h-full">
                             <h3 class="text-xl font-serif text-white mb-3 text-center">1. Post Your Trip</h3>
-                            <p class="text-slate-400 text-center leading-relaxed text-sm">
+                            <p class="text-[#00ffff] text-center leading-relaxed text-sm">
                                 Tell us where you're going and how much luggage space you have available.
                             </p>
                         </div>
@@ -102,7 +102,7 @@
                         <div
                             class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-colors h-full">
                             <h3 class="text-xl font-serif text-white mb-3 text-center">2. Get Matched</h3>
-                            <p class="text-slate-400 text-center leading-relaxed text-sm">
+                            <p class="text-[#00ffff] text-center leading-relaxed text-sm">
                                 Receive requests from shoppers wanting items from your destination.
                             </p>
                         </div>
@@ -117,7 +117,7 @@
                         <div
                             class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-colors h-full">
                             <h3 class="text-xl font-serif text-white mb-3 text-center">3. Deliver & Earn</h3>
-                            <p class="text-slate-400 text-center leading-relaxed text-sm">
+                            <p class="text-[#00ffff] text-center leading-relaxed text-sm">
                                 Buy the item, deliver it upon arrival, and get paid instantly.
                             </p>
                         </div>
@@ -140,7 +140,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-xl font-serif text-white mb-2">Secure Payments</h3>
-                                    <p class="text-slate-400 font-light">We hold the shopper's payment in escrow until
+                                    <p class="text-[#00ffff] font-light">We hold the shopper's payment in escrow until
                                         you
                                         successfully deliver the item.</p>
                                 </div>
@@ -152,7 +152,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-xl font-serif text-white mb-2">Global Community</h3>
-                                    <p class="text-slate-400 font-light">Join thousands of travellers and shoppers
+                                    <p class="text-[#00ffff] font-light">Join thousands of travellers and shoppers
                                         connecting
                                         worldwide every day.</p>
                                 </div>
@@ -166,12 +166,12 @@
                             <div class="space-y-6">
                                 <div>
                                     <label
-                                        class="block text-sm font-medium text-slate-400 mb-2 uppercase tracking-wide">
+                                        class="block text-sm font-medium text-[#00ffff] mb-2 uppercase tracking-wide">
                                         Luggage Space Available
                                     </label>
                                     <input type="range" min="1" max="10" step="1" v-model="calculatorLuggage"
                                         class="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-primary border border-white/10">
-                                    <div class="flex justify-between text-sm text-slate-500 mt-1">
+                                    <div class="flex justify-between text-sm text-[#00ffff] mt-1">
                                         <span>1 Bag</span>
                                         <span class="font-bold text-primary">{{ calculatorLuggage }} Bags</span>
                                         <span>10 Bags</span>
@@ -179,14 +179,14 @@
                                 </div>
                                 <div class="p-4 bg-surface rounded-sm border border-white/10">
                                     <div class="flex justify-between items-center mb-2">
-                                        <span class="text-slate-400 uppercase tracking-wide text-xs">Potential
+                                        <span class="text-[#00ffff] uppercase tracking-wide text-xs">Potential
                                             Earnings</span>
                                         <span class="text-2xl font-serif text-primary">{{ calculatedEarnings }}</span>
                                     </div>
-                                    <p class="text-xs text-slate-500">*Based on standard rewards (upto $500/bag)</p>
+                                    <p class="text-xs text-[#00ffff]">*Based on standard rewards (upto $500/bag)</p>
                                 </div>
                                 <button @click="openRegisterModal"
-                                    class="w-full py-4 bg-primary text-slate-900 font-bold rounded-none hover:bg-primary-hover transition-colors cursor-pointer uppercase tracking-widest text-sm">
+                                    class="w-full py-4 bg-primary text-white font-bold rounded-none hover:bg-primary-hover transition-colors cursor-pointer uppercase tracking-widest text-sm">
                                     Calculate for My Trip
                                 </button>
                             </div>
@@ -214,7 +214,7 @@
                         class="relative transform overflow-hidden rounded-sm bg-surface text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-3xl border border-white/10">
                         <!-- Close Button -->
                         <button @click="closeRegisterModal"
-                            class="absolute top-4 right-4 text-slate-400 hover:text-white focus:outline-none z-10 transition-colors">
+                            class="absolute top-4 right-4 text-[#00ffff] hover:text-white focus:outline-none z-10 transition-colors">
                             <X class="w-6 h-6" />
                         </button>
 
@@ -329,7 +329,7 @@
                                             :class="{ 'border-red-500': errors.password }"
                                             @input="clearError('password')" />
                                         <button type="button" @click="showPassword = !showPassword"
-                                            class="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-slate-500 hover:text-white focus:outline-none">
+                                            class="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-[#00ffff] hover:text-white focus:outline-none">
                                             <Eye v-if="!showPassword" class="h-5 w-5" />
                                             <EyeOff v-else class="h-5 w-5" />
                                         </button>
@@ -347,7 +347,7 @@
                                             :class="{ 'border-red-500': errors.password_confirmation }"
                                             @input="clearError('password_confirmation')" />
                                         <button type="button" @click="showConfirmPassword = !showConfirmPassword"
-                                            class="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-slate-500 hover:text-white focus:outline-none">
+                                            class="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-[#00ffff] hover:text-white focus:outline-none">
                                             <Eye v-if="!showConfirmPassword" class="h-5 w-5" />
                                             <EyeOff v-else class="h-5 w-5" />
                                         </button>
@@ -368,7 +368,7 @@
 
                                 <div class="pt-4">
                                     <button type="submit" :disabled="loading"
-                                        class="group relative w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent text-lg font-bold rounded-none text-slate-900 bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-70 disabled:cursor-not-allowed">
+                                        class="group relative w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent text-lg font-bold rounded-none text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-70 disabled:cursor-not-allowed">
                                         <span v-if="loading"
                                             class="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-900"></span>
                                         <span v-else>Register as Traveler</span>
