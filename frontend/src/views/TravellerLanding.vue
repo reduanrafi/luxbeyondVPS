@@ -4,7 +4,7 @@
         <section class="relative bg-background overflow-hidden">
             <!-- Background Image with Overlay -->
             <div
-                class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-40">
+                class="absolute inset-0 bg-[url('/assets/traveller.avif')] bg-cover bg-center opacity-40">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
 

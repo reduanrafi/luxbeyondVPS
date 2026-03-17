@@ -205,6 +205,17 @@
                             <span class="text-slate-400">Charges:</span>
                             <span class="font-semibold text-white">{{ formatPrice(getTotalCharges) }}</span>
                         </div>
+                        <!-- Applied Coupons -->
+                        <div v-if="order.coupons && order.coupons.length > 0" class="space-y-1 pt-2 border-t border-white/5">
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Applied Coupons</p>
+                            <div v-for="coupon in order.coupons" :key="coupon.id"
+                                class="flex justify-between items-center">
+                                <span class="text-slate-400 flex items-center gap-1.5">
+                                    <span class="font-mono text-[10px] px-1.5 py-0.5 bg-primary/10 text-primary border border-primary/20">{{ coupon.code }}</span>
+                                </span>
+                                <span class="font-semibold text-green-500">-{{ formatPrice(coupon.pivot?.discount_amount || 0) }}</span>
+                            </div>
+                        </div>
                         <div v-if="order.discount > 0" class="flex justify-between">
                             <span class="text-slate-400">Discount:</span>
                             <span class="font-semibold text-green-600">-{{ formatPrice(order.discount) }}</span>
@@ -212,14 +223,13 @@
 
                         <div class="flex justify-between">
                             <span class="text-slate-400">Delivery Charge:</span>
-                            <span class="font-semibold">{{ formatPrice(order.items[0].request.delivery_charge?? 0) }}</span>
+                            <span class="font-semibold" >{{ formatPrice(order.delivery_charge ?? order.shipping) }}</span>
                         </div>
 
                         <div class="flex justify-between">
                             <span class="text-slate-400">Payment Processing Fee:</span>
-                            <span class="font-semibold">{{ formatPrice(order.items[0].request.payment_processing_fee?? 0) }}</span>
+                            <span class="font-semibold">{{ formatPrice(order.payment_processing_fee?? 0) }}</span>
                         </div>
-                        {{ order }}
                         <div class="border-t border-white/10 pt-3 space-y-2">
                             <div class="flex justify-between">
                                 <span class="text-sm font-bold text-white">Total:</span>
@@ -251,7 +261,7 @@
                 <div class="flex flex-col md:flex-row gap-4">
                     <!-- Bkash -->
                     <button @click="initiateBkash" :disabled="processingBkash"
-                        class="px-6 py-3 bg-[#E2136E] text-white font-bold rounded-lg hover:bg-[#C2105E] transition-colors flex items-center justify-center gap-2">
+                        class="px-6 py-3 bg-[#E2136E] text-[#00ffff] font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
                         <span v-if="processingBkash"
                             class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
                         {{ processingBkash ? 'Processing...' : 'Pay with bKash' }}
@@ -259,8 +269,8 @@
 
                     <!-- Bank Transfer -->
                     <button @click="showPayment = true"
-                        class="px-6 py-3 bg-white text-white border border-slate-300 font-bold rounded-lg hover:bg-slate-50 transition-colors">
-                        Bank Transfer / Manual
+                        class="px-6 py-3 bg-[#00ffff]/70 text-white border border-slate-300 font-bold rounded-lg transition-colors">
+                        Bank Transfer
                     </button>
                 </div>
             </div>

@@ -55,6 +55,7 @@ class Order extends Model
         'paid_amount' => 'decimal:2',
         'due_amount' => 'decimal:2',
         'is_fully_paid' => 'boolean',
+        'payment_processing_fees' => 'decimal:2',
     ];
 
     protected $appends = [
@@ -93,6 +94,16 @@ class Order extends Model
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    /**
+     * Many-to-many: multiple coupons per order
+     */
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'order_coupon')
+                    ->withPivot('discount_amount')
+                    ->withTimestamps();
     }
 
     public function items()

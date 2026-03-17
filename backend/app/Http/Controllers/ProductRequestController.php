@@ -632,6 +632,7 @@ class ProductRequestController extends Controller
             'shipping' => $productRequest->delivery_fee,
             'tax' => $productRequest->tax,
             'payment_method' => $productRequest->payment_method,
+            'payment_processing_fees' => $productRequest->payment_processing_fees,
             'payment_status' => $productRequest->payment_status ?? 'unpaid',
             'shipping_address' => $productRequest->shipping_address,
             'notes' => 'Converted from Request #' . $productRequest->request_number,

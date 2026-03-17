@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderPayment;
 use App\Models\OrderStatus;
 use App\Models\OrderItem;
+use App\Models\CouponUsage;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,11 +126,20 @@ class OrderController extends Controller
                 $request->merge(['shipping_address' => $addr]);
             }
         }
+        if ($request->has('coupon_ids') && is_string($request->coupon_ids)) {
+            $request->merge(['coupon_ids' => json_decode($request->coupon_ids, true)]);
+        }
+        if ($request->has('coupon_discounts') && is_string($request->coupon_discounts)) {
+            $request->merge(['coupon_discounts' => json_decode($request->coupon_discounts, true)]);
+        }
 
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'event_id' => 'nullable|exists:events,id',
             'coupon_id' => 'nullable|exists:coupons,id',
+            'coupon_ids' => 'nullable|array',
+            'coupon_ids.*' => 'nullable|exists:coupons,id',
+            'coupon_discounts' => 'nullable|array', // discount_amount for each coupon
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'nullable|exists:products,id',
             'items.*.product_name' => 'required|string',
@@ -234,7 +244,31 @@ class OrderController extends Controller
             ]);
         }
 
-        $order->load(['user', 'status', 'event', 'coupon', 'items', 'payments']);
+        // Sync multi-coupon pivot table
+        $couponIds = $validated['coupon_ids'] ?? [];
+        $couponDiscounts = $validated['coupon_discounts'] ?? [];
+
+        if (!empty($couponIds)) {
+            $syncData = [];
+            foreach ($couponIds as $index => $couponId) {
+                $discountAmount = $couponDiscounts[$index] ?? 0;
+                $syncData[$couponId] = ['discount_amount' => $discountAmount];
+
+                // Record CouponUsage
+                CouponUsage::create([
+                    'coupon_id' => $couponId,
+                    'user_id' => $validated['user_id'],
+                    'order_id' => $order->id,
+                    'discount_amount' => $discountAmount,
+                ]);
+
+                // Increment usage count
+                \App\Models\Coupon::where('id', $couponId)->increment('usage_count');
+            }
+            $order->coupons()->sync($syncData);
+        }
+
+        $order->load(['user', 'status', 'event', 'coupon', 'coupons', 'items', 'payments']);
 
         // Send notification based on payment method
         if ($validated['payment_method'] === 'bank_transfer') {
@@ -259,7 +293,7 @@ class OrderController extends Controller
     public function show(Request $request, $id)
     {
         // Support both ID and order_number lookup
-        $order = Order::with(['user', 'status', 'event', 'coupon', 'items.product', 'items.request', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
+        $order = Order::with(['user', 'status', 'event', 'coupon', 'coupons', 'items.product', 'items.request', 'statusHistories.changedBy', 'statusHistories.status', 'payments'])
                      ->where(function($query) use ($id) {
                          $query->where('id', $id)
                                ->orWhere('order_number', $id);
