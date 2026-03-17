@@ -10,11 +10,17 @@ const __dirname = path.dirname(__filename)
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), Prerender({
-    routes: ['/', '/shop'],
-    renderer: new PuppeteerRenderer(),
-    staticDir: path.resolve(__dirname, 'dist'),
-  })],
+  plugins: [vue(), 
+
+    prerender({
+      staticDir: path.resolve(__dirname, 'dist'),
+      routes: ['/', '/shop', '/request-product', '/blogs'], // list top routes
+      renderer: new PuppeteerRenderer({
+        headless: true,
+        renderAfterDocumentEvent: 'prerender-ready', // we will trigger this from Vue
+      }),
+    }),
+  ],
   // START FIX: Wrap alias inside 'resolve'
   resolve: {
     alias: {

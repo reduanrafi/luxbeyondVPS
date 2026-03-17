@@ -83,6 +83,7 @@ const routes = [
     {
         path: '/request-product',
         component: () => import('../views/RequestProduct.vue'),
+        name:'request-product',
         meta: { requiresAuth: true, title: 'Request Product', description: 'Request a product from the admin luxbeyond' },
     },
 

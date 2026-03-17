@@ -73,7 +73,7 @@
                             <tr>
                                 <th class="p-3 text-left text-xs font-semibold text-slate-300 uppercase">Product</th>
                                 <th class="p-3 text-left text-xs font-semibold text-slate-300 uppercase">Quantity</th>
-                                <th class="p-3 text-left text-xs font-semibold text-slate-300 uppercase">Price</th>
+                                <th class="p-3 text-left text-xs font-semibold text-slate-300 uppercase">Base Price</th>
                                 <th class="p-3 text-right text-xs font-semibold text-slate-300 uppercase">Subtotal</th>
                             </tr>
                         </thead>
@@ -124,8 +124,7 @@
                                 </td>
                                 <td class="p-3 text-xs text-slate-400">{{ item.quantity }}</td>
                                 <td class="p-3 text-xs text-slate-400">{{ formatPrice(item.price) }}</td>
-                                <td class="p-3 text-right text-xs font-semibold text-white">{{ formatPrice(item.subtotal
-                                    || (item.price * item.quantity)) }}</td>
+                                <td class="p-3 text-right text-xs font-semibold text-white">{{ formatPrice(order.subtotal || 0) }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -210,6 +209,17 @@
                             <span class="text-slate-400">Discount:</span>
                             <span class="font-semibold text-green-600">-{{ formatPrice(order.discount) }}</span>
                         </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Delivery Charge:</span>
+                            <span class="font-semibold">{{ formatPrice(order.items[0].request.delivery_charge?? 0) }}</span>
+                        </div>
+
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Payment Processing Fee:</span>
+                            <span class="font-semibold">{{ formatPrice(order.items[0].request.payment_processing_fee?? 0) }}</span>
+                        </div>
+                        {{ order }}
                         <div class="border-t border-white/10 pt-3 space-y-2">
                             <div class="flex justify-between">
                                 <span class="text-sm font-bold text-white">Total:</span>

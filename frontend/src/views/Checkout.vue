@@ -818,7 +818,7 @@ const handlePaymentCallback = () => {
         // Clear cart on successful payment
         cartStore.clearCart();
         // Redirect to order page
-        router.push(`/dashboard/orders/${orderId}`);
+        router.push(`/thank-you?payment=${paymentStatus}`);
     } else if (paymentStatus === 'failed' || paymentStatus === 'error') {
         toast.error('Payment failed. Please try again.');
     }

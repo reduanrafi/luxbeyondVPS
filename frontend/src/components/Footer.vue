@@ -128,7 +128,7 @@
                     <span class="text-sm text-[#00ffff]">We Accept:</span>
                     <div class="flex flex-col items-center gap-2 px-3 py-1.5 ">
                         <img src="/eastern-bank-plc.webp" alt="luxbeyond ebl" width="120%">
-                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="88" height="40"
+                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="176" height="80" class="text-pink-500"
                             viewBox="0 0 122 54">
                             <title>bKash Logo</title>
                             <g fill="currentColor">

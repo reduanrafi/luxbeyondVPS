@@ -40,6 +40,9 @@ class ProductRequest extends Model
         'shipping_address',
         'shipping_name',
         'shipping_phone',
+        'paid_amount',
+        'due_amount',
+        'weight_charge'
     ];
 
     protected $casts = [

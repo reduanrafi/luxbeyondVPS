@@ -356,7 +356,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { Link as LinkIcon, Check, CheckCircle, Info } from 'lucide-vue-next';
 import axios from '../axios';
 
@@ -364,6 +364,7 @@ import { useToast } from 'vue-toastification';
 import { trackPurchase, trackBeginCheckout as trackBeginCheckoutGA4 } from '../utils/analytics';
 
 const router = useRouter();
+const route = useRoute();
 const toast = useToast();
 
 // State
@@ -561,6 +562,9 @@ const submitRequest = async () => {
 };
 
 onMounted(() => {
+    if (route.query.url) {
+        form.value.url = route.query.url
+    }
     fetchCurrencies();
 });
 </script>

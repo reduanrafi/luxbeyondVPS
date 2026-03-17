@@ -61,12 +61,11 @@
                             <Search class="h-12 w-12 text-gray-300 mx-auto mb-3" />
                             <p class="text-sm font-medium text-white">No products found</p>
                             <p class="text-xs text-gray-500 mt-1 mb-5">
-                                We are working on it.
+                               Request a product instead
                             </p>
-                            <router-link to="request-product"
-                                class="bg-gold-gradient rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
-                                Request Product
-                            </router-link>
+                            <router-link class="bg-gold-gradient rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm" :to="{ name: 'request-product', query: { url: searchQuery } }">
+                            Request Order
+                        </router-link>
                         </div>
 
                         <!-- Recent Searches / Suggestions (when no query) -->
@@ -246,7 +245,7 @@
                     </div>
                     <div v-else-if="searchQuery && !isSearching" class="p-6 text-center">
                         <p class="text-sm text-gray-500">No products found</p>
-                        <router-link to="/request-product">
+                        <router-link :to="{ name: 'request-product', query: { url: searchQuery } }">
                             Request Order
                         </router-link>
                     </div>

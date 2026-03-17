@@ -38,6 +38,7 @@ class Order extends Model
         'paid_amount',
         'due_amount',
         'is_fully_paid',
+        'weight_charge'
     ];
 
     protected $casts = [
@@ -156,7 +157,7 @@ class Order extends Model
     public function updateStatus($statusId, $note = null, $userId = null)
     {
         $status = OrderStatus::findOrFail($statusId);
-        
+
         $this->update([
             'status_id' => $statusId,
             'status' => $status->name,

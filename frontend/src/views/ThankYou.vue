@@ -35,7 +35,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-background pt-0 flex items-center justify-center px-4">
+  <div class="min-h-[600px] bg-background pt-0 flex items-center justify-center px-4">
     <div class="max-w-2xl w-full text-center space-y-8 animate-fadeIn">
 
       <div class="flex justify-center">
@@ -80,8 +80,9 @@ onMounted(() => {
         </template>
 
         <template v-else>
+
           <router-link :to="isOrder ? `/dashboard/orders/${id}` : `/dashboard/requests/${id}`"
-            class="px-8 py-3 bg-primary text-white font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]">
+            class="px-8 py-3 bg-primary text-white font-bold uppercase tracking-widest text-sm rounded-none hover:bg-primary-hover transition-all shadow-[0_0_20px_rgba(200,174,125,0.2)]" v-if="id !==undefined">
             View Details
           </router-link>
 
@@ -97,7 +98,7 @@ onMounted(() => {
         </template>
       </div>
 
-      <p class="text-xs text-slate-600 pt-8">
+      <p class="text-xs text-[#00ffff] pt-8">
         Need help? <a href="#" class="text-primary hover:underline">Contact our support team</a>
       </p>
 
