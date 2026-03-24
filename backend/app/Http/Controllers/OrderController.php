@@ -224,7 +224,7 @@ class OrderController extends Controller
             $file = $request->file('payment_slip');
             $folder = 'payment_slips';
             $filename = $order->order_number . '_' . time() . '.' . $file->getClientOriginalExtension();
-    
+
             $file->storeAs($folder, $filename, 'public');
             $paymentSlipPath = $folder . '/' . $filename;
 
@@ -383,9 +383,9 @@ class OrderController extends Controller
             'product_name' => $itemData['product_name'],
             'price'        => $price,
             'quantity'     => $qty,
-            'subtotal'     => $itemSubtotal, // <--- ADD THIS LINE
-            'variant_data' => is_array($itemData['variant_data']) 
-                              ? json_encode($itemData['variant_data']) 
+            'subtotal'     => $itemSubtotal,
+            'variant_data' => is_array($itemData['variant_data'])
+                              ? json_encode($itemData['variant_data'])
                               : $itemData['variant_data'],
         ]
     );
@@ -447,7 +447,7 @@ class OrderController extends Controller
 
         // 4. Notification Logic for Bank Transfer
         if ($order->payment_method === 'bank_transfer') {
-            $isApproved = (isset($validated['status_id']) && in_array($validated['status_id'], [2, 3, 4])) 
+            $isApproved = (isset($validated['status_id']) && in_array($validated['status_id'], [2, 3, 4]))
                     || (isset($validated['payment_status']) && $validated['payment_status'] === 'paid');
 
             if ($isApproved) {
@@ -517,7 +517,7 @@ class OrderController extends Controller
      public function downloadInvoice($orderId)
     {
         $payloads = [];
-       
+
         try {
             $order = Order::with('items.product')->where('order_number',$orderId)->latest()->first();
             if(!$order){
@@ -532,7 +532,7 @@ class OrderController extends Controller
             if (file_exists($logoPath)) {
                 $logoBase64 = 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath));
             }
-           
+
             $invoiceData = [
                 'order' => $order,
                 'logo' => $logoBase64,
