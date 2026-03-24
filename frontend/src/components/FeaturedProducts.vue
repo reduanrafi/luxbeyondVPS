@@ -1,6 +1,6 @@
 <template>
     <section id="products" class="py-24 bg-surface">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Section Header -->
             <div class="text-center mb-16">
                 <div
@@ -58,42 +58,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import Button from './ui/Button.vue';
 import ProductCard from './ProductCard.vue';
 import { Star, Package, ArrowRight } from 'lucide-vue-next';
-import axios from '../axios';
+import { useProductStore } from '../stores/product';
 
-const products = ref([]);
-const loading = ref(true);
+const productStore = useProductStore();
 
-const fetchFeaturedProducts = async () => {
-    loading.value = true;
-    try {
-        const response = await axios.get('/products', {
-            params: {
-                featured: true,
-                per_page: 8
-            }
-        });
-
-        // Handle paginated response
-        if (response.data.data) {
-            products.value = Array.isArray(response.data.data)
-                ? response.data.data
-                : response.data.data.data || [];
-        } else {
-            products.value = Array.isArray(response.data) ? response.data : [];
-        }
-    } catch (error) {
-        console.error('Error fetching featured products:', error);
-        products.value = [];
-    } finally {
-        loading.value = false;
-    }
-};
+const products = computed(() => productStore.featuredProducts);
+const loading = computed(() => productStore.loadingFeatured);
 
 onMounted(() => {
-    fetchFeaturedProducts();
+    productStore.fetchFeatured();
 });
 </script>

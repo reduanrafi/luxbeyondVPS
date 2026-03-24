@@ -22,3 +22,6 @@ app.use(Toast, {
 });
 
 app.mount('#app')
+
+// Dispatch prerender event for Puppeteer
+document.dispatchEvent(new Event('prerender-ready'))

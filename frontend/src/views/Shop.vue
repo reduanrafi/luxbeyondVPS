@@ -67,9 +67,9 @@
             </aside>
 
             <!-- Main content -->
-            <main class="flex-1 w-full min-h-[calc(100vh-5rem)] pb-10 mx-auto">
+            <main class="flex-1 min-h-[calc(100vh-5rem)] pb-10 mx-auto max-w-full px-4 sm:px-6 lg:px-8 ">
                 <!-- Hero Events Carousel -->
-                <div v-if="heroEvents.length > 0" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div v-if="heroEvents.length > 0" class="px-4 sm:px-6 lg:px-8 mb-6">
                     <div class="relative">
                         <!-- Carousel Container -->
                         <div class="overflow-hidden rounded-2xl mt-5">
@@ -124,12 +124,12 @@
                 </div>
 
                 <!-- Hero Section -->
-                <!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden lg:block">
+                <!-- <div class="hidden lg:block">
                     <HeroSection />
                 </div> -->
 
                 <!-- Products Section -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 px-4">
+                <div class="py-2 px-4">
 
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 flex-wrap">
                         <!-- Mobile Filter Button -->
@@ -181,7 +181,7 @@
                     </div>
                 </div>
 
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="">
                     <!-- Loading State -->
                     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         <div v-for="n in 8" :key="n" class="bg-surface rounded-xl border border-white/10 animate-pulse">
@@ -279,6 +279,11 @@ import { Search, Filter, Grid, List, Package, ChevronLeft, ChevronRight, Layers,
 import axios from '../axios';
 import ProductCard from '../components/ProductCard.vue';
 import ShopSidebar from '@/components/shop/ShopSidebar.vue';
+import { useProductStore } from '@/stores/product';
+
+const productStore = useProductStore();
+const categories = computed(() => productStore.categories);
+const brands = computed(() => productStore.brands);
 
 const route = useRoute();
 const router = useRouter();
@@ -287,8 +292,6 @@ const router = useRouter();
 const showMobileFilters = ref(false);
 
 const products = ref([]);
-const categories = ref([]);
-const brands = ref([]);
 const loading = ref(false);
 const searchQuery = ref('');
 const viewMode = ref('grid');
@@ -423,21 +426,11 @@ const fetchProducts = async () => {
 };
 
 const fetchCategories = async () => {
-    try {
-        const response = await axios.get('/categories');
-        categories.value = response.data.data || response.data || [];
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-    }
+    productStore.fetchCategories();
 };
 
 const fetchBrands = async () => {
-    try {
-        const response = await axios.get('/brands', { params: { all: true } });
-        brands.value = response.data || [];
-    } catch (error) {
-        console.error('Error fetching brands:', error);
-    }
+    productStore.fetchBrands();
 };
 
 const handleSearch = () => {

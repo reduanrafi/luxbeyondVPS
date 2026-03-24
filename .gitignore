@@ -4,3 +4,4 @@
 *.DS_Store
 frontend/package-lock.json
 /admin
+/backend/public/media

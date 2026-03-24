@@ -1,6 +1,6 @@
 <template>
     <section id="blogs" class="py-24 bg-surface">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-white sm:text-4xl mb-4">Latest News</h2>
                 <p class="text-xl text-[#00ffff] max-w-2xl mx-auto">Insights, trends, and updates from our team.</p>

@@ -24,35 +24,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Zap, ChevronRight } from 'lucide-vue-next';
-import axios from '../../axios';
+import { onMounted, computed } from 'vue';
 import SidebarItem from './SidebarItem.vue';
+import { useProductStore } from '@/stores/product';
 
-const categories = ref([]);
-const loading = ref(true);
+const productStore = useProductStore();
+
+const categories = computed(() => productStore.categories);
+const loading = computed(() => productStore.loadingCategories);
 
 onMounted(() => {
-    fetchCategories();
+    productStore.fetchCategories();
 });
-
-const fetchCategories = async () => {
-    loading.value = true;
-    try {
-        const response = await axios.get('/categories');
-        // Handle both paginated and non-paginated responses
-        if (response.data.data) {
-            categories.value = Array.isArray(response.data.data)
-                ? response.data.data
-                : response.data.data.data || [];
-        } else {
-            categories.value = Array.isArray(response.data) ? response.data : [];
-        }
-    } catch (error) {
-        console.error('Error fetching categories:', error);
-        categories.value = [];
-    } finally {
-        loading.value = false;
-    }
-};
 </script>

@@ -1,6 +1,6 @@
 <template>
     <section class="py-24 bg-background">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-serif text-primary sm:text-4xl mb-4 uppercase tracking-widest">What Our
                     Customers Say</h2>
@@ -15,15 +15,15 @@
                 dynamicBullets: true,
             }" :breakpoints="{
                     '640': {
-                        slidesPerView: 1,
+                        slidesPerView: 2,
                         spaceBetween: 20,
                     },
                     '768': {
-                        slidesPerView: 2,
+                        slidesPerView: 3,
                         spaceBetween: 30,
                     },
                     '1024': {
-                        slidesPerView: 3,
+                        slidesPerView: 4,
                         spaceBetween: 32,
                     },
                 }" class="w-full pb-14">

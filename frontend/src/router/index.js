@@ -113,11 +113,31 @@ const routes = [
     // Public Pages
     { path: '/travellers', component: () => import('../views/TravellerLanding.vue'), meta: { title: 'Travellers', description: 'Travellers luxbeyond' } },
     { path: '/track-order', component: () => import('../views/OrderTracking.vue'), meta: { title: 'Track Order', description: 'Track order luxbeyond' } },
+    { path: '/help-center', component: () => import('../views/HelpCenter.vue'), meta: { title: 'Help Center', description: 'Help Center luxbeyond' } },
+
+    // CMS Static Pages
+    { path: '/about-us', component: () => import('../views/StaticPage.vue'), props: { slug: 'about-us' }, meta: { title: 'About Us' } },
+    { path: '/privacy-policy', component: () => import('../views/StaticPage.vue'), props: { slug: 'privacy-policy' }, meta: { title: 'Privacy Policy' } },
+    { path: '/refund-policy', component: () => import('../views/StaticPage.vue'), props: { slug: 'refund-policy' }, meta: { title: 'Refund Policy' } },
+    { path: '/terms-of-service', component: () => import('../views/StaticPage.vue'), props: { slug: 'terms-of-service' }, meta: { title: 'Terms of Service' } },
+    // Generic catch-all for any future CMS pages
+    { path: '/pages/:slug', component: () => import('../views/StaticPage.vue'), meta: { title: 'Page' } },
+    
+    // Catch-all 404 Error Page
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { title: '404 - Page Not Found' } },
 ];
+
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
+    scrollBehavior(to, from, savedPosition) {
+        if (savedPosition) {
+            return savedPosition;
+        } else {
+            return { top: 0, behavior: 'smooth' };
+        }
+    },
 });
 
 router.beforeEach(async (to, from, next) => {

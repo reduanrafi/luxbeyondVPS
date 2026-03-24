@@ -46,9 +46,15 @@ export default defineConfig(async ({ mode }) => {
         staticDir: path.resolve(__dirname, 'dist'),
         routes: [
           '/',
+          '/request-product',
+          '/travellers',
+          '/track-order',
+          '/help-center',
+          '/privacy-policy',
+          '/terms-of-service',
+          '/refund-policy',
           '/shop',
           '/blogs',
-          '/request-product',
           ...productRoutes,
           ...blogRoutes, // ✅ add blogs here
         ],

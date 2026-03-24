@@ -1,6 +1,6 @@
 <template>
     <nav class="bg-surface border-b border-white/10 shadow-sm sticky w-full z-50 top-0 left-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
                 <div class="shrink-0">
@@ -10,7 +10,7 @@
                 </div>
 
                 <!-- Search Bar (Desktop) -->
-                <div class="hidden lg:flex flex-1 max-w-2xl mx-8 relative">
+                <div class="hidden lg:flex flex-1 max-w-xl mx-8 relative">
                     <div class="relative w-full group">
                         <Search
                             class="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500 group-hover:text-primary transition-colors" />
