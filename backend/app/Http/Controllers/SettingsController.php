@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Models\PaymentMethod;
 use App\Models\NotificationSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
@@ -48,6 +49,37 @@ class SettingsController extends Controller
         );
 
         return response()->json(['message' => 'Setting updated successfully']);
+    }
+
+    public function uploadLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,avif|max:2048',
+        ]);
+
+        $setting = Setting::where('key', 'site_logo')->first();
+
+        if ($setting && $setting->value) {
+            if (Storage::disk('public')->exists($setting->value)) {
+                Storage::disk('public')->delete($setting->value);
+            }
+        }
+
+        $path = $request->file('logo')->store('settings', 'public');
+
+        Setting::updateOrCreate(
+            ['key' => 'site_logo'],
+            [
+                'value' => $path,
+                'group' => 'general',
+                'type' => 'image'
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Logo uploaded successfully',
+            'url' => Storage::disk('public')->url($path)
+        ]);
     }
 
     // ========== Payment Methods ==========

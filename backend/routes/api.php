@@ -72,6 +72,7 @@ Route::get('/payment-methods', function () {
 
 // Public checkout settings
 Route::get('/settings/checkout', [\App\Http\Controllers\Public\SettingsController::class, 'getCheckoutSettings']);
+Route::get('/settings/general', [\App\Http\Controllers\Public\SettingsController::class, 'getGeneralSettings']);
 
 
 // Public payment callback (bKash redirects here)
@@ -196,6 +197,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('settings')->group(function () {
             Route::get('/', [\App\Http\Controllers\SettingsController::class, 'getSettings']);
             Route::post('/update', [\App\Http\Controllers\SettingsController::class, 'updateSettings']);
+            Route::post('/logo', [\App\Http\Controllers\SettingsController::class, 'uploadLogo']);
             Route::put('/{key}', [\App\Http\Controllers\SettingsController::class, 'updateSetting']);
             
             // Payment Methods

@@ -26,4 +26,32 @@ class SettingsController extends Controller
 
         return response()->json($settings);
     }
+
+    public function getGeneralSettings()
+    {
+        $keys = [
+            'site_name',
+            'site_email',
+            'site_phone',
+            'site_logo',
+            'footer_description',
+            'contact_address',
+            'facebook_url',
+            'instagram_url',
+            'linkedin_url',
+            'whatsapp_number',
+        ];
+
+        $settings = Setting::whereIn('key', $keys)
+            ->get()
+            ->mapWithKeys(function ($setting) {
+                $value = $setting->value;
+                if ($setting->key === 'site_logo' && $value) {
+                    $value = \Illuminate\Support\Facades\Storage::disk('public')->url($value);
+                }
+                return [$setting->key => $value];
+            });
+
+        return response()->json($settings);
+    }
 }
