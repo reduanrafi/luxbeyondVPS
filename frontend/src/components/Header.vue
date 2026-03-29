@@ -1,11 +1,11 @@
 <template>
     <nav class="bg-surface border-b border-white/10 shadow-sm sticky w-full z-50 top-0 left-0">
         <div class="w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex justify-between items-center h-24">
                 <!-- Logo -->
                 <div class="shrink-0">
                     <router-link to="/" class="flex items-center">
-                        <img src="/assets/logo.png" alt="Luxbeyond Logo" class="w-auto">
+                        <img :src="settingsStore.settings.site_logo || '/assets/logo.png'" alt="Luxbeyond Logo" class="w-auto max-h-24">
                     </router-link>
                 </div>
 
@@ -317,6 +317,7 @@ import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
 import { useNotificationStore } from '../stores/notification';
 import { useModalStore } from '../stores/modal';
+import { useSettingsStore } from '../stores/settings';
 import CartDrawer from './CartDrawer.vue';
 import WishlistDrawer from './WishlistDrawer.vue';
 import NotificationDrawer from './NotificationDrawer.vue';
@@ -334,6 +335,11 @@ const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
 const notificationStore = useNotificationStore();
 const modalStore = useModalStore();
+const settingsStore = useSettingsStore();
+
+onMounted(() => {
+    settingsStore.fetchSettings();
+});
 
 // Watch for cart drawer trigger from cart store
 watch(() => cartStore.shouldOpenDrawer, (shouldOpen) => {

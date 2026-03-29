@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Setting extends Model
 {
@@ -21,6 +22,19 @@ class Setting extends Model
     protected $casts = [
         'sort_order' => 'integer',
     ];
+
+    protected $appends = ['logo_url'];
+
+    /**
+     * Get the logo URL if this is a site logo setting.
+     */
+    public function getLogoUrlAttribute()
+    {
+        if ($this->key === 'site_logo' && $this->value) {
+            return Storage::disk('public')->url($this->value);
+        }
+        return null;
+    }
 
     /**
      * Get setting value by key

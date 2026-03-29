@@ -10,24 +10,24 @@
                 <!-- Brand Section -->
                 <div class="space-y-6">
                     <div class="flex items-center gap-2">
-                        <router-link to="/" class="bg-white/5 p-2 rounded-lg backdrop-blur-sm">
-                            <span class="text-2xl font-bold text-primary tracking-tight">Luxbeyond</span>
+                        <router-link to="/" class="bg-white/5 p-1 rounded-lg backdrop-blur-sm">
+                            <img v-if="settingsStore.settings.site_logo" :src="settingsStore.settings.site_logo" alt="Luxbeyond Logo" class="h-24 w-auto">
+                            <span v-else class="text-2xl font-bold text-primary tracking-tight px-2">{{ settingsStore.settings.site_name || 'Luxbeyond' }}</span>
                         </router-link>
                     </div>
                     <p class="text-[#00FFFF] leading-relaxed text-sm">
-                        Your premium gateway to global shopping. We connect you with travellers to bring the world to
-                        your doorstep with ease, security, and style.
+                        {{ settingsStore.settings.footer_description }}
                     </p>
                     <div class="flex gap-4 pt-2">
-                        <a href="https://www.facebook.com/luxbeyond.store" target="_blank"
+                        <a v-if="settingsStore.settings.facebook_url" :href="settingsStore.settings.facebook_url" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Facebook class="w-5 h-5" />
                         </a>
-                        <a href="https://www.instagram.com/luxbeyondbd" target="_blank"
+                        <a v-if="settingsStore.settings.instagram_url" :href="settingsStore.settings.instagram_url" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Instagram class="w-5 h-5" />
                         </a>
-                        <a href="https://www.linkedin.com/company/luxbeyondbd" target="_blank"
+                        <a v-if="settingsStore.settings.linkedin_url" :href="settingsStore.settings.linkedin_url" target="_blank"
                             class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-primary hover:bg-accent hover:text-black hover:scale-110 transition-all duration-300">
                             <Linkedin class="w-5 h-5" />
                         </a>
@@ -101,18 +101,22 @@
                     <div class="space-y-3">
                         <div class="flex items-start gap-3 text-[#00FFFF]">
                             <MapPin class="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                            <span class="text-sm">Flat 4B,House 33,Road 03,Sector 09,Uttara, Dhaka, Bangladesh,
-                                1230</span>
+                            <span class="text-sm whitespace-pre-line">{{ settingsStore.settings.contact_address }}</span>
                         </div>
                         <div class="flex items-center gap-3 text-[#00FFFF]">
                             <Mail class="w-5 h-5 text-accent shrink-0" />
-                            <a href="mailto:info.luxbeyond@gmail.com"
-                                class="text-sm hover:text-white transition-colors">info.luxbeyond@gmail.com</a>
+                            <a :href="`mailto:${settingsStore.settings.site_email}`"
+                                class="text-sm hover:text-white transition-colors">{{ settingsStore.settings.site_email }}</a>
                         </div>
                         <div class="flex items-center gap-3 text-[#00FFFF]">
                             <Phone class="w-5 h-5 text-accent shrink-0" />
-                            <a href="tel:01404458662"
-                                class="text-sm hover:text-white transition-colors">01404-458662</a>
+                            <a :href="`tel:${settingsStore.settings.site_phone}`"
+                                class="text-sm hover:text-white transition-colors">{{ settingsStore.settings.site_phone }}</a>
+                        </div>
+                        <div v-if="settingsStore.settings.whatsapp_number" class="flex items-center gap-3 text-[#00FFFF]">
+                            <MessageSquare class="w-5 h-5 text-accent shrink-0" />
+                            <a :href="`https://wa.me/${settingsStore.settings.whatsapp_number.replace(/\D/g, '')}`" target="_blank"
+                                class="text-sm hover:text-white transition-colors">WhatsApp Us</a>
                         </div>
                     </div>
                 </div>
@@ -121,7 +125,7 @@
             <!-- Bottom Bar -->
             <div class="border-t border-white/10 pt-8 sm:flex gap-4 items-center justify-between">
                 <p class="text-[#00ffff] text-sm text-center md:text-left">
-                    &copy; {{ new Date().getFullYear() }} Luxbeyond. All rights reserved.
+                    &copy; {{ new Date().getFullYear() }} {{ settingsStore.settings.site_name || 'Luxbeyond' }}. All rights reserved.
                 </p>
 
                 <!-- <div class="flex sm:flex-row flex-col items-center gap-2 text-sm text-[#00ffff] my-10 sm:mt-0">
@@ -172,5 +176,8 @@
 </template>
 
 <script setup>
-import { Facebook, Instagram, Linkedin, ArrowRight, MapPin, Mail, Phone, CreditCard } from 'lucide-vue-next';
+import { Facebook, Instagram, Linkedin, ArrowRight, MapPin, Mail, Phone, CreditCard, MessageSquare } from 'lucide-vue-next';
+import { useSettingsStore } from '../stores/settings';
+
+const settingsStore = useSettingsStore();
 </script>
