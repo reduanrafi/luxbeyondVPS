@@ -17,7 +17,7 @@ class ProductRequestController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         $query = ProductRequest::with(['orderStatus', 'timeline'])
             ->where('user_id', $user->id)
             ->whereDoesntHave('orderItem');
@@ -122,23 +122,25 @@ class ProductRequestController extends Controller
         // Calculate default delivery charge from settings
         $isInsideCity = $request->is_inside_city ?? false;
         $defaultDeliveryCharge = 0;
-        
+
         if ($isInsideCity) {
             $defaultDeliveryCharge = \App\Models\Setting::get('delivery_charge_inside_city', 0);
         } else {
             $defaultDeliveryCharge = \App\Models\Setting::get('delivery_charge_outside_city', 0);
         }
 
+        $weightCharge = 0;
+
         // Add additional weight charge if applicable
         if ($request->weight > 1) {
              $perKgCharge = \App\Models\Setting::get('delivery_charge_per_kg', 0);
-             $defaultDeliveryCharge += ($request->weight - 1) * $perKgCharge;
+             $weightCharge += ($request->weight - 1) * $perKgCharge;
         }
 
         // Calculate Additional Charges from 'charges' table based on currency
         $currencyCode = $request->currency;
         $currency = \App\Models\Currency::where('code', $currencyCode)->first();
-        
+
         $chargesBreakdown = [];
         $additionalChargesTotal = 0;
         $productSubtotal = $request->price * $request->quantity;
@@ -153,31 +155,32 @@ class ProductRequestController extends Controller
             foreach ($charges as $charge) {
                 // Determine base amount for calculation - usually product subtotal
                 $chargeAmount = $charge->calculate($productSubtotal);
-                
-                // Convert charge to BDT if needed for the total? 
+
+                // Convert charge to BDT if needed for the total?
                 // The 'calculate' method in Charge model usually returns amount in Charge's currency or Base?
                 // Looking at Charge.php: 'if ($this->currency && !$this->currency->is_base) { $amount = $amount * rate_to_base; }'
                 // This implies 'calculate' returns the BDT (Base) amount if rate_to_base is applied.
-                
+
                 $chargeAmountBDT = $chargeAmount; // Since calculate() handles conversion to base
-                
+
                 // Store in breakdown - usually we want to show original currency amount too?
                 // Let's assume calculate returns BDT value as per previous analysis of Charge.php
-                
+
                 // However, we might want to store the original calculated amount in the currency too?
-                // Let's re-read Charge.php carefully. 
+                // Let's re-read Charge.php carefully.
                 // Ah, check Charge.php content again.
                 // It converts to base if !is_base. So it returns Base Currency (BDT).
-                
+
                 $additionalChargesTotal += $chargeAmountBDT;
-                
+
                 $chargesBreakdown[] = [
                     'currency' => $currency->code, // The charge is associated with this currency
                     'charge' => $charge->name,
                     'calculation_type' => $charge->calculation_type,
                     'value' => $charge->value,
                     'amount_in_currency' => $charge->calculation_type === 'fixed' ? $charge->value : ($productSubtotal * $charge->value / 100),
-                    'amount_in_bdt' => $chargeAmountBDT
+                    'amount_in_bdt' => $chargeAmountBDT,
+                    'base_amount_in_bdt' => $chargeAmountBDT
                 ];
             }
         }
@@ -186,21 +189,21 @@ class ProductRequestController extends Controller
         // Note: frontend might be sending total_amount_bdt, tax etc.
         // If we are auto-calculating, we should override or merge?
         // User asked to "add them", implying backend calculation should take precedence or at least default them.
-        
+
         // Let's trust the backend calculation for new requests
         $tax = $request->tax ?? 0;
         $processingFee = $request->payment_processing_fee ?? 0;
         $otherAdditional = $request->additional_charges ?? 0; // Manual additional charges if any
-        
+
         // Total additional includes calculated + manual
         $finalAdditionalCharges = $additionalChargesTotal + $otherAdditional;
-        
+
         // We need to calculate Product Total in BDT for the grand total
         $productTotalBDT = $productSubtotal;
         if ($currency && !$currency->is_base) {
             $productTotalBDT = $productSubtotal * $currency->rate_to_base;
         }
-        
+
         $grandTotal = $productTotalBDT + $defaultDeliveryCharge + $tax + $finalAdditionalCharges + $processingFee + $shippingCost;
 
         $minPaymentAmountPercent =\App\Models\Setting::get('min_payment_percentage_request', 100);
@@ -222,9 +225,9 @@ class ProductRequestController extends Controller
             'tax' => $tax,
             'delivery_charge' => $defaultDeliveryCharge,
             'payment_processing_fee' => $processingFee,
-            'additional_charges' => $finalAdditionalCharges,
             'charges_breakdown' => $chargesBreakdown,
             'min_payment_amount' => $minPaymentAmount,
+            'weight_charge' => $weightCharge
         ]);
 
         $productRequest->refresh();
@@ -279,7 +282,7 @@ class ProductRequestController extends Controller
 
         // Configure Bkash - use DB config if available, otherwise fallback to .env
         $paymentMethod = \App\Models\PaymentMethod::where('type', 'bkash')->where('is_active', true)->first();
-        
+
         // if ($paymentMethod && $paymentMethod->config) {
         //     // Use database credentials
         //     // config([
@@ -395,7 +398,7 @@ class ProductRequestController extends Controller
             'product_request' => $productRequest
         ]);
     }
-    
+
     public function updateQuantity(Request $request, $id)
     {
         $productRequest = ProductRequest::where(function($query) use ($id) {
@@ -409,7 +412,7 @@ class ProductRequestController extends Controller
 
         // Only allow update if not paid, completed, or cancelled
         if (in_array($productRequest->status, ['completed', 'cancelled', 'paid']) || $productRequest->payment_status === 'paid') {
-           return response()->json(['message' => 'Cannot update quantity for this request status'], 400); 
+           return response()->json(['message' => 'Cannot update quantity for this request status'], 400);
         }
 
         $validated = $request->validate([
@@ -423,11 +426,11 @@ class ProductRequestController extends Controller
             $ratio = $newQuantity / $oldQuantity;
 
             // Scale explicit fields
-            $productRequest->tax = ($productRequest->tax ?? 0) * $ratio;
-            $productRequest->delivery_charge = ($productRequest->delivery_charge ?? 0) * $ratio;
-            $productRequest->additional_charges = ($productRequest->additional_charges ?? 0) * $ratio;
-            $productRequest->payment_processing_fee = ($productRequest->payment_processing_fee ?? 0) * $ratio;
-            $productRequest->declared_shipping_cost = ($productRequest->declared_shipping_cost ?? 0) * $ratio;
+            // $productRequest->tax = ($productRequest->tax ?? 0) * $ratio;
+            // $productRequest->delivery_charge = ($productRequest->delivery_charge ?? 0) * $ratio;
+            // $productRequest->additional_charges = ($productRequest->additional_charges ?? 0) * $ratio;
+            // $productRequest->payment_processing_fee = ($productRequest->payment_processing_fee ?? 0) * $ratio;
+            // $productRequest->declared_shipping_cost = ($productRequest->declared_shipping_cost ?? 0) * $ratio;
 
             // Scale charges breakdown
             $updatedBreakdown = [];
@@ -447,7 +450,7 @@ class ProductRequestController extends Controller
                 $productRequest->charges_breakdown = $updatedBreakdown;
             }
 
-            // Scale total and min payment
+            $productRequest->weightCharge = $productRequest->weightCharge * $ratio;
             $productRequest->total_amount_bdt = $productRequest->total_amount_bdt * $ratio;
             $minPaymentAmountPercent = \App\Models\Setting::get('min_payment_percentage_request', 100);
             $productRequest->min_payment_amount = ($productRequest->total_amount_bdt * $minPaymentAmountPercent) / 100;
@@ -463,24 +466,24 @@ class ProductRequestController extends Controller
     }
     public function show($id)
     {
-       
+
         $productRequest = ProductRequest::with(['user', 'orderStatus', 'timeline.creator'])->where(function($query) use ($id){
             $query->where('id', $id)->orWhere('request_number', $id);
         })->firstOrFail();
-        
+
         if ($productRequest->user_id != Auth::id() && !Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         return response()->json($productRequest);
     }
-    
+
     // Admin approves and updates image
     public function update(Request $request, $id)
     {
         $productRequest = ProductRequest::where(function($query) use ($id){
             $query->where('id', $id)->orWhere('request_number', $id);
         })->firstOrFail();
-        
+
         // Check permission (simple check for now, better to use Policies)
         if (!Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -508,10 +511,13 @@ class ProductRequestController extends Controller
             'min_payment_amount' => 'nullable|numeric|min:0',
             'payment_status' => 'nullable|string',
             'charges_breakdown' => 'nullable|array',
+            'paid_amount'       => 'nullable|numeric|min:0',
+            'due_amount'       => 'nullable|numeric|min:0',
         ]);
 
         $oldStatus = $productRequest->status;
         $oldStatusId = $productRequest->status_id;
+
 
         // Update all provided fields
         $updateData = $request->except(['_token', '_method']);
@@ -524,10 +530,10 @@ class ProductRequestController extends Controller
         // If status_id is provided, also update status name from order_status
         $newStatusName = null;
         if (isset($updateData['status_id'])) {
-            $orderStatus = OrderStatus::find($updateData['status_id']);
+        $orderStatus = OrderStatus::find($updateData['status_id']);
             if ($orderStatus) {
                 $newStatusName = $orderStatus->name;
-                $updateData['status'] = $orderStatus->name; 
+                $updateData['status'] = $orderStatus->name;
             }
         } elseif (isset($updateData['status'])) {
             $newStatusName = $updateData['status'];
@@ -583,7 +589,7 @@ class ProductRequestController extends Controller
         $productRequest = ProductRequest::with('user')->where(function($query) use ($id){
             $query->where('id', $id)->orWhere('request_number', $id);
         })->firstOrFail();
-        
+
         // Admin only
         if (!Auth::user()->hasRole('Admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -606,7 +612,7 @@ class ProductRequestController extends Controller
 
         // Fallback default if still no valid status found
         if (!$orderStatusId) {
-             $defaultStatus = OrderStatus::where('is_default', true)->first() 
+             $defaultStatus = OrderStatus::where('is_default', true)->first()
                               ?? OrderStatus::where('name', 'pending')->first();
              $orderStatusId = $defaultStatus?->id;
              $orderStatusName = $defaultStatus?->name ?? 'pending';
@@ -614,7 +620,7 @@ class ProductRequestController extends Controller
 
         // Calculate total
         $total = $productRequest->total_amount_bdt ?: 0;
-        
+
         // Create Order
         $order = Order::create([
             'user_id' => $productRequest->user_id,
@@ -623,7 +629,10 @@ class ProductRequestController extends Controller
             'subtotal' => $total, // Simplified: treating Total BDT as subtotal since it includes all
             'total' => $total,
             'currency' => 'BDT',
+            'shipping' => $productRequest->delivery_fee,
+            'tax' => $productRequest->tax,
             'payment_method' => $productRequest->payment_method,
+            'payment_processing_fees' => $productRequest->payment_processing_fees,
             'payment_status' => $productRequest->payment_status ?? 'unpaid',
             'shipping_address' => $productRequest->shipping_address,
             'notes' => 'Converted from Request #' . $productRequest->request_number,
@@ -656,10 +665,10 @@ class ProductRequestController extends Controller
             'note' => 'Converted to Order #' . $order->order_number,
             'created_by' => Auth::id(),
         ]);
-        
+
         // Create Status History for Order
         $order->updateStatus($defaultStatus->id, 'Created from Request #' . $productRequest->request_number, Auth::id());
-        
+
         // Notify User
         $productRequest->user->notify(new \App\Notifications\OrderPlacedNotification($order));
 

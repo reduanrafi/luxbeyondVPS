@@ -184,6 +184,7 @@ class CouponController extends Controller
             'code' => 'required|string',
             'subtotal' => 'required|numeric|min:0',
             'product_ids' => 'nullable|array',
+            'applied_coupon_ids' => 'nullable|array', // Already applied coupons
         ]);
 
         // Convert code to uppercase for case-sensitive search
@@ -195,6 +196,15 @@ class CouponController extends Controller
                 'valid' => false,
                 'message' => 'Invalid coupon code'
             ], 404);
+        }
+
+        // Check if this coupon is already applied
+        $appliedIds = $validated['applied_coupon_ids'] ?? [];
+        if (in_array($coupon->id, $appliedIds)) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'This coupon is already applied'
+            ], 422);
         }
 
         $userId = auth()->id();
@@ -243,24 +253,38 @@ class CouponController extends Controller
     public function available()
     {
         $user = auth()->user();
+        $userId = auth()->id();
 
-        // basic query for active coupons
-        // In a real app, you might check if the user has already used the coupon limit, etc.
+        // Get all active, non-expired coupons visible to this user
         $coupons = Coupon::where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             })
-            ->where(function ($q) {
+            ->where(function ($q) use ($userId) {
                 // Public coupons OR coupons assigned to this user
                 $q->where('is_private', false)
-                    ->orWhereHas('users', function ($q2) {
-                    $q2->where('users.id', auth()->id());
+                    ->orWhereHas('users', function ($q2) use ($userId) {
+                    $q2->where('users.id', $userId);
                 });
             })
             ->latest()
-            ->get();
+            ->get()
+            ->filter(function ($coupon) use ($userId) {
+                return $coupon->canBeUsedBy($userId);
+            })
+            ->values();
 
-        return response()->json($coupons);
+        // Separate into featured and private
+        $featured = $coupons->where('is_featured', true)->values();
+        $private = $coupons->where('is_private', true)->values();
+        $other = $coupons->where('is_featured', false)->where('is_private', false)->values();
+
+        return response()->json([
+            'featured' => $featured,
+            'private' => $private,
+            'other' => $other,
+            'all' => $coupons,
+        ]);
     }
 }

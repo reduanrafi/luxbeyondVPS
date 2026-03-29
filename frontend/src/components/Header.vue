@@ -1,6 +1,6 @@
 <template>
     <nav class="bg-surface border-b border-white/10 shadow-sm sticky w-full z-50 top-0 left-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
                 <!-- Logo -->
                 <div class="shrink-0">
@@ -10,7 +10,7 @@
                 </div>
 
                 <!-- Search Bar (Desktop) -->
-                <div class="hidden lg:flex flex-1 max-w-2xl mx-8 relative">
+                <div class="hidden lg:flex flex-1 max-w-xl mx-8 relative">
                     <div class="relative w-full group">
                         <Search
                             class="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-500 group-hover:text-primary transition-colors" />
@@ -61,12 +61,11 @@
                             <Search class="h-12 w-12 text-gray-300 mx-auto mb-3" />
                             <p class="text-sm font-medium text-white">No products found</p>
                             <p class="text-xs text-gray-500 mt-1 mb-5">
-                                We are working on it.
+                               Request a product instead
                             </p>
-                            <router-link to="request-product"
-                                class="bg-gold-gradient rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm">
-                                Request Product
-                            </router-link>
+                            <router-link class="bg-gold-gradient rounded-full hover:opacity-90 mt-10 text-black p-1  px-2 text-sm" :to="{ name: 'request-product', query: { url: searchQuery } }">
+                            Request Order
+                        </router-link>
                         </div>
 
                         <!-- Recent Searches / Suggestions (when no query) -->
@@ -88,7 +87,7 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
                     <router-link to="/shop"
-                        class="px-4 py-2 text-sm font-medium text-[#00FFFF]  hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
+                        class="px-4 py-2 text-sm font-medium text-[#00FFFF]  hover:text-white hover:bg-primary/10 rounded-full transition-colors">
                         Shop
                     </router-link>
                     <router-link to="/travellers"
@@ -246,7 +245,7 @@
                     </div>
                     <div v-else-if="searchQuery && !isSearching" class="p-6 text-center">
                         <p class="text-sm text-gray-500">No products found</p>
-                        <router-link to="/request-product">
+                        <router-link :to="{ name: 'request-product', query: { url: searchQuery } }">
                             Request Order
                         </router-link>
                     </div>

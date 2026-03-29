@@ -6,15 +6,15 @@
             :class="{ '-translate-x-full': !isSidebarOpen, 'translate-x-0': isSidebarOpen, 'lg:translate-x-0': true }">
             <div class="h-full flex flex-col relative overflow-hidden">
 
-                <!-- Logo -->
-                <div class="relative h-20 flex items-center px-6 border-b border-white/10">
-                    <router-link to="/"
-                        class="text-3xl font-extrabold text-white tracking-tighter flex items-center gap-2">
-                        <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center shadow-lg">
-                            <span class="text-white text-xl">L</span>
+               <div class="h-20 flex items-center justify-center px-6 border-b border-white/5">
+                    <router-link to="/" class="flex items-center gap-3">
+                        <div class="flex items-center justify-center">
+                            <img src="/assets/logo.png" alt="Luxbeyond logo">
                         </div>
-                        <span>LUX<span class="text-accent">.</span></span>
                     </router-link>
+                    <button class="lg:hidden text-zinc-400 hover:text-white" @click="isSidebarOpen = false">
+                        <ChevronLeft class="w-5 h-5" />
+                    </button>
                 </div>
 
                 <!-- Navigation -->

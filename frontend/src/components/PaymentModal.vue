@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isOpen" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div v-if="isOpen" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div class="bg-slate-900 p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-800">
             <h2 class="text-2xl font-bold text-white mb-6">Bank Transfer Payment</h2>
 
@@ -32,14 +32,6 @@
             </div>
 
             <form @submit.prevent="submitPayment">
-                <div class="mb-5">
-                    <label class="block text-sm font-semibold text-slate-300 mb-2">Transaction ID / Reference Number
-                        *</label>
-                    <input v-model="transactionId" type="text"
-                        class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                        required placeholder="e.g. TXN123456789">
-                </div>
-
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-slate-300 mb-2">Upload Payment Slip / Screenshot
                         *</label>
@@ -80,7 +72,6 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'payment-submitted']);
 
-const transactionId = ref('');
 const file = ref(null);
 const fileName = ref('');
 const submitting = ref(false);
@@ -101,7 +92,6 @@ const submitPayment = () => {
         requestId: props.requestId,
         orderId: props.orderId,
         method: 'bank',
-        transactionId: transactionId.value,
         proof: file.value
     });
     // Reset submitting after a delay (parent should close modal)

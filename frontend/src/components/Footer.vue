@@ -5,7 +5,7 @@
             class="absolute inset-0 bg-gradient-to-br from-primary/10 via-purple-900/10 to-secondary/10 opacity-30 pointer-events-none">
         </div>
 
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                 <!-- Brand Section -->
                 <div class="space-y-6">
@@ -66,18 +66,18 @@
                         <span class="absolute -bottom-2 left-0 w-12 h-1 bg-accent rounded-full"></span>
                     </h4>
                     <ul class="space-y-3">
-                        <li><a href="#"
+                        <li><a href="/help-center"
                                 class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Help
                                 Center</a></li>
-                        <li><a href="#"
-                                class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Terms
-                                of Service</a></li>
-                        <li><a href="#"
+                        <li><a href="/privacy-policy"
                                 class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Privacy
                                 Policy</a></li>
-                        <li><a href="#"
-                                class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Shipping
-                                & Returns</a></li>
+                        <li><a href="/refund-policy"
+                                class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">
+                                Refund Policy</a></li>
+                        <li><a href="/terms-of-service"
+                                class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Terms
+                                of Service</a></li>
                     </ul>
                 </div>
 
@@ -106,30 +106,35 @@
                         </div>
                         <div class="flex items-center gap-3 text-[#00FFFF]">
                             <Mail class="w-5 h-5 text-accent shrink-0" />
-                            <span class="text-sm">support@luxbeyond.store</span>
+                            <a href="mailto:info.luxbeyond@gmail.com"
+                                class="text-sm hover:text-white transition-colors">info.luxbeyond@gmail.com</a>
+                        </div>
+                        <div class="flex items-center gap-3 text-[#00FFFF]">
+                            <Phone class="w-5 h-5 text-accent shrink-0" />
+                            <a href="tel:01404458662"
+                                class="text-sm hover:text-white transition-colors">01404-458662</a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Bottom Bar -->
-            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="border-t border-white/10 pt-8 sm:flex gap-4 items-center justify-between">
                 <p class="text-[#00ffff] text-sm text-center md:text-left">
                     &copy; {{ new Date().getFullYear() }} Luxbeyond. All rights reserved.
                 </p>
 
-                <div class="flex gap-6 text-sm text-[#00ffff]">
-                    <a href="#" class="hover:text-white transition-colors">Privacy</a>
-                    <a href="#" class="hover:text-white transition-colors">Terms</a>
-                    <a href="#" class="hover:text-white transition-colors">Sitemap</a>
-                </div>
+                <!-- <div class="flex sm:flex-row flex-col items-center gap-2 text-sm text-[#00ffff] my-10 sm:mt-0">
+                    <router-link to="/privacy-policy" class="hover:text-white transition-colors">Privacy Policy</router-link>
+                    <router-link to="/terms-of-service" class="hover:text-white transition-colors">Terms of Service</router-link>
+                    <router-link to="/refund-policy" class="hover:text-white transition-colors">Refunds Policy</router-link>
+                </div> -->
                 <!-- Payment Methods -->
                 <div class="flex flex-col items-center gap-3">
                     <span class="text-sm text-[#00ffff]">We Accept:</span>
-                    <div class="flex flex-col items-center gap-2 px-3 py-1.5 ">
-                        <img src="/eastern-bank-plc.webp" alt="luxbeyond ebl" width="120%">
-                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="88" height="40"
-                            viewBox="0 0 122 54">
+                    <div class="flex flex-col sm:flex-row items-center gap-10 px-3 py-1.5 ">
+                        <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="176" height="80"
+                            class="text-pink-500" viewBox="0 0 122 54">
                             <title>bKash Logo</title>
                             <g fill="currentColor">
                                 <path
@@ -157,6 +162,7 @@
                                 d="M36.9 41.2h-.3c-7.8 0-12.2-4.3-12.2-8.6 0-3.6 3.3-7.8 10.9-7.8l1.3 1c-5.3 0-9.6 3.4-9.6 6.8 0 3 3.8 7.8 9.9 7.8v.8z">
                             </path>
                         </svg>
+                        <img src="/eastern-bank-plc.webp" alt="luxbeyond ebl" width="120%">
                     </div>
                 </div>
 
@@ -166,5 +172,5 @@
 </template>
 
 <script setup>
-import { Facebook, Instagram, Linkedin, ArrowRight, MapPin, Mail, CreditCard } from 'lucide-vue-next';
+import { Facebook, Instagram, Linkedin, ArrowRight, MapPin, Mail, Phone, CreditCard } from 'lucide-vue-next';
 </script>

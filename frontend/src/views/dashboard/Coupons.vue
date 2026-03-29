@@ -84,8 +84,9 @@ const fetchCoupons = async () => {
     loading.value = true;
     try {
         const response = await axios.get('/coupons/available');
-        // Handle both array and paginated response formats just in case
-        const couponsData = response.data.data || response.data;
+        // Handle new structured response: { featured, private, other, all }
+        const data = response.data;
+        const couponsData = data.all || data.data || data;
         coupons.value = Array.isArray(couponsData) ? couponsData : [];
     } catch (error) {
         console.error('Error fetching coupons:', error);

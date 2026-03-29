@@ -54,32 +54,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { Vue3Marquee } from 'vue3-marquee';
-import axios from '../axios';
+import { useProductStore } from '@/stores/product';
 
-const brands = ref([]);
-const loading = ref(true);
+const productStore = useProductStore();
+
+const brands = computed(() => productStore.brands);
+const loading = computed(() => productStore.loadingBrands);
 
 const getImageUrl = (url) => {
     if (!url) return '';
     return url;
 };
 
-const fetchBrands = async () => {
-    loading.value = true;
-    try {
-        const response = await axios.get('/brands', { params: { all: true } });
-        brands.value = response.data;
-    } catch (error) {
-        console.error('Error fetching brands:', error);
-    } finally {
-        loading.value = false;
-    }
-};
-
 onMounted(() => {
-    fetchBrands();
+    productStore.fetchBrands();
 });
 </script>
 

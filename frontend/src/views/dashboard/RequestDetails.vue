@@ -63,7 +63,7 @@
                                     <div>
                                         <p class="text-xs text-slate-500 mb-1">Product Name</p>
                                         <p class="text-sm font-semibold text-white">{{ request.product_name ?? 'N/A'
-                                            }}</p>
+                                        }}</p>
                                     </div>
                                     <div v-if="request.status === 'request_accepted' || request.status === 'accepted'"
                                         class="flex gap-2">
@@ -147,6 +147,30 @@
                                             <span class="text-xs font-semibold text-white">৳{{
                                                 formatPrice(((charge.amount_in_bdt ?? charge.amount ?? 0) /
                                                     (request.quantity || 1)) * editableQuantity) }}</span>
+                                        </div>
+                                        <div
+                                            class="flex justify-between items-center px-4 py-2 border border-white/5 hover:border-primary/30">
+                                            <span class="text-xs text-slate-400">Delivery Charge</span>
+                                            <span class="text-xs font-semibold text-white">৳{{
+                                                formatPrice(request.delivery_charge ?? 0)}}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center px-4 py-2 border border-white/5 hover:border-primary/30"
+                                            v-if="request.tax > 0">
+                                            <span class="text-xs text-slate-400">Tax</span>
+                                            <span class="text-xs font-semibold text-white">৳{{ formatPrice(request.tax
+                                                ?? 0)}}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center px-4 py-2 border border-white/5 hover:border-primary/30"
+                                            v-if="request.declared_shipping_cost > 0">
+                                            <span class="text-xs text-slate-400">Shipping Charge</span>
+                                            <span class="text-xs font-semibold text-white">৳{{ formatPrice(request.declared_shipping_cost
+                                                ?? 0)}}</span>
+                                        </div>
+                                        <div class="flex justify-between items-center px-4 py-2 border border-white/5 hover:border-primary/30"
+                                            v-if="request.payment_processing_fee > 0">
+                                            <span class="text-xs text-slate-400">Payment Processing Fee</span>
+                                            <span class="text-xs font-semibold text-white">৳{{ formatPrice(request.payment_processing_fee
+                                                ?? 0)}}</span>
                                         </div>
                                     </div>
                                 </div>

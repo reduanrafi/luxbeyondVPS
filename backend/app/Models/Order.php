@@ -38,6 +38,7 @@ class Order extends Model
         'paid_amount',
         'due_amount',
         'is_fully_paid',
+        'weight_charge'
     ];
 
     protected $casts = [
@@ -54,6 +55,7 @@ class Order extends Model
         'paid_amount' => 'decimal:2',
         'due_amount' => 'decimal:2',
         'is_fully_paid' => 'boolean',
+        'payment_processing_fees' => 'decimal:2',
     ];
 
     protected $appends = [
@@ -92,6 +94,16 @@ class Order extends Model
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);
+    }
+
+    /**
+     * Many-to-many: multiple coupons per order
+     */
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'order_coupon')
+                    ->withPivot('discount_amount')
+                    ->withTimestamps();
     }
 
     public function items()
@@ -156,7 +168,7 @@ class Order extends Model
     public function updateStatus($statusId, $note = null, $userId = null)
     {
         $status = OrderStatus::findOrFail($statusId);
-        
+
         $this->update([
             'status_id' => $statusId,
             'status' => $status->name,

@@ -235,6 +235,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // Payout Management
         Route::apiResource('payouts', \App\Http\Controllers\Admin\PayoutController::class)->only(['index', 'update']);
 
+        // Pages / CMS Management
+        Route::apiResource('pages', \App\Http\Controllers\Admin\PageContentController::class);
+
         // Extended Traveller Management
         Route::put('travellers/{id}/profile', [\App\Http\Controllers\Admin\TravellerController::class, 'updateProfile']);
         
@@ -252,6 +255,10 @@ Route::get('/events/{slug}', [\App\Http\Controllers\Public\EventController::clas
 Route::get('/blogs', [\App\Http\Controllers\Public\BlogController::class, 'index']);
 Route::get('/blogs/recent', [\App\Http\Controllers\Public\BlogController::class, 'getRecent']);
 Route::get('/blogs/{slug}', [\App\Http\Controllers\Public\BlogController::class, 'show']);
+
+// Public Pages API (CMS)
+Route::get('/pages', [\App\Http\Controllers\Public\PageContentController::class, 'index']);
+Route::get('/pages/{key}', [\App\Http\Controllers\Public\PageContentController::class, 'show']);
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {

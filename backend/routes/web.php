@@ -21,3 +21,14 @@ Route::get('/storage-link', function () {
     Artisan::call('storage:link');
     return redirect()->back();
 });
+Route::get('/content-seed', function () {
+    try {
+        Artisan::call('db:seed', [
+            '--class' => 'PageContentSeeder',
+            '--force' => true
+        ]);
+        return "<h1>Seeding Successful!</h1><pre>" . Artisan::output() . "</pre><br><a href='/'>Back to Home</a>";
+    } catch (\Exception $e) {
+        return "<h1>Seeding Failed</h1><p>" . $e->getMessage() . "</p>";
+    }
+});

@@ -1,6 +1,9 @@
 <template>
-    <div class="min-h-screen pt-32 pb-20 px-4 md:px-8">
-        <div class="max-w-4xl mx-auto space-y-12">
+    <div class="min-h-[700px] pt-32 pb-20 px-4 md:px-8 relative my-auto">
+        <div
+                class="absolute inset-0 bg-[url('/assets/track.png')] bg-cover bg-center opacity-20">
+            </div>
+        <div class="max-w-4xl m-auto space-y-12 mt-10">
             <!-- Header -->
             <div class="text-center space-y-4">
                 <h1 class="text-4xl md:text-5xl font-bold font-serif text-primary">Track Your Order</h1>

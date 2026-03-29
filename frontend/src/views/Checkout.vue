@@ -255,36 +255,42 @@
                             </div>
                         </div>
 
-                        <!-- Coupon Code -->
-                        <div class="mb-6 p-4 bg-background/50 rounded-none border border-white/10">
-                            <div v-if="!appliedCoupon" class="space-y-2">
-                                <label class="block text-sm font-semibold text-slate-300 mb-2">Have a coupon
-                                    code?</label>
-                                <div class="flex flex-wrap gap-2">
-                                    <input v-model="couponCode" type="text" placeholder="Enter coupon code"
-                                        class="flex-1 px-4 py-2 border border-primary/50 rounded-none focus:outline-none focus:ring-2 focus:ring-primary/20 outline-none"
-                                        @keyup.enter="applyCoupon" />
-                                    <button @click="applyCoupon" :disabled="applyingCoupon || !couponCode.trim()"
-                                        class="px-6 py-2 bg-primary text-white font-semibold rounded-none hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                                        <span v-if="applyingCoupon">Applying...</span>
-                                        <span v-else>Apply</span>
+                        <!-- Coupons Section -->
+                        <div class="mb-6 space-y-3">
+                            <!-- Available Coupons Button -->
+                            <button @click="showCouponsModal = true"
+                                class="w-full flex items-center justify-between p-4 bg-background/50 border border-white/10 hover:border-primary/30 transition-all group">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-1.5 bg-primary/10 border border-primary/20 group-hover:bg-primary/20 transition-colors">
+                                        <Ticket class="w-4 h-4 text-primary" />
+                                    </div>
+                                    <span class="text-sm font-semibold text-white">Available Coupons</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span v-if="availableCouponsCount > 0"
+                                        class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 border border-primary/20">
+                                        {{ availableCouponsCount }}
+                                    </span>
+                                    <ChevronRight class="w-4 h-4 text-slate-500 group-hover:text-primary transition-colors" />
+                                </div>
+                            </button>
+
+                            <!-- Applied Coupons List -->
+                            <div v-if="appliedCoupons.length > 0" class="space-y-2">
+                                <div v-for="ac in appliedCoupons" :key="ac.id"
+                                    class="flex items-center justify-between p-3 bg-green-500/5 border border-green-500/20">
+                                    <div class="flex items-center gap-2">
+                                        <CheckCircle class="w-4 h-4 text-green-500 flex-shrink-0" />
+                                        <div>
+                                            <span class="text-xs font-mono font-bold text-green-400 tracking-wider">{{ ac.code }}</span>
+                                            <span class="text-xs text-green-500/60 ml-2">-৳{{ formatPrice(ac.discount_amount) }}</span>
+                                        </div>
+                                    </div>
+                                    <button @click="removeCoupon(ac)"
+                                        class="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase tracking-widest">
+                                        Remove
                                     </button>
                                 </div>
-                                <p v-if="couponError" class="text-xs text-red-600 mt-1">{{ couponError }}</p>
-                            </div>
-                            <div v-else class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <CheckCircle class="w-5 h-5 text-green-600" />
-                                    <div>
-                                        <p class="text-sm font-semibold text-white">{{ appliedCoupon.code }}</p>
-                                        <p class="text-xs text-slate-500">{{ appliedCoupon.description || `Coupon
-                                            applied` }}</p>
-                                    </div>
-                                </div>
-                                <button @click="removeCoupon"
-                                    class="text-sm text-red-600 hover:text-red-700 font-semibold">
-                                    Remove
-                                </button>
                             </div>
                         </div>
 
@@ -380,6 +386,19 @@
                 </div>
             </div>
         </div>
+
+        <!-- Coupons Modal -->
+        <CouponsModal
+            :is-open="showCouponsModal"
+            :coupons="availableCouponsData"
+            :applied-coupon-ids="appliedCouponIds"
+            :subtotal="orderSummary.subtotal"
+            :loading="couponsLoading"
+            @close="showCouponsModal = false"
+            @apply="handleApplyCoupon"
+            @apply-code="handleApplyCouponCode"
+            @remove="removeCoupon"
+        />
     </div>
 </template>
 
@@ -388,7 +407,8 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useAuthStore } from '../stores/auth';
-import { MapPin, CreditCard, ShoppingCart, Lock, Upload, CheckCircle } from 'lucide-vue-next';
+import { MapPin, CreditCard, ShoppingCart, Lock, Upload, CheckCircle, Ticket, ChevronRight } from 'lucide-vue-next';
+import CouponsModal from '../components/CouponsModal.vue';
 import axios from '../axios';
 import { trackBeginCheckout, trackPurchase } from '../utils/analytics';
 import { useToast } from 'vue-toastification';
@@ -430,10 +450,35 @@ const orderSummary = ref({
 });
 
 const couponCode = ref('');
-const appliedCoupon = ref(null);
+const appliedCoupons = ref([]);
 const applyingCoupon = ref(false);
 const couponError = ref('');
 const paymentAmount = ref(100); // 60 or 100
+const availableCouponsData = ref({ featured: [], private: [] });
+const showCouponsModal = ref(false);
+const couponsLoading = ref(false);
+
+const appliedCouponIds = computed(() => appliedCoupons.value.map(c => c.id));
+
+const availableCouponsCount = computed(() => {
+    return (availableCouponsData.value.all || []).length;
+});
+
+const totalCouponDiscount = computed(() => {
+    return appliedCoupons.value.reduce((sum, c) => sum + Number(c.discount_amount || 0), 0);
+});
+
+const fetchAvailableCoupons = async () => {
+    couponsLoading.value = true;
+    try {
+        const response = await axios.get('/coupons/available');
+        availableCouponsData.value = response.data || { featured: [], private: [], other: [], all: [] };
+    } catch (error) {
+        console.error('Error fetching available coupons:', error);
+    } finally {
+        couponsLoading.value = false;
+    }
+};
 
 const checkoutSettings = ref({
     min_payment_percentage_shop: 60, // Default fallback
@@ -540,14 +585,10 @@ const calculateCharges = async () => {
         orderSummary.value.payment_processing_fee = response.data.payment_processing_fee || 0;
         chargesBreakdown.value = response.data.breakdown || [];
 
-        // Calculate total (subtract coupon discount if applied)
-        // Note: backend total_charges includes delivery and payment fee.
-        // We need to match frontend total with backend grand_total logic.
-        // Backend: grand_total = base_amount + total_charges (which has delivery + fee + hub charges)
-        // Frontend total should match this minus discount.
-
+        // Calculate total (subtract coupon discounts)
         const totalCharges = response.data.total_charges || 0;
-        const discountAmount = orderSummary.value.discount || 0;
+        const discountAmount = totalCouponDiscount.value;
+        orderSummary.value.discount = discountAmount;
         orderSummary.value.total = subtotal + totalCharges - discountAmount;
 
         // Calculate minimum payment
@@ -578,41 +619,55 @@ const fetchPaymentMethods = async () => {
     }
 };
 
-const applyCoupon = async () => {
-    if (!couponCode.value.trim()) return;
+const applyCouponByCode = async (code) => {
+    const productIds = cartStore.items.map(item => item.id).filter(id => id);
+    const response = await axios.post('/coupons/apply', {
+        code: code,
+        subtotal: orderSummary.value.subtotal,
+        product_ids: productIds.length > 0 ? productIds : null,
+        applied_coupon_ids: appliedCouponIds.value,
+    });
+    return response.data;
+};
 
-    applyingCoupon.value = true;
-    couponError.value = '';
+const handleApplyCoupon = async (coupon) => {
+    if (appliedCouponIds.value.includes(coupon.id)) return;
 
     try {
-        const productIds = cartStore.items.map(item => item.id).filter(id => id);
-        const response = await axios.post('/coupons/apply', {
-            code: couponCode.value.trim(),
-            subtotal: orderSummary.value.subtotal,
-            product_ids: productIds.length > 0 ? productIds : null,
-        });
-
-        if (response.data.valid) {
-            appliedCoupon.value = response.data.coupon;
-            orderSummary.value.discount = response.data.discount || 0;
-            await calculateCharges(); // Recalculate total with discount
-            couponCode.value = '';
-        } else {
-            couponError.value = response.data.message || 'Invalid coupon code';
+        const data = await applyCouponByCode(coupon.code);
+        if (data.valid) {
+            appliedCoupons.value.push({
+                ...data.coupon,
+                discount_amount: data.discount || 0,
+            });
+            await calculateCharges();
         }
     } catch (error) {
         console.error('Error applying coupon:', error);
-        couponError.value = error.response?.data?.message || 'Failed to apply coupon';
-    } finally {
-        applyingCoupon.value = false;
     }
 };
 
-const removeCoupon = () => {
-    appliedCoupon.value = null;
-    orderSummary.value.discount = 0;
-    calculateCharges(); // Recalculate total without discount
-    couponError.value = '';
+const handleApplyCouponCode = async ({ code, onSuccess, onError }) => {
+    try {
+        const data = await applyCouponByCode(code);
+        if (data.valid) {
+            appliedCoupons.value.push({
+                ...data.coupon,
+                discount_amount: data.discount || 0,
+            });
+            await calculateCharges();
+            onSuccess();
+        } else {
+            onError(data.message || 'Invalid coupon code');
+        }
+    } catch (error) {
+        onError(error.response?.data?.message || 'Failed to apply coupon');
+    }
+};
+
+const removeCoupon = (coupon) => {
+    appliedCoupons.value = appliedCoupons.value.filter(c => c.id !== coupon.id);
+    calculateCharges();
 };
 
 const placeOrder = async () => {
@@ -634,7 +689,9 @@ const placeOrder = async () => {
         // Prepare base order data
         const orderData = {
             user_id: authStore.user?.id,
-            coupon_id: appliedCoupon.value?.id || null,
+            coupon_id: appliedCoupons.value.length > 0 ? appliedCoupons.value[0].id : null,
+            coupon_ids: appliedCoupons.value.map(c => c.id),
+            coupon_discounts: appliedCoupons.value.map(c => c.discount_amount),
             items: items,
             subtotal: orderSummary.value.subtotal,
             shipping: orderSummary.value.delivery_charge,
@@ -654,7 +711,7 @@ const placeOrder = async () => {
             const formData = new FormData();
             Object.keys(orderData).forEach(key => {
                 if (orderData[key] != null && orderData[key] != undefined) {
-                    if (key === 'items' || key === 'shipping_address') {
+                    if (key === 'items' || key === 'shipping_address' || key === 'coupon_ids' || key === 'coupon_discounts') {
                         formData.append(key, JSON.stringify(orderData[key]));
                     } else {
                         formData.append(key, orderData[key]);
@@ -815,12 +872,10 @@ const handlePaymentCallback = () => {
     const orderId = urlParams.get('order_id');
 
     if (paymentStatus === 'success' && orderId) {
-        // Clear cart on successful payment
         cartStore.clearCart();
-        // Redirect to order page
-        router.push(`/dashboard/orders/${orderId}`);
-    } else if (paymentStatus === 'failed' || paymentStatus === 'error') {
-        toast.error('Payment failed. Please try again.');
+    } 
+    if(paymentStatus){
+        router.push(`/thank-you?payment=${paymentStatus}`);
     }
 };
 
@@ -830,11 +885,12 @@ onMounted(async () => {
         shippingForm.value.email = authStore.user.email || '';
         shippingForm.value.name = authStore.user.name || '';
     }
+    handlePaymentCallback();
+    fetchAvailableCoupons();
+    fetchPaymentMethods();
     await fetchBDTCurrency();
     await fetchCheckoutSettings();
     await calculateCharges();
-    fetchPaymentMethods();
-    handlePaymentCallback();
 
     if (cartStore.items.length > 0) {
         trackBeginCheckout(cartStore.items, orderSummary.value.total);

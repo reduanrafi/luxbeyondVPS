@@ -4,22 +4,22 @@
         <section class="relative bg-background overflow-hidden">
             <!-- Background Image with Overlay -->
             <div
-                class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-40">
+                class="absolute inset-0 bg-[url('/assets/traveller.avif')] bg-cover bg-center opacity-40">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
 
-            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+            <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-32">
                 <div class="md:w-2/3 lg:w-1/2">
                     <div
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 backdrop-blur-sm">
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6 md:mb-8 backdrop-blur-sm">
                         <Plane class="w-4 h-4" />
                         <span class="uppercase tracking-wider text-xs font-bold">Travel more, earn more</span>
                     </div>
-                    <h1 class="text-4xl md:text-6xl font-serif text-white mb-6 leading-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight">
                         Turn Your Luggage Space Into <span class="text-primary italic">Cash</span>
 
                     </h1>
-                    <p class="text-xl text-slate-300 mb-10 leading-relaxed font-light">
+                    <p class="text-lg md:text-xl text-slate-300 mb-8 md:mb-10 leading-relaxed font-light">
                         Connect with shoppers who need products from your destination. Deliver items, earn commissions,
                         and fund your next adventure.
                     </p>
@@ -40,22 +40,22 @@
             <!-- Stats Banner -->
             <div class="relative border-y border-primary/5 bg-surface/50 backdrop-blur-sm">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/5">
-                        <div>
-                            <p class="text-4xl font-serif text-white mb-1">10k+</p>
-                            <p class="text-primary text-xs uppercase tracking-widest">Active Travellers</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-y-10 gap-x-4 text-center">
+                        <div class="border-r border-white/5">
+                            <p class="text-3xl md:text-4xl font-serif text-white mb-1">10k+</p>
+                            <p class="text-primary text-[10px] md:text-xs uppercase tracking-widest">Active Travellers</p>
+                        </div>
+                        <div class="md:border-r md:border-white/5">
+                            <p class="text-3xl md:text-4xl font-serif text-white mb-1">$2M+</p>
+                            <p class="text-primary text-[10px] md:text-xs uppercase tracking-widest">Paid Out</p>
+                        </div>
+                        <div class="border-r border-white/5 md:border-r md:border-white/5">
+                            <p class="text-3xl md:text-4xl font-serif text-white mb-1">50+</p>
+                            <p class="text-primary text-[10px] md:text-xs uppercase tracking-widest">Countries</p>
                         </div>
                         <div>
-                            <p class="text-4xl font-serif text-white mb-1">$2M+</p>
-                            <p class="text-primary text-xs uppercase tracking-widest">Paid Out</p>
-                        </div>
-                        <div>
-                            <p class="text-4xl font-serif text-white mb-1">50+</p>
-                            <p class="text-primary text-xs uppercase tracking-widest">Countries</p>
-                        </div>
-                        <div>
-                            <p class="text-4xl font-serif text-white mb-1">4.9/5</p>
-                            <p class="text-primary text-xs uppercase tracking-widest">User Rating</p>
+                            <p class="text-3xl md:text-4xl font-serif text-white mb-1">4.9/5</p>
+                            <p class="text-primary text-[10px] md:text-xs uppercase tracking-widest">User Rating</p>
                         </div>
                     </div>
                 </div>
@@ -74,52 +74,57 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
                     <!-- Connecting Line (Desktop) -->
-                    <div class="hidden md:block absolute top-12 left-1/6 right-1/6 h-px bg-white/10 -z-10">
-
+                    <div class="hidden md:block absolute top-12 left-[12%] right-[12%] h-px bg-white/10 -z-10">
                     </div>
 
                     <!-- Step 1 -->
-                    <div class="relative group">
+                    <div class="relative group h-full pt-12 md:pt-0">
                         <div
-                            class="w-24 h-24 bg-surface border border-white/10 rounded-full flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:border-primary/50 relative z-10">
-                            <MapPin class="w-10 h-10 text-primary" />
-                        </div>
-                        <div
-                            class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-colors h-full">
-                            <h3 class="text-xl font-serif text-white mb-3 text-center">1. Post Your Trip</h3>
-                            <p class="text-[#00ffff] text-center leading-relaxed text-sm">
-                                Tell us where you're going and how much luggage space you have available.
-                            </p>
+                            class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-all duration-300 h-full relative">
+                            <div
+                                class="w-24 h-24 bg-surface border border-white/10 rounded-full flex items-center justify-center absolute -top-12 left-1/2 -translate-x-1/2 group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:border-primary/50 z-20">
+                                <MapPin class="w-10 h-10 text-primary" />
+                            </div>
+                            <div class="mt-8">
+                                <h3 class="text-xl font-serif text-white mb-3 text-center uppercase tracking-wide">1. Post Your Trip</h3>
+                                <p class="text-slate-400 text-center leading-relaxed text-sm font-light">
+                                    Tell us where you're going and how much luggage space you have available.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="relative group">
+                    <div class="relative group h-full pt-12 md:pt-0">
                         <div
-                            class="w-24 h-24 bg-surface border border-white/10 rounded-full flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:border-primary/50 relative z-10">
-                            <Package class="w-10 h-10 text-primary" />
-                        </div>
-                        <div
-                            class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-colors h-full">
-                            <h3 class="text-xl font-serif text-white mb-3 text-center">2. Get Matched</h3>
-                            <p class="text-[#00ffff] text-center leading-relaxed text-sm">
-                                Receive requests from shoppers wanting items from your destination.
-                            </p>
+                            class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-all duration-300 h-full relative">
+                            <div
+                                class="w-24 h-24 bg-surface border border-white/10 rounded-full flex items-center justify-center absolute -top-12 left-1/2 -translate-x-1/2 group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:border-primary/50 z-20">
+                                <Package class="w-10 h-10 text-primary" />
+                            </div>
+                            <div class="mt-8">
+                                <h3 class="text-xl font-serif text-white mb-3 text-center uppercase tracking-wide">2. Get Matched</h3>
+                                <p class="text-slate-400 text-center leading-relaxed text-sm font-light">
+                                    Receive requests from shoppers wanting items from your destination.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="relative group">
+                    <div class="relative group h-full pt-12 md:pt-0">
                         <div
-                            class="w-24 h-24 bg-surface border border-white/10 rounded-full flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:border-primary/50 relative z-10">
-                            <DollarSign class="w-10 h-10 text-primary" />
-                        </div>
-                        <div
-                            class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-colors h-full">
-                            <h3 class="text-xl font-serif text-white mb-3 text-center">3. Deliver & Earn</h3>
-                            <p class="text-[#00ffff] text-center leading-relaxed text-sm">
-                                Buy the item, deliver it upon arrival, and get paid instantly.
-                            </p>
+                            class="bg-surface p-8 border border-primary/5 hover:border-primary/20 transition-all duration-300 h-full relative">
+                            <div
+                                class="w-24 h-24 bg-surface border border-white/10 rounded-full flex items-center justify-center absolute -top-12 left-1/2 -translate-x-1/2 group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:border-primary/50 z-20">
+                                <DollarSign class="w-10 h-10 text-primary" />
+                            </div>
+                            <div class="mt-8">
+                                <h3 class="text-xl font-serif text-white mb-3 text-center uppercase tracking-wide">3. Deliver & Earn</h3>
+                                <p class="text-slate-400 text-center leading-relaxed text-sm font-light">
+                                    Buy the item, deliver it upon arrival, and get paid instantly.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,9 +132,9 @@
         </section>
 
         <!-- Why Choose Us -->
-        <section class="py-24 bg-surface border-t border-primary/5">
+        <section class="py-24 bg-surface border-t border-primary/5 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                     <div>
                         <h2 class="text-3xl md:text-4xl font-serif text-white mb-6">Travel Smart, Earn Smart</h2>
                         <div class="space-y-8">
@@ -140,7 +145,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-xl font-serif text-white mb-2">Secure Payments</h3>
-                                    <p class="text-[#00ffff] font-light">We hold the shopper's payment in escrow until
+                                    <p class="text-slate-400 font-light text-sm md:text-base">We hold the shopper's payment in escrow until
                                         you
                                         successfully deliver the item.</p>
                                 </div>
@@ -152,7 +157,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-xl font-serif text-white mb-2">Global Community</h3>
-                                    <p class="text-[#00ffff] font-light">Join thousands of travellers and shoppers
+                                    <p class="text-slate-400 font-light text-sm md:text-base">Join thousands of travellers and shoppers
                                         connecting
                                         worldwide every day.</p>
                                 </div>
@@ -179,11 +184,11 @@
                                 </div>
                                 <div class="p-4 bg-surface rounded-sm border border-white/10">
                                     <div class="flex justify-between items-center mb-2">
-                                        <span class="text-[#00ffff] uppercase tracking-wide text-xs">Potential
+                                        <span class="text-slate-400 uppercase tracking-wide text-[10px] md:text-xs">Potential
                                             Earnings</span>
-                                        <span class="text-2xl font-serif text-primary">{{ calculatedEarnings }}</span>
+                                        <span class="text-xl md:text-2xl font-serif text-primary">{{ calculatedEarnings }}</span>
                                     </div>
-                                    <p class="text-xs text-[#00ffff]">*Based on standard rewards (upto $500/bag)</p>
+                                    <p class="text-[10px] md:text-xs text-slate-500 italic">*Based on standard rewards (upto $500/bag)</p>
                                 </div>
                                 <button @click="openRegisterModal"
                                     class="w-full py-4 bg-primary text-white font-bold rounded-none hover:bg-primary-hover transition-colors cursor-pointer uppercase tracking-widest text-sm">
@@ -218,11 +223,11 @@
                             <X class="w-6 h-6" />
                         </button>
 
-                        <div class="px-4 pb-4 pt-5 sm:p-8 sm:pb-4">
+                        <div class="px-4 pb-6 pt-10 sm:p-10 sm:pb-8">
                             <div class="text-center mb-8 mt-2">
-                                <span class="text-primary font-bold tracking-widest uppercase text-xs">Join Us
+                                <span class="text-primary font-bold tracking-widest uppercase text-[10px] md:text-xs">Join Us
                                     Today</span>
-                                <h2 class="text-2xl md:text-3xl font-serif text-white mt-2">Start Your Journey as a
+                                <h2 class="text-xl md:text-3xl font-serif text-white mt-3 leading-tight">Start Your Journey as a
                                     Traveler</h2>
                             </div>
 
@@ -366,11 +371,11 @@
                                     </div>
                                 </div>
 
-                                <div class="pt-4">
+                                <div class="pt-6">
                                     <button type="submit" :disabled="loading"
-                                        class="group relative w-full flex justify-center items-center gap-2 py-4 px-4 border border-transparent text-lg font-bold rounded-none text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 uppercase tracking-widest text-sm disabled:opacity-70 disabled:cursor-not-allowed">
+                                        class="group relative w-full flex justify-center items-center gap-3 py-4 md:py-5 px-4 border border-transparent text-sm md:text-base font-bold rounded-none text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 uppercase tracking-[0.2em] disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-primary/20">
                                         <span v-if="loading"
-                                            class="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-900"></span>
+                                            class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
                                         <span v-else>Register as Traveler</span>
                                         <ArrowRight v-if="!loading"
                                             class="w-5 h-5 group-hover:translate-x-1 transition-transform" />

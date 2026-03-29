@@ -1,6 +1,6 @@
 <template>
     <section id="blogs" class="py-24 bg-surface">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold text-white sm:text-4xl mb-4">Latest News</h2>
                 <p class="text-xl text-[#00ffff] max-w-2xl mx-auto">Insights, trends, and updates from our team.</p>
@@ -30,7 +30,7 @@
                                 class="w-full h-full object-contain transform group-hover:scale-105 transition duration-500">
                             <div class="absolute top-0 right-0">
                                 <span
-                                    class="bg-primary text-white text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
+                                    class="bg-[#00ffff] text-black shadow text-[10px] font-bold px-3 py-1 uppercase tracking-wider">
                                     {{ blog.category || 'News' }}
                                 </span>
                             </div>
