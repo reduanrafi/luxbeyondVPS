@@ -32,3 +32,5 @@ Route::get('/content-seed', function () {
         return "<h1>Seeding Failed</h1><p>" . $e->getMessage() . "</p>";
     }
 });
+
+Route::get('/google-merchant-catalog.xml', [App\Http\Controllers\CatalogController::class, 'googleMerchantFeed']);

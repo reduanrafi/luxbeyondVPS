@@ -18,8 +18,16 @@ use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Dompdf\Options;
 
 
+use App\Services\PricingService;
+
 class OrderController extends Controller
 {
+    protected $pricingService;
+
+    public function __construct(PricingService $pricingService)
+    {
+        $this->pricingService = $pricingService;
+    }
     public function stats()
     {
         $totalOrders = Order::count();
@@ -162,15 +170,13 @@ class OrderController extends Controller
             'payment_slip' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120', // 5MB max
         ]);
 
-        // Calculate total
+        // Simplified: using provided values but relying on PricingService for min_payment
         $total = $validated['subtotal']
                + ($validated['tax'] ?? 0)
                + ($validated['shipping'] ?? 0)
                - ($validated['discount'] ?? 0);
 
-        // Calculate minimum payment amount for shop orders
-        $minPaymentPercentage = \App\Models\Setting::get('min_payment_percentage_shop', 0);
-        $minPaymentAmount = ($total * $minPaymentPercentage) / 100;
+        $minPaymentAmount = ($total * \App\Models\Setting::get('min_payment_percentage_shop', 0)) / 100;
 
         // Get default status
         $defaultStatus = OrderStatus::where('is_default', true)->first();
@@ -390,46 +396,11 @@ class OrderController extends Controller
         ]
     );
 
-    // If this item is tied to a ProductRequest, scale its charges dynamically
+    // If this item is tied to a ProductRequest, scale its charges dynamically using PricingService
     if ($orderItem->request_id) {
         $productRequest = \App\Models\ProductRequest::find($orderItem->request_id);
         if ($productRequest && $productRequest->quantity != $qty && $productRequest->quantity > 0) {
-            $ratio = $qty / $productRequest->quantity;
-
-            // Scale explicit fields
-            $productRequest->tax = ($productRequest->tax ?? 0) * $ratio;
-            $productRequest->delivery_charge = ($productRequest->delivery_charge ?? 0) * $ratio;
-            $productRequest->additional_charges = ($productRequest->additional_charges ?? 0) * $ratio;
-            $productRequest->payment_processing_fee = ($productRequest->payment_processing_fee ?? 0) * $ratio;
-            $productRequest->declared_shipping_cost = ($productRequest->declared_shipping_cost ?? 0) * $ratio;
-
-            // Scale charges breakdown
-            $updatedBreakdown = [];
-            if (!empty($productRequest->charges_breakdown)) {
-                $breakdown = is_string($productRequest->charges_breakdown) ? json_decode($productRequest->charges_breakdown, true) : $productRequest->charges_breakdown;
-                if(is_array($breakdown)){
-                    foreach ($breakdown as $charge) {
-                        if (isset($charge['amount_in_currency'])) {
-                            $charge['amount_in_currency'] *= $ratio;
-                        }
-                        if (isset($charge['amount_in_bdt'])) {
-                            $charge['amount_in_bdt'] *= $ratio;
-                        }
-                        if (isset($charge['amount'])) {
-                            $charge['amount'] *= $ratio;
-                        }
-                        $updatedBreakdown[] = $charge;
-                    }
-                    $productRequest->charges_breakdown = $updatedBreakdown;
-                }
-            }
-
-            // Scale total and min payment
-            $productRequest->total_amount_bdt = $productRequest->total_amount_bdt * $ratio;
-            $minPaymentAmountPercent = \App\Models\Setting::get('min_payment_percentage_request', 100);
-            $productRequest->min_payment_amount = ($productRequest->total_amount_bdt * $minPaymentAmountPercent) / 100;
-
-            $productRequest->quantity = $qty;
+            $productRequest = $this->pricingService->scalePricing($productRequest, $qty);
             $productRequest->save();
         }
     }

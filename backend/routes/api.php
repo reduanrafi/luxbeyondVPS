@@ -19,6 +19,8 @@ use App\Http\Controllers\ProductRequestController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
 // Public product routes
 Route::get('/products', [ProductController::class, 'index']);
