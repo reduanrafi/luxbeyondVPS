@@ -135,9 +135,9 @@ class ChargeController extends Controller
         }
 
         $additionalData = $request->additional_data ?? [];
-        
+
         $result = $this->pricingService->calculateBreakdown(
-            $request->base_amount, 
+            $request->base_amount,
             $currency ? $currency->code : 'BDT',
             $request->scope ?? 'request',
             $additionalData
@@ -145,12 +145,18 @@ class ChargeController extends Controller
 
         return response()->json([
             'base_amount' => $request->base_amount,
-            'total_charges' => round($result['grand_total'] - $request->base_amount, 2),
+
+            'total_charges' => round(
+                $result['grand_total'] - $result['product_total_bdt'],
+                2
+            ),
+
             'grand_total' => round($result['grand_total'], 2),
+            'grand_total_currency' => round($result['grand_total_currency'], 3),
             'breakdown' => $result['breakdown'],
             'delivery_charge' => round($result['delivery_charge'], 2),
             'payment_processing_fee' => round($result['processing_fee'], 2),
-            'international_shipping' => round($result['international_shipping'] ?? 0, 2),
+            'international_shipping' => round($result['international_shipping'], 2),
         ]);
     }
 

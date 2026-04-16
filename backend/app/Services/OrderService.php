@@ -30,23 +30,34 @@ class OrderService
                 $statusName = $defaultStatus?->name ?? 'pending';
             }
 
+            // Calculate product-only subtotal in BDT
+            // We can derive this from total_amount_bdt by subtracting all charges
+            $shippingTotal = ($productRequest->delivery_charge ?? 0) + ($productRequest->weight_charge ?? 0);
+            $taxTotal = $productRequest->tax ?? 0;
+            $processingFee = $productRequest->payment_processing_fee ?? 0;
+            $additionalCharges = $productRequest->additional_charges ?? 0;
+            
+            $productSubtotalBDT = $productRequest->total_amount_bdt - $shippingTotal - $taxTotal - $processingFee - $additionalCharges;
+
             // Create the Order
             $order = Order::create([
                 'user_id' => $userId,
                 'status_id' => $statusId,
                 'status' => $statusName,
-                'subtotal' => $productRequest->total_amount_bdt, // Using total as subtotal for requests
+                'subtotal' => $productSubtotalBDT,
                 'total' => $productRequest->total_amount_bdt,
                 'currency' => 'BDT',
-                'shipping' => ($productRequest->declared_shipping_cost ?? 0) + ($productRequest->delivery_charge ?? 0),
-                'tax' => $productRequest->tax ?? 0,
+                'shipping' => $shippingTotal,
+                'tax' => $taxTotal,
+                'discount' => 0,
                 'payment_method' => $data['payment_method'] ?? $productRequest->payment_method,
                 'payment_status' => $productRequest->payment_status ?? 'unpaid',
                 'shipping_address' => $data['shipping_address'] ?? $productRequest->shipping_address,
-                'shipping_name' => $data['shipping_name'] ?? $productRequest->shipping_name ?? $productRequest->user->name,
-                'shipping_phone' => $data['shipping_phone'] ?? $productRequest->shipping_phone ?? $productRequest->user->phone,
+                'shipping_name' => $data['shipping_name'] ?? $productRequest->shipping_name ?? ($productRequest->user->name ?? ''),
+                'shipping_phone' => $data['shipping_phone'] ?? $productRequest->shipping_phone ?? ($productRequest->user->phone ?? ''),
                 'notes' => $data['notes'] ?? 'Order from Request #' . $productRequest->request_number,
                 'min_payment_amount' => $productRequest->min_payment_amount,
+                'weight_charge' => $productRequest->weight_charge,
             ]);
 
             // Create Order Item
@@ -54,13 +65,15 @@ class OrderService
                 'order_id' => $order->id,
                 'request_id' => $productRequest->id,
                 'product_name' => $productRequest->product_name ?? 'Product Request #' . $productRequest->request_number,
-                'price' => $productRequest->price,
+                'price' => $productRequest->price, // This is in original currency
                 'quantity' => $productRequest->quantity,
-                'subtotal' => $productRequest->total_amount_bdt,
+                'subtotal' => $productSubtotalBDT, // Per-item subtotal (total product amount)
                 'image' => $productRequest->admin_image_url ?? $this->getFallbackImage($productRequest->url),
                 'variant_data' => [
                     'request_url' => $productRequest->url,
                     'request_number' => $productRequest->request_number,
+                    'currency' => $productRequest->currency,
+                    'original_price' => $productRequest->price,
                 ],
             ]);
 

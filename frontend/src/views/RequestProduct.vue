@@ -411,20 +411,15 @@ const setCity = (val) => {
     form.value.is_inside_city = val;
 };
 
-// Merged Step 1 Calculation
 const calculateEstimate = async () => {
-    // Moved validation to handleCalculateAndNext for better UX feedback
-
     calculationLoading.value = true;
     try {
+        // Send the ORIGINAL price to the backend (e.g., $50, not ৳6300)
+        // The backend handles the single BDT conversion internally
         const productTotal = form.value.price * form.value.quantity;
-        let baseAmount = productTotal;
-        if (selectedCurrency.value && !selectedCurrency.value.is_base) {
-            baseAmount = productTotal * selectedCurrency.value.rate_to_base;
-        }
 
         const response = await axios.post('/charges/calculate', {
-            base_amount: baseAmount,
+            base_amount: productTotal,  // e.g., 50 (USD) — NOT pre-converted to BDT
             currency_id: selectedCurrency.value?.id,
             scope: 'request',
             additional_data: {
@@ -441,13 +436,17 @@ const calculateEstimate = async () => {
             }
         }
 
+        // Use backend's grand_total directly — it already includes the BDT conversion
+        const grandTotalBDT = response.data.grand_total + declaredShipping;
+        const productTotalBDT = productTotal * (selectedCurrency.value?.rate_to_base ?? 1);
+
         costBreakdown.value = {
-            product_total: baseAmount,
+            product_total: productTotalBDT,
             total_charges: response.data.total_charges,
             delivery_charge: response.data.delivery_charge,
             payment_processing_fee: response.data.payment_processing_fee,
             declared_shipping: declaredShipping,
-            grand_total: baseAmount + response.data.total_charges + declaredShipping,
+            grand_total: grandTotalBDT,
             breakdown: response.data.breakdown || [],
         };
         return true;

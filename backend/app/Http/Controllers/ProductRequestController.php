@@ -13,8 +13,6 @@ use Ihasan\Bkash\Facades\Bkash;
 use Illuminate\Support\Facades\DB;
 
 use App\Services\PricingService;
-
-use App\Services\PricingService;
 use App\Services\OrderService;
 
 class ProductRequestController extends Controller
