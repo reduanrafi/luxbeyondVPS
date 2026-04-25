@@ -410,13 +410,17 @@ const handleSearch = () => {
                 }
             });
 
-            // Handle both paginated and non-paginated responses
-            if (response.data.data) {
-                searchResults.value = Array.isArray(response.data.data)
-                    ? response.data.data
-                    : response.data.data.data || [];
+            // Robust handling for both paginated and non-paginated responses
+            if (response.data && response.data.data) {
+                // Laravel pagination format: { data: [...] }
+                searchResults.value = Array.isArray(response.data.data) 
+                    ? response.data.data 
+                    : (response.data.data.data || []);
+            } else if (Array.isArray(response.data)) {
+                // Direct array format: [...]
+                searchResults.value = response.data;
             } else {
-                searchResults.value = Array.isArray(response.data) ? response.data : [];
+                searchResults.value = [];
             }
         } catch (error) {
             console.error('Search error:', error);

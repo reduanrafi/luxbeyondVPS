@@ -66,18 +66,18 @@
                         <span class="absolute -bottom-2 left-0 w-12 h-1 bg-accent rounded-full"></span>
                     </h4>
                     <ul class="space-y-3">
-                        <li><a href="/help-center"
+                        <li><router-link to="/help-center"
                                 class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Help
-                                Center</a></li>
-                        <li><a href="/privacy-policy"
+                                Center</router-link></li>
+                        <li><router-link to="/privacy-policy"
                                 class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Privacy
-                                Policy</a></li>
-                        <li><a href="/refund-policy"
+                                Policy</router-link></li>
+                        <li><router-link to="/refund-policy"
                                 class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">
-                                Refund Policy</a></li>
-                        <li><a href="/terms-of-service"
+                                Refund Policy</router-link></li>
+                        <li><router-link to="/terms-of-service"
                                 class="text-[#00FFFF] hover:text-white hover:translate-x-1 transition-all duration-300 flex items-center gap-2">Terms
-                                of Service</a></li>
+                                of Service</router-link></li>
                     </ul>
                 </div>
 

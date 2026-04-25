@@ -15,7 +15,7 @@ class ProductController extends Controller
         // Only show published products for public API (header search, shop page, etc.)
         // Admin can see all products by passing status parameter
         if (!$request->has('status') || $request->status != 'all') {
-            $query->where('status', 'published');
+            $query->whereIn('status', ['published', 'publish', 'active']);
         }
 
         // Search

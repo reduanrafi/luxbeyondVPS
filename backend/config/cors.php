@@ -15,11 +15,11 @@ return [
     |
     */
 
-    'paths' => ['v1/*', 'sanctum/csrf-cookie', 'storage/*', 'media/*'],
+    'paths' => ['*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' =>  explode(',', env('CORS_ALLOWED_ORIGINS')?? '*'),
+    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://luxbeyond.store', 'https://dev.luxbeyond.store'],
 
     'allowed_origins_patterns' => [],
 
@@ -29,6 +29,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
