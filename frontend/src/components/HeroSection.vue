@@ -55,10 +55,12 @@ onMounted(async () => {
                     <div class="relative w-full h-full overflow-hidden bg-zinc-900">
                         <!-- Desktop Banner -->
                         <img :src="slide.desktop" :alt="slide.alt" 
-                            class="hidden lg:block w-full h-full object-cover">
+                            class="hidden lg:block w-full h-full object-cover"
+                            fetchpriority="high" loading="eager" decoding="async">
                         <!-- Mobile Banner -->
                         <img :src="slide.mobile || slide.desktop" :alt="slide.alt" 
-                            class="block lg:hidden w-full h-full object-cover">
+                            class="block lg:hidden w-full h-full object-cover"
+                            fetchpriority="high" loading="eager" decoding="async">
                         
                         <!-- Overlay Content -->
                         <div v-if="slide.heading || slide.subheading" class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent flex items-center">

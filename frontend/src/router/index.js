@@ -8,6 +8,12 @@ const routes = [
     { path: '/login', redirect: '/dashboard' },
     { path: '/register', redirect: '/dashboard' },
     { path: '/forgot-password', redirect: '/dashboard' },
+    { 
+        path: '/reset-password', 
+        name: 'reset-password',
+        component: () => import('../views/ResetPassword.vue'), 
+        meta: { title: 'Reset Password' } 
+    },
 
     // Customer Dashboard
     {
@@ -153,7 +159,8 @@ router.beforeEach(async (to, from, next) => {
     document.description = to.meta.description || 'Luxbeyond';
 
     if (!authStore.user && authStore.token) {
-        await authStore.fetchUser();
+        // Fire non-blocking — don't await and delay page render
+        authStore.fetchUser();
     }
 
     // Handle direct navigation to auth routes - open modals instead

@@ -281,6 +281,8 @@ import ProductCard from '../components/ProductCard.vue';
 import ShopSidebar from '@/components/shop/ShopSidebar.vue';
 import { useProductStore } from '@/stores/product';
 
+defineOptions({ name: 'Shop' });
+
 const productStore = useProductStore();
 const categories = computed(() => productStore.categories);
 const brands = computed(() => productStore.brands);

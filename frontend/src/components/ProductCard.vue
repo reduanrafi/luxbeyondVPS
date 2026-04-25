@@ -11,6 +11,7 @@
       <router-link :to="`/shop/${product.slug || product.id}`" class="block h-full w-full p-4">
         <img :src="getProductImage(product)" :alt="product.name"
           class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
+          loading="lazy" decoding="async"
           @error="handleImageError" />
       </router-link>
 

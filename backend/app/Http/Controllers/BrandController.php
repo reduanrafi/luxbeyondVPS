@@ -6,6 +6,7 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class BrandController extends Controller
 {
@@ -32,7 +33,14 @@ class BrandController extends Controller
 
         // Check if requesting all brands (for dropdowns)
         if ($request->has('all') && $request->all) {
-            return response()->json($query->where('is_active', true)->orderBy('name')->get());
+            $brands = Cache::remember('public_brands_all', 600, function () {
+                return Brand::withCount('products')
+                    ->where('is_active', true)
+                    ->orderBy('name')
+                    ->get();
+            });
+            return response()->json($brands)
+                ->header('Cache-Control', 'public, max-age=300, s-maxage=600');
         }
 
         // Paginated response
