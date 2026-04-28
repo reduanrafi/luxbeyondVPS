@@ -19,6 +19,76 @@ jobs:
         php-version: '8.2'
         tools: composer:v2
 
+    - name: Provision VPS & Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.VPS_IP }}
+        username: ${{ secrets.VPS_USER }}
+        password: ${{ secrets.VPS_PASSWORD }}
+        script: |
+          # 1. VPS Setup (runs automatically)
+          export DEBIAN_FRONTEND=noninteractive
+          apt update && apt upgrade -y
+          apt install -y curl wget git unzip software-properties-common nginx mariadb-server
+          
+          if ! command -v php &> /dev/null; then
+            add-apt-repository -y ppa:ondrej/php
+            apt update
+            apt install -y php8.2-fpm php8.2-cli php8.2-common php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath
+          fi
+          
+          if ! command -v composer &> /dev/null; then
+            curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          fi
+          
+          if ! command -v node &> /dev/null; then
+            curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+            apt install -y nodejs
+          fi
+          
+          mysql -e "CREATE DATABASE IF NOT EXISTS lux_db;"
+          mysql -e "CREATE USER IF NOT EXISTS 'lux_user'@'localhost' IDENTIFIED BY 'SecretLuxPass123!';"
+          mysql -e "GRANT ALL PRIVILEGES ON lux_db.* TO 'lux_user'@'localhost';"
+          mysql -e "FLUSH PRIVILEGES;"
+          
+          mkdir -p /var/www/lux
+          
+          cat > /etc/nginx/sites-available/lux << 'EOF'
+          server {
+              listen 80;
+              server_name 46.250.229.164;
+              root /var/www/lux/frontend/dist;
+              index index.html;
+          
+              location / {
+                  try_files $uri $uri/ /index.html;
+              }
+          
+              location /api {
+                  alias /var/www/lux/backend/public;
+                  try_files $uri $uri/ @api;
+                  
+                  location ~ \.php$ {
+                      fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+                      fastcgi_param SCRIPT_FILENAME $request_filename;
+                      include fastcgi_params;
+                  }
+              }
+          
+              location @api {
+                  rewrite /api/(.*)$ /api/index.php?/$1 last;
+              }
+          }
+          EOF
+          
+          ln -sf /etc/nginx/sites-available/lux /etc/nginx/sites-enabled/
+          rm -f /etc/nginx/sites-enabled/default
+          systemctl restart nginx
+          
+          ufw allow OpenSSH
+          ufw allow 'Nginx Full'
+          ufw --force enable
+
     - name: Copy files to VPS via SSH
       uses: appleboy/scp-action@master
       with:
@@ -29,7 +99,7 @@ jobs:
         target: "/var/www/lux"
         rm: false
 
-    - name: Execute remote ssh commands
+    - name: Finalize Deployment Configuration
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.VPS_IP }}
@@ -38,9 +108,20 @@ jobs:
         script: |
           cd /var/www/lux
           
+          # Copy .env files
+          cp backend/.env.example backend/.env
+          sed -i 's/DB_DATABASE=laravel/DB_DATABASE=lux_db/g' backend/.env
+          sed -i 's/DB_USERNAME=root/DB_USERNAME=lux_user/g' backend/.env
+          sed -i 's/DB_PASSWORD=/DB_PASSWORD=SecretLuxPass123!/g' backend/.env
+          sed -i 's/APP_URL=http:\/\/localhost/APP_URL=http:\/\/46.250.229.164/g' backend/.env
+          
+          cp frontend/.env.example frontend/.env || echo "VITE_API_URL=http://46.250.229.164/api" > frontend/.env
+          sed -i 's/VITE_API_URL=.*/VITE_API_URL=http:\/\/46.250.229.164\/api/g' frontend/.env
+          
           # Setup Backend
           cd backend
           composer install --no-interaction --prefer-dist --optimize-autoloader
+          php artisan key:generate --force
           php artisan migrate --force
           php artisan config:cache
           php artisan route:cache
