@@ -33,4 +33,3 @@ Route::get('/content-seed', function () {
     }
 });
 
-Route::get('/google-merchant-catalog.xml', [App\Http\Controllers\CatalogController::class, 'googleMerchantFeed']);

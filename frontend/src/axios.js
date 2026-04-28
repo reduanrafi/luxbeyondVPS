@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
     response => response,
     async error => {
         const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             localStorage.removeItem('token');
             // Optional: Redirect to login or refresh token logic here

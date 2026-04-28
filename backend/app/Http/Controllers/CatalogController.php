@@ -32,7 +32,7 @@ class CatalogController extends Controller
             $item->addChild('g:id', $product->sku ?: $product->id, 'http://base.google.com/ns/1.0');
             $item->addChild('g:title', htmlspecialchars($product->name), 'http://base.google.com/ns/1.0');
             $item->addChild('g:description', htmlspecialchars(strip_tags($product->description)), 'http://base.google.com/ns/1.0');
-            $item->addChild('g:link', $frontendUrl . '/products/' . $product->slug, 'http://base.google.com/ns/1.0');
+            $item->addChild('g:link', $frontendUrl . '/shop/' . $product->slug, 'http://base.google.com/ns/1.0');
             $item->addChild('g:image_link', $product->image_url, 'http://base.google.com/ns/1.0');
             
             // Availability & Condition

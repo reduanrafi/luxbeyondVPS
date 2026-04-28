@@ -30,7 +30,10 @@ const router = useRouter();
 const user = computed(() => authStore.user);
 
 const handleLogout = async () => {
-    await authStore.logout();
-    router.push('/');
+    try {
+        await authStore.logout();
+    } finally {
+        router.push('/login');
+    }
 };
 </script>

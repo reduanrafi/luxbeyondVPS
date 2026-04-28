@@ -3,37 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Charge;
+use App\Models\Currency;
+use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 use App\Services\PricingService;
 
 class ChargeController extends Controller
 {
-    protected $pricingService;
+    protected PricingService $pricingService;
 
     public function __construct(PricingService $pricingService)
     {
         $this->pricingService = $pricingService;
     }
+
     public function index(Request $request)
     {
         $query = Charge::with('currency');
 
-        // Search
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // Type filter
-        if ($request->has('type') && $request->type) {
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        // Currency filter
-        if ($request->has('currency_id') && $request->currency_id) {
+        if ($request->filled('currency_id')) {
             $query->where('currency_id', $request->currency_id);
         }
 
-        // Status filter
         if ($request->has('status')) {
             if ($request->status === 'active') {
                 $query->where('is_active', true);
@@ -42,14 +41,16 @@ class ChargeController extends Controller
             }
         }
 
-        // Check if requesting all charges (for dropdowns)
-        if ($request->has('all') && $request->all) {
-            return response()->json($query->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get());
+        // Return all (for dropdowns)
+        if ($request->boolean('all')) {
+            return response()->json(
+                $query->where('is_active', true)->orderBy('sort_order')->orderBy('name')->get()
+            );
         }
 
-        // Paginated response
-        $charges = $query->orderBy('sort_order')->orderBy('name')->paginate($request->per_page ?? 15);
-        return response()->json($charges);
+        return response()->json(
+            $query->orderBy('sort_order')->orderBy('name')->paginate($request->per_page ?? 15)
+        );
     }
 
     public function store(Request $request)
@@ -76,8 +77,7 @@ class ChargeController extends Controller
 
     public function show($id)
     {
-        $charge = Charge::with('currency')->findOrFail($id);
-        return response()->json($charge);
+        return response()->json(Charge::with('currency')->findOrFail($id));
     }
 
     public function update(Request $request, $id)
@@ -101,24 +101,34 @@ class ChargeController extends Controller
         $charge->update($validated);
         $charge->load('currency');
 
-        return response()->json([
-            'message' => 'Charge updated successfully',
-            'charge' => $charge
-        ]);
+        return response()->json(['message' => 'Charge updated successfully', 'charge' => $charge]);
     }
 
     public function destroy($id)
     {
-        $charge = Charge::findOrFail($id);
-        $charge->delete();
+        Charge::findOrFail($id)->delete();
 
-        return response()->json([
-            'message' => 'Charge deleted successfully'
-        ]);
+        return response()->json(['message' => 'Charge deleted successfully']);
     }
 
     /**
-     * Calculate charges for a product request
+     * Calculate charges for a product and return a full breakdown.
+     *
+     * Expected body:
+     *  {
+     *    "base_amount": 20,           // product price × quantity in original currency (e.g. USD)
+     *    "currency_id": 1,            // currency of base_amount
+     *    "scope": "request"|"hub",
+     *    "additional_data": {
+     *      "weight": 0.5,
+     *      "is_inside_city": true,
+     *      "is_international": false,
+     *      "seller_shipping_cost": 0, // in original currency — backend converts to BDT
+     *      "tax": 0,                  // already in BDT
+     *      "payment_processing_fee": 0,
+     *      "additional_charges": 0
+     *    }
+     *  }
      */
     public function calculate(Request $request)
     {
@@ -127,110 +137,80 @@ class ChargeController extends Controller
             'currency_id' => 'nullable|exists:currencies,id',
             'scope' => 'nullable|in:hub,request',
             'additional_data' => 'nullable|array',
+            // seller_shipping_cost is in the original currency, passed inside additional_data
         ]);
 
-        $currency = null;
-        if ($request->currency_id) {
-            $currency = \App\Models\Currency::find($request->currency_id);
+        $currencyCode = 'BDT';
+        if ($request->filled('currency_id')) {
+            $currency = Currency::findOrFail($request->currency_id);
+            $currencyCode = $currency->code;
         }
 
-        $additionalData = $request->additional_data ?? [];
+        $additionalData = $request->input('additional_data', []);
 
         $result = $this->pricingService->calculateBreakdown(
             $request->base_amount,
-            $currency ? $currency->code : 'BDT',
-            $request->scope ?? 'request',
+            $currencyCode,
+            $request->input('scope', 'request'),
             $additionalData
         );
 
         return response()->json([
             'base_amount' => $request->base_amount,
-
-            'total_charges' => round(
-                $result['grand_total'] - $result['product_total_bdt'],
-                2
-            ),
-
-            'grand_total' => round($result['grand_total'], 2),
-            'grand_total_currency' => round($result['grand_total_currency'], 3),
+            'product_total_bdt' => $result['product_total_bdt'],
+            'total_charges' => round($result['grand_total'] - $result['product_total_bdt'], 2),
+            'delivery_charge' => $result['delivery_charge'],
+            'international_shipping' => $result['international_shipping'],
+            'seller_shipping' => $result['seller_shipping'],
+            'tax' => $result['tax'],
+            'processing_fee' => $result['processing_fee'],
+            'grand_total' => $result['grand_total'],
+            'grand_total_currency' => $result['grand_total_currency'],
+            'min_payment_amount' => $result['min_payment_amount'],
             'breakdown' => $result['breakdown'],
-            'delivery_charge' => round($result['delivery_charge'], 2),
-            'payment_processing_fee' => round($result['processing_fee'], 2),
-            'international_shipping' => round($result['international_shipping'], 2),
         ]);
     }
 
-    /**
-     * Calculate payment processing fee from payment method
-     */
-    private function calculatePaymentProcessingFee($totalAmount, $paymentMethod = null)
+    // ─── Payment helpers (used by other parts of the app) ────────────────────
+
+    private function getPaymentMethod(string $paymentMethod): ?PaymentMethod
     {
-        if (!$paymentMethod) {
-            return 0;
-        }
-
-        $paymentMethodObj = \App\Models\PaymentMethod::where('type', $paymentMethod)
-            ->orWhere('name', 'like', '%' . $paymentMethod . '%')
-            ->where('is_active', true)
+        return PaymentMethod::where('is_active', true)
+            ->where(function ($q) use ($paymentMethod) {
+                $q->where('type', $paymentMethod)
+                    ->orWhere('name', 'like', '%' . $paymentMethod . '%');
+            })
             ->first();
-
-        if (!$paymentMethodObj) {
-            return 0;
-        }
-
-        $fee = 0;
-
-        // If percentage fee is set, calculate from total amount
-        if ($paymentMethodObj->fee_percentage && $paymentMethodObj->fee_percentage > 0) {
-            $fee = ($totalAmount * $paymentMethodObj->fee_percentage) / 100;
-        }
-        // If fixed fee is set, use it
-        elseif ($paymentMethodObj->fee && $paymentMethodObj->fee > 0) {
-            $fee = $paymentMethodObj->fee;
-        }
-
-        return round($fee, 2);
     }
 
-    /**
-     * Get payment fee type (percentage or fixed)
-     */
-    private function getPaymentFeeType($paymentMethod = null)
+    private function calculatePaymentProcessingFee(float $totalAmount, ?string $paymentMethod = null): float
     {
-        if (!$paymentMethod) {
-            return 'fixed';
+        $method = $this->getPaymentMethod($paymentMethod ?? '');
+        if (!$method)
+            return 0.0;
+
+        if ($method->fee_percentage > 0) {
+            return round($totalAmount * $method->fee_percentage / 100, 2);
         }
 
-        $paymentMethodObj = \App\Models\PaymentMethod::where('type', $paymentMethod)
-            ->orWhere('name', 'like', '%' . $paymentMethod . '%')
-            ->where('is_active', true)
-            ->first();
-
-        if (!$paymentMethodObj) {
-            return 'fixed';
-        }
-
-        return ($paymentMethodObj->fee_percentage && $paymentMethodObj->fee_percentage > 0) ? 'percentage' : 'fixed';
+        return round((float) ($method->fee ?? 0), 2);
     }
 
-    /**
-     * Get payment fee value
-     */
-    private function getPaymentFeeValue($paymentMethod = null)
+    private function getPaymentFeeType(?string $paymentMethod = null): string
     {
-        if (!$paymentMethod) {
-            return 0;
-        }
+        $method = $this->getPaymentMethod($paymentMethod ?? '');
+        if (!$method)
+            return 'fixed';
 
-        $paymentMethodObj = \App\Models\PaymentMethod::where('type', $paymentMethod)
-            ->orWhere('name', 'like', '%' . $paymentMethod . '%')
-            ->where('is_active', true)
-            ->first();
+        return ($method->fee_percentage && $method->fee_percentage > 0) ? 'percentage' : 'fixed';
+    }
 
-        if (!$paymentMethodObj) {
-            return 0;
-        }
+    private function getPaymentFeeValue(?string $paymentMethod = null): float
+    {
+        $method = $this->getPaymentMethod($paymentMethod ?? '');
+        if (!$method)
+            return 0.0;
 
-        return $paymentMethodObj->fee_percentage ?? $paymentMethodObj->fee ?? 0;
+        return (float) ($method->fee_percentage ?? $method->fee ?? 0);
     }
 }

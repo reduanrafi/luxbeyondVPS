@@ -20,34 +20,39 @@
             </div>
 
             <Vue3Marquee v-else :clone="true" :duration="40" :pause-on-hover="true" class="py-4 overflow-hidden">
-                <div v-for="brand in brands" :key="brand.id"
-                    class="mx-12 flex items-center justify-center min-w-[150px]">
-                    <!-- Image Logo with Gold Hover -->
-                    <div v-if="brand.image_url" class="relative group/brand transition-all duration-300">
-                        <!-- Ghost Image (Preserves Aspect Ratio) -->
-                        <img :src="brand.image_url" :alt="brand.name" class="h-16 w-auto" aria-hidden="true" />
+                <template v-for="brand in brands" :key="brand.id">
+                    <div v-if="brand" class="mx-6 flex items-center justify-center min-w-[150px]">
+                        <a :href="brand.url || '#'" :target="brand.url ? '_blank' : '_self'" 
+                           :class="brand.url ? 'cursor-pointer' : 'cursor-default'"
+                           class="relative group/brand transition-all duration-300 block">
+                            <!-- Image Logo with Gold Hover -->
+                            <div v-if="brand.image_url" class="relative">
+                                <!-- Ghost Image (Preserves Aspect Ratio) -->
+                                <img :src="brand.image_url" :alt="brand.name" class="h-16 w-auto" aria-hidden="true" />
 
-                        <!-- Color Layer (Masked by Logo) -->
-                        <div class="absolute inset-0 bg-slate-500 group-hover/brand:bg-primary transition-colors duration-300"
-                            :style="{
-                                '-webkit-mask-image': `url(${getImageUrl(brand.image_url)})`,
-                                'mask-image': `url(${getImageUrl(brand.image_url)})`,
-                                '-webkit-mask-size': 'contain',
-                                'mask-size': 'contain',
-                                '-webkit-mask-repeat': 'no-repeat',
-                                'mask-repeat': 'no-repeat',
-                                '-webkit-mask-position': 'center',
-                                'mask-position': 'center'
-                            }">
-                        </div>
+                                <!-- Color Layer (Masked by Logo) -->
+                                <div class="absolute inset-0 bg-slate-500 group-hover/brand:bg-primary transition-colors duration-300"
+                                    :style="{
+                                        '-webkit-mask-image': `url(${getImageUrl(brand.image_url)})`,
+                                        'mask-image': `url(${getImageUrl(brand.image_url)})`,
+                                        '-webkit-mask-size': 'contain',
+                                        'mask-size': 'contain',
+                                        '-webkit-mask-repeat': 'no-repeat',
+                                        'mask-repeat': 'no-repeat',
+                                        '-webkit-mask-position': 'center',
+                                        'mask-position': 'center'
+                                    }">
+                                </div>
+                            </div>
+
+                            <!-- Text Fallback -->
+                            <span v-else
+                                class="text-2xl font-serif text-slate-500 group-hover/brand:text-primary transition-colors duration-300 font-bold uppercase">
+                                {{ brand.name }}
+                            </span>
+                        </a>
                     </div>
-
-                    <!-- Text Fallback -->
-                    <span v-else
-                        class="text-2xl font-serif text-slate-500 hover:text-primary transition-colors duration-300 font-bold uppercase cursor-default">
-                        {{ brand.name }}
-                    </span>
-                </div>
+                </template>
             </Vue3Marquee>
         </div>
     </div>

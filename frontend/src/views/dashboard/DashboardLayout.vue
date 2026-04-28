@@ -231,8 +231,11 @@ const isActive = (path) => {
 };
 
 const handleLogout = async () => {
-    await authStore.logout();
-    router.push('/login');
+    try {
+        await authStore.logout();
+    } finally {
+        router.push('/login');
+    }
 };
 
 const handleAction = (action) => {

@@ -85,8 +85,9 @@ Route::get('/payments/bkash/callback', [\App\Http\Controllers\PaymentController:
 Route::post('/track-order', [\App\Http\Controllers\Public\TrackingController::class, 'track']);
 Route::get('/download-invoice/{orderId}', [\App\Http\Controllers\OrderController::class, 'downloadInvoice']);
 
-// Facebook Catalog XML
+// Catalog XMLs
 Route::get('/catalog.xml', [\App\Http\Controllers\Public\CatalogController::class, 'facebookCatalog']);
+Route::get('/google-merchant-catalog.xml', [\App\Http\Controllers\Public\CatalogController::class, 'googleMerchantFeed']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -278,3 +279,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Traveller Trips
     Route::apiResource('/traveller/trips', \App\Http\Controllers\Traveller\TripController::class);
 });
+
+Route::get('/debug-charges', [App\Http\Controllers\ChargeController::class, 'index']);
+

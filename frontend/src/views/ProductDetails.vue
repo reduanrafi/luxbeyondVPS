@@ -241,8 +241,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useCartStore } from '../stores/cart';
 import { useWishlistStore } from '../stores/wishlist';
 import { Star, ShoppingCart, Heart, CheckCircle, Minus, Plus, Package } from 'lucide-vue-next';
@@ -253,11 +253,28 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 const route = useRoute();
+const router = useRouter();
 const cartStore = useCartStore();
 const wishlistStore = useWishlistStore();
-
 const product = ref(null);
 const relatedProducts = ref([]);
+
+// Watch for slug changes to refresh the page content
+watch(
+    () => route.params.slug,
+    (newSlug) => {
+        if (newSlug) {
+            // Reset local states
+            quantity.value = 1;
+            selectedVariant.value = null;
+            selectedImage.value = '';
+            // Fetch new product
+            fetchProduct();
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+);
 const loading = ref(true);
 const quantity = ref(1);
 const activeTab = ref('Description');
