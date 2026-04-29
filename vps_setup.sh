@@ -45,14 +45,14 @@ server {
     }
 
     # Backend API Routing (Assuming Laravel is in /var/www/lux/backend)
-    location /api {
+    location ^~ /api {
         alias /var/www/lux/backend/public;
         try_files $uri $uri/ @api;
         
         location ~ \.php$ {
             fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-            fastcgi_param SCRIPT_FILENAME $request_filename;
             include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME /var/www/lux/backend/public/index.php;
         }
     }
 
