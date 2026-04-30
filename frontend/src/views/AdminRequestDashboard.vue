@@ -1,9 +1,15 @@
 <template>
     <div class="space-y-8">
         <!-- Header -->
-        <div>
-            <h2 class="text-3xl font-serif font-bold text-white tracking-wide">Product Requests</h2>
-            <p class="text-zinc-400 mt-2 text-sm">Manage and track customer product inquiries</p>
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-3xl font-serif font-bold text-white tracking-wide">Product Requests</h2>
+                <p class="text-zinc-400 mt-2 text-sm">Manage and track customer product inquiries</p>
+            </div>
+            <router-link to="/admin/users" class="px-4 py-2 bg-white/5 border border-white/10 text-white rounded-lg hover:bg-white/10 transition-all flex items-center gap-2">
+                <Users class="w-4 h-4 text-primary" />
+                <span>All Users</span>
+            </router-link>
         </div>
 
         <!-- Stats -->
@@ -171,7 +177,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { Eye, Edit, X, Search, RotateCcw, Ghost, FileText, CheckCircle, Clock } from 'lucide-vue-next';
+import { Eye, Edit, X, Search, RotateCcw, Ghost, FileText, CheckCircle, Clock, Users } from 'lucide-vue-next';
 import { Link2 } from 'lucide-vue-next';
 import axios from '../axios';
 import { debounce } from 'lodash';

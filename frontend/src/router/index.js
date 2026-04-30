@@ -129,6 +129,18 @@ const routes = [
     // Generic catch-all for any future CMS pages
     { path: '/pages/:slug', component: () => import('../views/StaticPage.vue'), meta: { title: 'Page' } },
     
+    // Admin Routes
+    {
+        path: '/admin/requests',
+        component: () => import('../views/AdminRequestDashboard.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true, title: 'Product Requests' }
+    },
+    {
+        path: '/admin/users',
+        component: () => import('../views/AdminUserDashboard.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true, title: 'All Users' }
+    },
+
     // Catch-all 404 Error Page
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { title: '404 - Page Not Found' } },
 ];
